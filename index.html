@@ -3,120 +3,577 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Enes Duruk Games</title>
+  <title>Enes Duruk - Developer Page</title>
   <meta name="description" content="Developer page for games and apps by Enes Duruk." />
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
-      margin: 32px;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Tahoma, Arial, sans-serif;
+      background: #3a6ea5;
+    }
+
+
+    /* ── Desktop icons (left column) ── */
+    .xp-icons {
+      position: fixed;
+      top: 12px;
+      left: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 10;
+    }
+
+    .xp-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      width: 68px;
+      cursor: default;
+      text-decoration: none;
+    }
+
+    .xp-icon-img {
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+    }
+
+    .xp-icon:hover .xp-icon-img {
+      outline: 1px dotted #ffffff;
+      background: rgba(49, 106, 197, 0.45);
+    }
+
+    .xp-icon-label {
+      font-size: 11px;
+      color: #ffffff;
+      text-align: center;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.95), -1px -1px 3px rgba(0,0,0,0.95);
+      line-height: 1.3;
+    }
+
+    /* ── Taskbar (full width, fixed bottom) ── */
+    .xp-taskbar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to bottom, #245fae, #1c4f96);
+      height: 38px;
+      display: flex; align-items: center;
+      padding: 0 6px; gap: 6px;
+      z-index: 200;
+      border-top: 1px solid #5588cc;
+    }
+
+    .xp-start-btn {
+      background: linear-gradient(to bottom, #3da53d, #2d852d);
+      color: #ffffff;
+      font-size: 13px; font-weight: bold; font-family: Tahoma;
+      padding: 3px 14px 3px 10px;
+      border: 1px solid #1a6a1a;
+      border-radius: 0 12px 12px 0;
+      cursor: default; height: 28px;
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    .xp-taskbar-sep {
+      width: 1px; height: 26px;
+      background: rgba(255,255,255,0.2);
+      margin: 0 2px;
+    }
+
+    .xp-task-item {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #ffffff; font-size: 11px;
+      padding: 2px 12px; height: 24px;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .xp-clock-area {
+      margin-left: auto;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #ffffff; font-size: 11px;
+      padding: 2px 10px; height: 24px;
+      display: flex; align-items: center;
+    }
+
+    /* ── Main window (fills viewport minus taskbar, opens with animation) ── */
+    @keyframes xp-open {
+      0%   { opacity: 0; transform: scale(0.4) translateY(30px); }
+      60%  { opacity: 1; transform: scale(1.02) translateY(-4px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .xp-window {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      bottom: 46px;
+      background: #ece9d8;
+      border: 1px solid #003c74;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 50;
+      animation: xp-open 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    /* Title bar */
+    .xp-titlebar {
+      background: linear-gradient(to bottom, #0a5da6 0%, #1e7de0 15%, #1466c0 50%, #0a4e96 100%);
+      color: #ffffff;
+      padding: 4px 6px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; font-weight: bold;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .xp-titlebar-left { display: flex; align-items: center; gap: 6px; }
+
+    .xp-titlebar-icon {
+      width: 16px; height: 16px;
+      background: #ffd700; border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+    }
+
+    .xp-btns { display: flex; gap: 2px; }
+
+    .xp-btn {
+      width: 21px; height: 21px;
+      border: none; border-radius: 3px;
+      font-size: 11px; font-weight: bold;
+      cursor: default;
+      display: flex; align-items: center; justify-content: center;
+      color: #ffffff;
+    }
+    .xp-btn-min, .xp-btn-max { background: #3d8fcc; }
+    .xp-btn-close { background: #c03030; }
+
+    /* Menu bar */
+    .xp-menubar {
+      background: #ece9d8;
+      border-bottom: 1px solid #aca899;
+      padding: 2px 4px;
+      display: flex;
+      flex-shrink: 0;
+    }
+    .xp-menu-item { padding: 2px 8px; font-size: 12px; cursor: default; color: #000000; }
+
+    /* Toolbar */
+    .xp-toolbar {
+      background: #e8e5dc;
+      border-bottom: 1px solid #aca899;
+      padding: 3px 6px;
+      display: flex; align-items: center; gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .xp-toolbar-btn {
+      padding: 2px 10px;
+      background: #dedad0;
+      border: 1px solid #aca899;
+      font-size: 12px; cursor: default;
+      font-family: Tahoma, Arial;
+      color: #000000;
+    }
+
+    .xp-addr-bar {
+      flex: 1;
       background: #ffffff;
-      color: #111111;
-      line-height: 1.5;
+      border: 1px solid #7a7a7a;
+      padding: 2px 6px;
+      color: #000000;
+      font-size: 11px;
+      font-family: Tahoma, Arial;
     }
 
-    main {
-      max-width: 760px;
+    /* Content area - fills remaining height */
+    .xp-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
     }
 
-    header {
-      border-bottom: 1px solid #999999;
-      margin-bottom: 22px;
-      padding-bottom: 12px;
+    /* Sidebar */
+    .xp-sidebar {
+      width: 190px;
+      background: linear-gradient(to bottom, #83b4e3, #5a8fc5);
+      border-right: 1px solid #3a6ea5;
+      padding: 10px 0;
+      flex-shrink: 0;
+      overflow-y: auto;
     }
 
-    h1 {
-      margin: 0 0 6px;
-      font-size: 28px;
-    }
+    .xp-sidebar-group { margin-bottom: 8px; }
 
-    h2 {
-      font-size: 20px;
-      margin: 28px 0 8px;
-    }
-
-    p, li {
-      font-size: 15px;
-    }
-
-    ul {
-      padding-left: 22px;
-    }
-
-    a {
-      color: #0645ad;
-    }
-
-    button {
-      font: inherit;
+    .xp-sidebar-title {
+      background: #1e5ba0;
+      color: #ffffff;
+      font-size: 11px; font-weight: bold;
       padding: 4px 10px;
-      border: 1px solid #777777;
-      background: #eeeeee;
-      color: #111111;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .xp-sidebar-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 10px;
+      font-size: 12px; color: #ffffff;
       cursor: pointer;
+      text-decoration: none;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    .xp-sidebar-link:hover { background: rgba(255,255,255,0.25); }
+    .xp-dot { width: 6px; height: 6px; background: #ffd700; border-radius: 50%; flex-shrink: 0; }
+
+    /* Main scrollable area */
+    .xp-main {
+      flex: 1;
+      background: #ffffff;
+      padding: 16px 22px;
+      overflow-y: auto;
     }
 
-    button:hover {
-      background: #dddddd;
+    /* Hero */
+    .xp-hero {
+      background: #d6e8fb;
+      border: 1px solid #83b4e3;
+      padding: 14px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 16px;
     }
 
-    .note {
-      color: #444444;
+    .xp-avatar {
+      width: 56px; height: 56px;
+      background: #316ac5; border: 2px solid #1e5ba0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; color: #ffd700; font-weight: bold; flex-shrink: 0;
     }
 
-    footer {
-      border-top: 1px solid #999999;
-      margin-top: 30px;
-      padding-top: 12px;
-      font-size: 14px;
+    .xp-hero-name { font-size: 18px; font-weight: bold; color: #1e3a6a; }
+    .xp-hero-sub { font-size: 12px; color: #444444; margin-top: 3px; }
+
+    /* Section title */
+    .xp-section-title {
+      font-size: 13px; font-weight: bold; color: #1e5ba0;
+      border-bottom: 1px solid #83b4e3;
+      padding-bottom: 3px; margin: 16px 0 10px;
     }
+
+    /* Games grid */
+    .xp-games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 8px;
+    }
+
+    /* Game card */
+    .xp-game-card {
+      background: #f0ede4;
+      border: 1px solid #aca899;
+      padding: 8px 10px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .xp-game-card:hover { border-color: #316ac5; background: #ddeeff; }
+
+    .xp-game-thumb {
+      width: 52px; height: 52px;
+      background: #316ac5; border: 1px solid #003c74;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .xp-game-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .xp-game-info { flex: 1; }
+    .xp-game-title { font-size: 13px; font-weight: bold; color: #000000; margin-bottom: 2px; }
+    .xp-game-desc { font-size: 11px; color: #444444; margin-bottom: 6px; }
+    .xp-game-links { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+    .xp-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 9px; font-size: 10px; font-weight: bold;
+      border: 1px solid; border-radius: 2px;
+      text-decoration: none;
+    }
+    .xp-badge-steam  { background: #1b2838; color: #c7d5e0; border-color: #4a5a6a; }
+    .xp-badge-steam:hover  { background: #2a475e; }
+    .xp-badge-play   { background: #01875f; color: #e0f5ed; border-color: #016945; }
+    .xp-badge-play:hover   { background: #016945; }
+    .xp-badge-privacy { background: #ece9d8; color: #333333; border-color: #aca899; }
+    .xp-badge-privacy:hover { background: #dedad0; }
+    .xp-badge-yt     { background: #cc0000; color: #ffffff; border-color: #990000; }
+    .xp-badge-yt:hover     { background: #990000; }
+
+    /* YouTube card */
+    .xp-yt-card {
+      background: #f0ede4;
+      border: 1px solid #aca899;
+      padding: 8px 10px; margin-bottom: 8px;
+      display: flex; gap: 10px; align-items: center;
+    }
+
+    .xp-yt-thumb {
+      width: 52px; height: 52px;
+      background: #cc0000; border: 1px solid #990000;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; color: #ffffff; flex-shrink: 0;
+    }
+
+    /* Contact */
+    .xp-contact-card {
+      background: #f0ede4;
+      border: 1px solid #aca899;
+      padding: 10px 14px; margin-bottom: 16px;
+    }
+    .xp-contact-card p { font-size: 12px; color: #333333; margin-bottom: 8px; }
+
+    .xp-contact-btn {
+      padding: 3px 14px;
+      background: #dedad0;
+      border: 1px solid #aca899;
+      font-size: 12px; cursor: pointer;
+      font-family: Tahoma, Arial;
+      color: #000000;
+    }
+    .xp-contact-btn:hover { background: #c8ddf5; border-color: #316ac5; }
+
+    /* Status bar */
+    .xp-statusbar {
+      background: #d0cdc0;
+      border-top: 1px solid #aca899;
+      padding: 3px 8px;
+      font-size: 11px; color: #333333;
+      display: flex; gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .xp-placeholder { font-size: 11px; color: #888888; font-style: italic; }
 
     @media (max-width: 640px) {
-      body {
-        margin: 18px;
-      }
+      .xp-icons  { display: none; }
+      .xp-sidebar { display: none; }
+      .xp-window { left: 4px; right: 4px; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <header>
-      <h1>Enes Duruk Apps</h1>
-      <p class="note">Developer page for games and apps published by Enes Duruk.</p>
-    </header>
 
-    <h2>Mobile Games</h2>
-    <ul>
-      <li>
-        <strong>Brick Multiplier</strong><br />
-        Casual arcade puzzle game for Android.<br />
-        <a href="https://play.google.com/store/apps/details?id=com.enesduruk.brickmultiplier">Google Play</a><br />
-        <a href="https://enesduruk.github.io/brick-multiplier-privacy/">Privacy Policy</a>
-      </li>
-    </ul>
+<!-- Main window -->
+  <!-- Desktop icons -->
+  <div class="xp-icons">
+    <a href="#hero" class="xp-icon">
+      <div class="xp-icon-img">🖥️</div>
+      <span class="xp-icon-label">My Portfolio</span>
+    </a>
+    <a href="#steam" class="xp-icon">
+      <div class="xp-icon-img">🎮</div>
+      <span class="xp-icon-label">Steam Games</span>
+    </a>
+    <a href="#mobile" class="xp-icon">
+      <div class="xp-icon-img">📱</div>
+      <span class="xp-icon-label">Play Store</span>
+    </a>
+    <a href="#youtube" class="xp-icon">
+      <div class="xp-icon-img">▶️</div>
+      <span class="xp-icon-label">YouTube</span>
+    </a>
+    <a href="#contact" class="xp-icon">
+      <div class="xp-icon-img">✉️</div>
+      <span class="xp-icon-label">Contact</span>
+    </a>
+  </div>
 
-    <h2>PC Games</h2>
-    <ul>
-      <li>
-        <strong>Steam games</strong><br />
-        PC game links will be added here.
-      </li>
-    </ul>
+  <div class="xp-window">
 
-    <h2>Support</h2>
-    <p>
-      For questions about these apps, use the contact button below.
-    </p>
-    <p>
-      <button type="button" id="contact-button">Contact by email</button>
-    </p>
+    <div class="xp-titlebar">
+      <div class="xp-titlebar-left">
+        <div class="xp-titlebar-icon">🎮</div>
+        <span>Developer Page</span>
+      </div>
+      <div class="xp-btns">
+        <button class="xp-btn xp-btn-min" aria-label="Minimize">_</button>
+        <button class="xp-btn xp-btn-max" aria-label="Maximize">□</button>
+        <button class="xp-btn xp-btn-close" aria-label="Close">✕</button>
+      </div>
+    </div>
 
-  </main>
+    <div class="xp-menubar">
+      <span class="xp-menu-item">File</span>
+      <span class="xp-menu-item">View</span>
+      <span class="xp-menu-item">Favorites</span>
+      <span class="xp-menu-item">Help</span>
+    </div>
+
+    <div class="xp-toolbar">
+      <button class="xp-toolbar-btn">&#9664; Back</button>
+      <button class="xp-toolbar-btn">&#9654; Forward</button>
+      <button class="xp-toolbar-btn">&#127968; Home</button>
+      <div class="xp-addr-bar">https://enesduruk.github.io/</div>
+      <button class="xp-toolbar-btn">Go</button>
+    </div>
+
+    <div class="xp-content">
+
+      <nav class="xp-sidebar" aria-label="Page navigation">
+        <div class="xp-sidebar-group">
+          <div class="xp-sidebar-title">Navigation</div>
+          <a href="#hero"    class="xp-sidebar-link"><span class="xp-dot"></span> Home</a>
+          <a href="#steam"   class="xp-sidebar-link"><span class="xp-dot"></span> Steam Games</a>
+          <a href="#mobile"  class="xp-sidebar-link"><span class="xp-dot"></span> Mobile Games</a>
+          <a href="#youtube" class="xp-sidebar-link"><span class="xp-dot"></span> YouTube</a>
+          <a href="#contact" class="xp-sidebar-link"><span class="xp-dot"></span> Contact</a>
+        </div>
+        <div class="xp-sidebar-group">
+          <div class="xp-sidebar-title">Quick Links</div>
+          <a href="https://store.steampowered.com/curator/45965420" target="_blank" rel="noopener" class="xp-sidebar-link"><span class="xp-dot"></span> Steam Profile</a>
+          <a href="https://play.google.com/store/apps/dev?id=8356765742853202213" target="_blank" rel="noopener" class="xp-sidebar-link"><span class="xp-dot"></span> Google Play</a>
+        </div>
+      </nav>
+
+      <main class="xp-main">
+
+        <section id="hero" class="xp-hero">
+          <div class="xp-avatar">ED</div>
+          <div>
+            <div class="xp-hero-name">Enes Duruk</div>
+            <div class="xp-hero-sub">Indie Game Developer; Steam &amp; Mobile Games</div>
+          </div>
+        </section>
+
+        <section id="steam">
+          <div class="xp-section-title">🎮 Steam Games</div>
+          <div class="xp-games-grid">
+            <div class="xp-game-card">
+              <div class="xp-game-thumb"><img src="images/not_yet.jpg" alt="Not Yet" /></div>
+              <div class="xp-game-info">
+                <div class="xp-game-title">Not Yet</div>
+                <div class="xp-game-desc">A first-person psychological horror experience on Steam.</div>
+                <div class="xp-game-links">
+                  <a href="https://store.steampowered.com/app/4383440/Not_Yet/" target="_blank" rel="noopener" class="xp-badge xp-badge-steam">&#9654; Steam</a>
+                </div>
+              </div>
+            </div>
+            <div class="xp-game-card">
+              <div class="xp-game-thumb"><img src="images/still_open.jpg" alt="Still Open: Taskbar Cafe Idle" /></div>
+              <div class="xp-game-info">
+                <div class="xp-game-title">Still Open: Taskbar Cafe Idle</div>
+                <div class="xp-game-desc">A peaceful taskbar idle game about running a cozy cafe.</div>
+                <div class="xp-game-links">
+                  <a href="https://store.steampowered.com/app/4668620/Still_Open_Taskbar_Cafe_Idle/" target="_blank" rel="noopener" class="xp-badge xp-badge-steam">&#9654; Steam</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="mobile">
+          <div class="xp-section-title">📱 Mobile Games</div>
+          <div class="xp-games-grid">
+            <div class="xp-game-card">
+              <div class="xp-game-thumb"><img src="images/brick_multiplier.png" alt="Brick Multiplier" /></div>
+              <div class="xp-game-info">
+                <div class="xp-game-title">Brick Multiplier</div>
+                <div class="xp-game-desc">Casual arcade puzzle game for Android.</div>
+                <div class="xp-game-links">
+                  <a href="https://play.google.com/store/apps/details?id=com.enesduruk.brickmultiplier" target="_blank" rel="noopener" class="xp-badge xp-badge-play">&#9654; Play Store</a>
+                  <a href="https://enesduruk.github.io/brick-multiplier-privacy/" target="_blank" rel="noopener" class="xp-badge xp-badge-privacy">Privacy Policy</a>
+                </div>
+              </div>
+            </div>
+            <div class="xp-game-card">
+              <div class="xp-game-thumb"><img src="images/stackline.png" alt="Stackline" /></div>
+              <div class="xp-game-info">
+                <div class="xp-game-title">Stackline</div>
+                <div class="xp-game-desc">A timing-based block stacking game for Android.</div>
+                <div class="xp-game-links">
+                  <span class="xp-badge xp-badge-play">&#9654; Play Store</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="youtube">
+          <div class="xp-section-title">&#9654; YouTube</div>
+          <div class="xp-yt-card">
+            <div class="xp-yt-thumb">&#9654;</div>
+            <div class="xp-game-info">
+              <div class="xp-game-title">Enes Duruk</div>
+              <div class="xp-game-desc">Game dev videos and devlogs.</div>
+              <div class="xp-game-links">
+                <a href="https://www.youtube.com/@enesduruk" target="_blank" rel="noopener" class="xp-badge xp-badge-yt">&#9654; YouTube Channel</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="contact">
+          <div class="xp-section-title">&#9993; Contact</div>
+          <div class="xp-contact-card">
+            <p>For questions about any of these games or apps, reach out by email.</p>
+            <button type="button" class="xp-contact-btn" id="contact-button">&#9993; Contact by email</button>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <div class="xp-statusbar">
+      <span>enesduruk.github.io</span>
+      <span>|</span>
+      <span>4 games listed</span>
+    </div>
+
+  </div>
+
+  <!-- Taskbar -->
+  <div class="xp-taskbar">
+    <button class="xp-start-btn">
+      <span style="display:inline-grid;grid-template-columns:1fr 1fr;gap:1px;width:14px;height:14px;flex-shrink:0;">
+        <span style="background:#e83030;border-radius:1px 0 0 0;"></span>
+        <span style="background:#30a030;border-radius:0 1px 0 0;"></span>
+        <span style="background:#3060e8;border-radius:0 0 0 1px;"></span>
+        <span style="background:#e8c030;border-radius:0 0 1px 0;"></span>
+      </span>
+      Start
+    </button>
+    <div class="xp-taskbar-sep"></div>
+    <div class="xp-task-item">🎮 Enes Duruk &mdash; Developer Page</div>
+    <div class="xp-clock-area" id="xp-clock">00:00</div>
+  </div>
+
   <script>
     document.getElementById("contact-button").addEventListener("click", function () {
       var user = "enesduruk.tr";
       var domain = "gmail.com";
       window.location.href = "mailto:" + user + "@" + domain;
     });
+
+    function updateClock() {
+      var now = new Date();
+      var h = String(now.getHours()).padStart(2, "0");
+      var m = String(now.getMinutes()).padStart(2, "0");
+      document.getElementById("xp-clock").textContent = h + ":" + m;
+    }
+    updateClock();
+    setInterval(updateClock, 10000);
   </script>
 </body>
 </html>
