@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Enes Duruk - Developer Page</title>
-  <meta name="description" content="Developer page for games and apps by Enes Duruk." />
+  <title>Outwinder - Developer Page</title>
+  <meta name="description" content="Developer page for games and apps by Outwinder." />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -631,9 +631,10 @@
 
     .xp-avatar {
       width: 56px; height: 56px;
-      background: #316ac5; border: 2px solid #1e5ba0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px; color: #ffd700; font-weight: bold; flex-shrink: 0;
+      background: #ffffff; border: 2px solid #1e5ba0;
+      display: block;
+      object-fit: cover;
+      flex-shrink: 0;
     }
 
     .xp-hero-name { font-size: 18px; font-weight: bold; color: #1e3a6a; text-shadow: 1px 1px 0 #ffffff, 0 0 8px rgba(49,106,197,0.18); }
@@ -847,7 +848,7 @@
       <button class="xp-toolbar-btn"><span class="xp-tool-icon xp-tool-icon-back"></span> Back</button>
       <button class="xp-toolbar-btn"><span class="xp-tool-icon xp-tool-icon-forward"></span> Forward</button>
       <button class="xp-toolbar-btn"><span class="xp-tool-icon xp-tool-icon-home"></span> Home</button>
-      <div class="xp-addr-bar">https://enesduruk.github.io/</div>
+      <div class="xp-addr-bar">https://outwinder.com/</div>
       <button class="xp-toolbar-btn" id="refresh-button"><span class="xp-tool-glyph xp-tool-glyph-refresh" aria-hidden="true">↻</span> Refresh</button>
       <button class="xp-toolbar-btn" id="go-button"><span class="xp-tool-glyph xp-tool-glyph-go" aria-hidden="true">➜</span> Go</button>
     </div>
@@ -873,9 +874,9 @@
       <main class="xp-main">
 
         <section id="hero" class="xp-hero">
-          <div class="xp-avatar">ED</div>
+          <img src="logo.jpeg" alt="Outwinder logo" class="xp-avatar" />
           <div>
-            <div class="xp-hero-name">Enes Duruk</div>
+            <div class="xp-hero-name">Outwinder</div>
             <div class="xp-hero-sub">Indie Game Developer; Steam &amp; Mobile Games</div>
           </div>
         </section>
@@ -945,10 +946,10 @@
           <div class="xp-yt-card">
             <div class="xp-yt-thumb"><span class="xp-nav-icon xp-nav-icon-media"></span></div>
             <div class="xp-game-info">
-              <div class="xp-game-title">Enes Duruk</div>
+              <div class="xp-game-title">Outwinder</div>
               <div class="xp-game-desc">Game dev videos and devlogs.</div>
               <div class="xp-game-links">
-                <a href="https://www.youtube.com/@enesduruk" target="_blank" rel="noopener" class="xp-badge xp-badge-yt">YouTube Channel</a>
+                <a href="https://www.youtube.com/@outwinder" target="_blank" rel="noopener" class="xp-badge xp-badge-yt">YouTube Channel</a>
               </div>
             </div>
           </div>
@@ -966,7 +967,7 @@
     </div>
 
     <div class="xp-statusbar">
-      <span>enesduruk.github.io</span>
+      <span>outwinder.com</span>
       <span>|</span>
       <span>4 games listed</span>
     </div>
@@ -985,7 +986,7 @@
       Start
     </button>
     <div class="xp-taskbar-sep"></div>
-    <div class="xp-task-item"><span class="xp-nav-icon xp-nav-icon-game"></span> Developer Page</div>
+    <div class="xp-task-item"><span class="xp-nav-icon xp-nav-icon-game"></span> Outwinder Page</div>
     <div class="xp-clock-area">
       <svg width="16" height="16" viewBox="0 0 16 16" title="Volume" style="flex-shrink:0;filter:drop-shadow(1px 1px 0 rgba(0,0,0,0.5))">
         <rect x="1" y="5" width="5" height="6" fill="#c8e4ff" stroke="#003c74" stroke-width="1"/>
@@ -1013,7 +1014,7 @@
 
   <script>
     document.getElementById("contact-button").addEventListener("click", function () {
-      var user = "enesduruk.tr";
+      var user = "outwinder";
       var domain = "gmail.com";
       window.location.href = "mailto:" + user + "@" + domain;
     });
