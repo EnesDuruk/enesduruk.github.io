@@ -1,0 +1,9 @@
+# Working files: kept locally, never published
+_dream_*.html
+_site_*.html
+*_backup.html
+dream/ASSET_PROMPTS.md
+dream/TR_DUZELTME.md
+dream/gdd_text.txt
+dream/images/*.jpeg
+__pycache__/

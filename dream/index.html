@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Bloomrise · Game Design Study · Enes Duruk</title>
+<meta name="description" content="A casual tap-to-blast puzzle game design document." />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --paper:#faf8f4; --paper-2:#f2efe8;
+  --ink:#1e2419; --ink-2:#4a5443; --ink-3:#7c8577;
+  --line:#e0dbd0;
+  --green:#2f6b3f; --green-soft:#eaf1e9;
+  --terra:#b8562f; --terra-soft:#fbeee7;
+  --gold:#a8822c;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:Charter,Georgia,"Iowan Old Style",serif;
+}
+
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.72}
+
+.wrap{max-width:820px;margin:0 auto;padding:0 24px}
+
+.topnav{position:sticky;top:0;z-index:50;background:rgba(250,248,244,.94);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topnav-inner{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;
+  align-items:center;gap:17px;overflow-x:auto;scrollbar-width:none}
+.topnav-inner::-webkit-scrollbar{display:none}
+.topnav a{font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--ink-3);
+  text-decoration:none;white-space:nowrap;padding:3px 0;border-bottom:2px solid transparent}
+.topnav a:hover{color:var(--green);border-bottom-color:var(--green)}
+.topnav a.active{color:var(--green);font-weight:700;border-bottom-color:var(--green)}
+.topnav .nav-home{font-weight:700;color:var(--ink)}
+.topnav .nav-lang{margin-left:auto;font-weight:700;color:var(--terra);border:1px solid var(--line);border-radius:6px;padding:2px 9px}
+.topnav .nav-lang:hover{color:#fff;background:var(--terra);border-color:var(--terra)}
+.topnav .nav-home.active{color:var(--ink);border-bottom-color:transparent}
+
+.masthead{padding:62px 0 38px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--terra);margin-bottom:18px}
+h1{font-family:var(--sans);font-size:clamp(38px,7vw,58px);line-height:1.04;
+  letter-spacing:-.025em;font-weight:800;margin-bottom:14px}
+.subtitle{font-size:clamp(18px,2.6vw,21px);color:var(--ink-2);line-height:1.5;
+  max-width:30em;margin-bottom:26px}
+.byline{font-family:var(--sans);font-size:13.5px;color:var(--ink-3);
+  display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.byline a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47,107,63,.3)}
+
+section{padding:50px 0;border-bottom:1px solid var(--line)}
+.part-label{font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--terra);margin-bottom:10px}
+h2{font-family:var(--sans);font-size:clamp(27px,4.4vw,34px);line-height:1.15;
+  letter-spacing:-.02em;font-weight:800;margin-bottom:20px}
+h3{font-family:var(--sans);font-size:20px;font-weight:700;letter-spacing:-.01em;
+  margin:36px 0 12px;line-height:1.3}
+h4{font-family:var(--sans);font-size:15.5px;font-weight:700;margin:26px 0 8px}
+p{margin-bottom:17px}
+p:last-child{margin-bottom:0}
+ul,ol{margin:0 0 17px 22px}
+li{margin-bottom:7px}
+li:last-child{margin-bottom:0}
+code{font-family:var(--mono);font-size:.86em;background:var(--paper-2);
+  padding:1px 5px;border-radius:3px;border:1px solid var(--line)}
+.lead{font-size:19.5px;line-height:1.62;color:var(--ink-2)}
+
+.callout{background:var(--green-soft);border-left:3px solid var(--green);
+  padding:18px 22px;margin:26px 0;border-radius:0 6px 6px 0}
+.callout.warn{background:var(--terra-soft);border-left-color:var(--terra)}
+.callout.plain{background:var(--paper-2);border-left-color:var(--ink-3)}
+.callout p{margin-bottom:11px;font-size:16px}
+.callout p:last-child{margin-bottom:0}
+.callout-title{font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--green);margin-bottom:8px;display:block}
+.callout.warn .callout-title{color:var(--terra)}
+.callout.plain .callout-title{color:var(--ink-3)}
+
+.tbl-scroll{overflow-x:auto;margin:24px 0;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);
+  font-size:14px;line-height:1.5;min-width:520px}
+th{text-align:left;font-weight:700;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-3);border-bottom:1.5px solid var(--ink-3);padding:0 12px 8px 0;vertical-align:bottom}
+td{padding:10px 12px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.num{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.tbl-icon{width:22px;height:22px;vertical-align:middle;margin-right:6px;object-fit:contain;display:inline-block}
+.cell-icon{width:80%;height:80%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.25))}
+
+.cards{display:grid;gap:14px;margin:24px 0}
+@media(min-width:620px){.cards.two{grid-template-columns:1fr 1fr}}
+.card{border:1px solid var(--line);border-radius:8px;padding:18px 20px;background:#fff}
+.card h5{font-family:var(--sans);font-size:15px;font-weight:700;margin-bottom:4px;
+  display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.tag{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;padding:2px 7px;border-radius:99px;
+  background:var(--green-soft);color:var(--green)}
+.tag.t{background:var(--terra-soft);color:var(--terra)}
+.tag.g{background:#f7f0dd;color:var(--gold)}
+.card p{font-size:15px;line-height:1.6;margin-bottom:9px;color:var(--ink-2)}
+.card p:last-child{margin-bottom:0}
+.card .why{font-size:14px;color:var(--ink-3);border-top:1px solid var(--line);
+  padding-top:9px;margin-top:11px}
+
+figure{margin:28px 0}
+figcaption{font-family:var(--sans);font-size:13px;color:var(--ink-3);margin-top:11px;line-height:1.5}
+
+.todo{background:#fff4d6;border:2px dashed var(--gold);border-radius:8px;
+  padding:16px 20px;margin:24px 0;font-family:var(--sans);font-size:15px;color:#6b5312}
+.todo b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+
+footer{padding:42px 0 70px;font-family:var(--sans);font-size:14px;color:var(--ink-3)}
+footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47,107,63,.3)}
+
+.print-only{display:none}
+
+@media print{
+  .topnav,#proto-reset,.todo{display:none!important}
+  /* the prototype cannot be played on paper: point at it instead of printing a dead grid */
+  #proto-board,.proto-hud,.proto-key,.proto-log{display:none!important}
+  .print-only{display:block}
+  .wf-frame,.wf-grid>div,.cards,.card{break-inside:avoid}
+  body{font-size:10.5pt;line-height:1.5;background:#fff}
+  .wrap{max-width:100%;padding:0}
+  section{padding:16pt 0;border-bottom:none}
+  h2{font-size:17pt;margin-top:10pt}
+  h2,h3,h4{break-after:avoid}
+  table,figure,.callout,.card{break-inside:avoid}
+  .masthead{padding:0 0 16pt}
+  h1{font-size:26pt}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="nav-home" href="https://outwinder.com">← Outwinder</a>
+    <a href="#analysis">I · Analysis</a>
+    <a href="#concept">II · Concept</a>
+    <a href="#first50">III · First 50 Levels</a>
+    <a href="#catalogue">IV · Elements</a>
+    <a href="#art">V · Art &amp; Audio</a>
+    <a href="#meta">VI · Meta &amp; Economy</a>
+    <a href="#leveldesign">VII · Level Design</a>
+    <a href="#ui">VIII · Wireframes</a>
+    <a href="#prototype">Prototype</a>
+    <a class="nav-lang" href="tr/index.html">Türkçe</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="eyebrow">Game Design Study</div>
+  <h1>Bloomrise</h1>
+  <p class="subtitle">A casual tap-to-blast puzzle game, and an analysis of the two games I studied to design it.</p>
+  <div class="byline">
+    <span><strong>Enes Duruk</strong></span><span>·</span>
+    <span>September 2026</span><span>·</span>
+    <span><a href="https://outwinder.com">outwinder.com</a></span>
+  </div>
+</header>
+
+<section id="intro">
+  <p class="lead">I build and ship games. Five of them, made alone over about eight months, three published so far. So I came at this brief the way I come at my own projects: decide what the player does with their thumb, then work outward until the economy and the art direction agree with it.</p>
+
+  <p>The document has two halves. Part I analyses Royal Match and Toon Blast across the seven requested dimensions. Parts II to VIII detail the design of <strong>Bloomrise</strong>. Its core is deliberately conventional; the work is in the content set, the economy, and a slow meter that sits beside the power-up ladder instead of inside it.</p>
+
+  <p>There is a working prototype of the core mechanic at the end of this page. Every number I quote about the mechanic came out of it, including the ones that told me I was wrong.</p>
+
+  <p>Part III is the schedule and Part IV is the catalogue. They cover the same ground from two directions on purpose, because a level designer and an artist need different documents.</p>
+</section>
+
+<section id="analysis">
+  <div class="part-label">Part I</div>
+  <h2>Analysis</h2>
+
+  <p class="lead">Before the seven dimensions, one observation about the brief itself, because it decided everything downstream.</p>
+
+  <p><strong>Dream Games does not ship a tap-to-blast game.</strong> Royal Match and Royal Kingdom are both swap match-3. Royal Kingdom differs from Royal Match in its meta layer and its boss levels, not in what the player's finger does. The only blast title named in this brief is Toon Blast, which belongs to Peak.</p>
+
+  <p>So the exercise is not "design a fourth match-3 for a company that already makes match-3." It is closer to: take a mechanic Dream has not shipped, and build it to the standard Dream is known for. That framing decided where I spent the risk. Bloomrise's theme is warm, character-led and deliberately familiar, and so is its core. The one thing I added rather than borrowed is a slow meter that sits beside the power-up ladder instead of inside it.</p>
+
+  <h3>Where I am in these games</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Game</th><th>Progress</th><th>Played</th><th>Used as</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Royal Match</strong></td><td class="num">Level 130</td><td class="num">8h 30m</td><td>Main reference for meta structure, progression pacing and where offers appear.</td></tr>
+      <tr><td><strong>Toon Blast</strong></td><td class="num">Level 30</td><td class="num">50m</td><td>Main reference for the core verb: cluster selection, cascade feel, power-up thresholds.</td></tr>
+      <tr><td><strong>Royal Kingdom</strong></td><td class="num">Level 30</td><td class="num">50m</td><td>Played to establish where it diverges from Royal Match.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Everything else in my Google Play history</h4>
+
+  <p>These are all of it, with the times the store recorded. I would rather give the real list than a curated one.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Game</th><th>Time</th><th>Game</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr><td>Royal Match</td><td class="num">8h 30m</td><td>Ballz</td><td class="num">20m</td></tr>
+      <tr><td>Cube Escape: Paradox</td><td class="num">2h</td><td>Helix Jump</td><td class="num">13m</td></tr>
+      <tr><td>Stack</td><td class="num">1h 24m</td><td>Bricks</td><td class="num">10m</td></tr>
+      <tr><td>Arrows</td><td class="num">1h 6m</td><td>Everblast</td><td class="num">10m</td></tr>
+      <tr><td>Royal Kingdom</td><td class="num">50m</td><td>Stack Blocks</td><td class="num">8m</td></tr>
+      <tr><td>Toon Blast</td><td class="num">50m</td><td>Traffic Hero</td><td class="num">7m</td></tr>
+      <tr><td>Nonogram</td><td class="num">25m</td><td>Bricky Boy</td><td class="num">6m</td></tr>
+      <tr><td>Color Switch</td><td class="num">25m</td><td>Two Dots</td><td class="num">5m</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The shape of that list is a developer's, not a player's. Most of those sessions are short because I installed the game to find out how a specific mechanic was built, played until I understood it, and stopped. Royal Match is the one exception, and it is the only title here I have played the way its audience plays it.</p>
+
+  <p>What the list does show is the line from what I studied to what I shipped. <strong>Stack</strong> is the game <em>Stackline</em> is a deliberate clone of, and I have said so in this document before naming the source here. <strong>Ballz, Bricks, Everblast, Stack Blocks</strong> and <strong>Bricky Boy</strong> are the brick-breakers I went through before building <em>Brick Multiplier</em>. <strong>Cube Escape: Paradox</strong> is Rusty Lake's, and I went there to read how point-and-click structure holds up on a phone, because I want to bring <em>October</em> to mobile as well. Nothing in my install history is there by accident.</p>
+
+  <p>The honest limit: this is not the profile of someone embedded in mobile free-to-play, and I am not going to claim market literacy I do not have. My knowledge of this genre is a maker's knowledge, built from taking mechanics apart and rebuilding them, and it is thinner on the commercial side than on the design side. That is the gap I would be closing in the first month, and it is why Part VI states its economy assumptions out loud.</p>
+
+  <h3>1 · Game Mechanics</h3>
+
+  <p>The two games ask for different kinds of decision.</p>
+
+  <p><strong>Royal Match asks you to find a shape.</strong> You swap two adjacent tiles, and the move's value lies in the geometry you produce. Four in a line makes a Rocket. Four in a square makes a Propeller. Five in an L or T makes a TNT. Five in a line makes a Light Ball. The board is full of legal moves and most of them are worth nothing, so the skill is scanning for the few that are.</p>
+
+  <p><strong>Toon Blast asks you to find a size.</strong> Any two adjacent cubes of the same colour are legal. The question is never whether a move is allowed, only whether the cluster is big enough yet. Five cubes gives a Rocket, seven or eight a Bomb, nine a Disco Ball.</p>
+
+  <p>The consequence is that a blast player always knows how close they are. The cluster is sitting there and it can be counted. A swap player often discovers a power-up rather than planning one. So blast trades scanning difficulty for planning transparency, and the pressure moves from perception to patience. Taking a cluster early is always visibly wasteful, and the player feels that every turn.</p>
+
+  <p>That is the observation Bloomrise is built on. If patience is where a blast player's tension already lives, then the interesting place to add design is the reward you are being patient for.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Royal Match</th><th>Created by</th><th>Toon Blast</th><th>Created by</th></tr></thead>
+    <tbody>
+      <tr><td>Rocket</td><td class="num">4 in a line</td><td>Rocket</td><td class="num">5 cubes</td></tr>
+      <tr><td>Propeller</td><td class="num">4 in a square</td><td>Bomb</td><td class="num">7–8 cubes</td></tr>
+      <tr><td>TNT</td><td class="num">5 in an L or T</td><td>Disco Ball</td><td class="num">9 cubes</td></tr>
+      <tr><td>Light Ball</td><td class="num">5 in a line</td><td>–</td><td>–</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Royal Match carries four power-ups to Toon Blast's three, and it needs the extra one. When creation is shape-driven, each distinct shape has to pay differently or the geometry stops being interesting. Toon Blast runs a single axis instead, cluster size, which is a cleaner thing to hold in your head but caps the vocabulary at three.</p>
+
+  <p>Both games then get most of their depth from how power-ups combine, and both put the same kind of thing at the top of the ladder. Royal Match's Light Ball, swiped into another power-up, converts match items into that power-up. Toon Blast's Disco Ball clears every cube of one colour on its own, and scatters rockets or bombs across the board when it is combined with one. Neither is simply a bigger explosion. Combined, each acts on the power-up system itself, which is why doubling them clears everything and why nothing needs to sit above them.</p>
+
+  <h3>2 · Level Design</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Level</th><th>Element</th><th>What it teaches</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Balloons</td><td>Adjacency clears things that are not cubes</td></tr>
+      <tr><td class="num">4</td><td>Crates</td><td>Some things take more than one hit</td></tr>
+      <tr><td class="num">11</td><td>Bubbles</td><td>An obstacle can sit on top of a playable tile</td></tr>
+      <tr><td class="num">21</td><td>Magic Hats</td><td>Some things empty out instead of breaking</td></tr>
+      <tr><td class="num">31</td><td>Colored Balloons</td><td>Colour becomes a constraint, not just a match key</td></tr>
+      <tr><td class="num">41</td><td>Ducks</td><td>Gravity goals: bring something down</td></tr>
+      <tr><td class="num">51</td><td>Light Bulbs</td><td>Two-hit targets that are also goal items</td></tr>
+      <tr><td class="num">61</td><td>Can Toss</td><td>Nine hits, so power-ups stop being optional</td></tr>
+      <tr><td class="num">81</td><td>Soda Bottle</td><td>Colour-specific hits, four or five deep</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>I have played to level 30, so the first four rows are mine and the rest are collated from community documentation and consistent across sources. Nine elements inside the first 81 levels, then a long gap before the next wave. The teaching happens where churn is highest and the audience is largest, and the enormous level count behind it is carried by recombining what the player already knows. That is an efficient way to spend art and design budget, and I have copied the shape directly: nine elements across Bloomrise's first fifty, then composition.</p>
+
+  <p>Royal Match segments the same problem through areas. Each is a themed room with its own restoration tasks, each level completed yields one star, stars are spent on those tasks, and finishing a room opens the next. The campaign is therefore always cut into chapters small enough to feel finishable. You are never more than a few levels away from completing something, which is a better retention instrument than any single feature on the home screen.</p>
+
+  <h3>3 · Level Difficulty</h3>
+
+  <p>In a swap game, difficulty is mostly about denying shapes. In a blast game it is about denying contiguity, and that changes which dials matter.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Dial</th><th>Effect in a blast game</th><th>Cost of using it</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Colour count</strong></td><td>The strongest and quietest lever. Going from four colours to five collapses average cluster size and makes power-ups much rarer.</td><td>Almost none. Invisible to the player.</td></tr>
+      <tr><td><strong>Move budget</strong></td><td>Removes slack without changing what the level teaches.</td><td>None, and it can be retuned after launch.</td></tr>
+      <tr><td><strong>Board fragmentation</strong></td><td>Immovable obstacles split columns, so clusters cannot form across the break.</td><td>High. Fragmented boards are the least readable.</td></tr>
+      <tr><td><strong>Obstacle hit count</strong></td><td>Toon Blast's Can Toss needs nine hits, which makes power-ups compulsory.</td><td>Moderate. Turns a puzzle into a grind if overused.</td></tr>
+      <tr><td><strong>Goal quantity</strong></td><td>Raises the floor on efficiency across the whole level.</td><td>Low, but it flattens the shape of the level.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Royal Match adds one instrument that Toon Blast does not, and it is the smartest difficulty decision in either game: it labels levels <em>Hard</em> and <em>Super Hard</em>, and it pays extra Royal Pass keys for them. A spike is normally pure cost to the player. Attaching progression currency to it converts the spike into an opportunity, and it gives the team a legible place to raise difficulty without the player reading it as unfairness.</p>
+
+  <p>Both games also gate attempts with lives, five maximum, regenerating on a timer, refillable with currency or by asking a team. A life is lost on failure. That system has less to do with difficulty than it appears to: its real function is to convert a bad session into a reason to come back tomorrow.</p>
+
+  <p>I have not measured fail rates, completion rates or churn points in either game. Everything above is read from what the systems permit, not from telemetry. Where Part VII proposes difficulty targets for Bloomrise, they are stated as starting hypotheses.</p>
+
+  <h3>4 · Graphics</h3>
+
+  <p>Both games solve the same problem, which is that a tile has to be identifiable in a quarter of a second, at thumb size, on a phone held outdoors.</p>
+
+  <p>Royal Match solves it with rendering. Tiles are lit, bevelled and materially specific, and the restoration scenes are close to illustration. The fidelity is earning its cost commercially, because the meta sells the fantasy of restoring something beautiful and the restoration has to actually look beautiful or the loop has no payoff at the end. The cost shows up as per-asset expense across a very large number of themed rooms.</p>
+
+  <p>Toon Blast solves it with flatness. Single-colour cubes with one highlight, characters drawn in thick outline, almost no material detail. Adding a fiftieth obstacle costs a fraction of what the same addition would cost in Royal Match's idiom, and a flat cube reads faster, which matters more in a game where taps are quick and frequent.</p>
+
+  <p>Both spend colour only where it means something. Board backgrounds are desaturated so tiles pop off them, and the loud saturated colours are held back for progress, rewards and offers. That discipline is why a Royal Match home screen can carry as much as it does without becoming noise.</p>
+
+  <p>One thing I would push harder than either does: shape redundancy. Both lean on hue to separate match items. Around 8% of men have some degree of colour vision deficiency, which in a colour-matching game is a playability problem. Bloomrise's five elements are silhouette-distinct before they are colour-distinct, and the test is that the game should be playable in greyscale.</p>
+
+  <h3>5 · Animation</h3>
+
+  <p>A single tap in Toon Blast can destroy fifteen cubes and collapse four columns. The board moves a great deal and has to be readable the moment it stops, so animation here is not decoration, it is how the player keeps their model of the board.</p>
+
+  <p>The collapse is staggered. Cubes fall with a small per-column delay and the settle takes noticeably longer than it needs to. That extra time is what makes a large clear feel like an event, and more practically it gives the eye a sequence to follow so the new board arrives in an order.</p>
+
+  <p>Power-up creation gets anticipation: a beat of hold before the cube becomes a Rocket, so the player registers that they earned something. Both games also run idle animations on their characters, which is a cheap and effective way to pull attention back to a screen the player has stopped looking at.</p>
+
+  <p>I ran into the readability half of this problem on <em>Stackline</em>, a one-tap stacking game I shipped. At speed the tower rises faster than the eye follows. I first had the camera cut upward, which was technically correct and felt broken. Replacing the cut with a follow that eases back down cost about four frames and made the game legible. The blast equivalent is the moment after a Disco Ball, when most of the board changes at once. If nothing gives the player a path to follow through that change, their next tap is a guess.</p>
+
+  <h3>6 · Particles &amp; Special Effects</h3>
+
+  <p>Blast games face a problem swap games mostly avoid, which is event density. One swap destroys three to five tiles. One good tap destroys fifteen, and a chained power-up destroys most of the board.</p>
+
+  <p>Toon Blast handles this by tiering. A small clear gets a modest pop with a few short-lived particles. A power-up detonation gets screen-scale work: light, debris, camera shake, trails. The budget goes to the moments meant to be memorable and is withheld from the ones meant to be routine, which is what keeps the memorable ones feeling different.</p>
+
+  <p>Royal Match spends more per event and makes the particles material-specific. Glass shatters into shards, wood splinters, ice fractures. The particle is telling you what the obstacle was made of, which is readability disguised as polish. Toon Blast's debris is more generic and more cheerful, which fits its flatter art.</p>
+
+  <p>Trails are the underrated part. A Rocket's trail is not there to look fast, it is there so the player can see which line was cleared after the fact. Same for the Propeller's flight path. In both games the effects that survive at speed are the ones carrying information.</p>
+
+  <p>Audio is where I have made this mistake myself. In <em>Stackline</em> I gave every falling fragment its own sound because silent debris felt dead, and the first version was unusable. At speed it became a wall of noise. The fix was not removing sounds, it was shaping them: quieter per event, varied slightly in pitch, overlapping instead of stacking at full volume. A blast game has the same problem one order of magnitude larger, and its specific failure mode is not boredom. It is that the player mutes the game, which removes most of the feedback loop permanently.</p>
+
+  <h3>7 · User Interface</h3>
+
+  <p>Royal Match's home screen is the busier of the two. It carries the restoration view, the play button, the task counter, lives, coins, a team entry, and a rotating set of event icons and timed offers around the edges. Toon Blast's is calmer, with the level path as the dominant object and fewer live surfaces at once.</p>
+
+  <p>What both get right is that there is never any question about the primary action. Whatever else is on screen, the largest and brightest element is play the next level, and nothing competes with it for weight. In a game where retention depends on someone opening the app and being inside a level within a few seconds, that is most of what a home screen is for.</p>
+
+  <p>The gameplay screens are more alike than the home screens. Goals sit top-left, the move counter sits top-right or centre and is the largest number on the screen, boosters sit along the bottom within thumb reach, and the board takes everything in between. Royal Match frames the move counter inside a crown, which sounds like decoration but makes the single most-checked number on the screen instantly findable. Neither game puts anything interactive in the bottom corners where a thumb rests, because accidental taps there cost a move.</p>
+
+  <p>The screen both games treat most carefully is the one after a failure. It arrives with the board still visible behind it, shows exactly how close you came, and offers extra moves at a price. That is the single most commercially important screen in a casual puzzle game, and it is designed to be read in under two seconds.</p>
+
+  <p>Where I would push back on Royal Match: the number of simultaneous live event surfaces. Around level 130 the home screen regularly carries several competing timers and progress bars. The cost is not visual clutter so much as the work of re-parsing what is urgent at the start of every session. Bloomrise caps concurrent event surfaces at two, and Part VIII says what I gave up to hold that cap.</p>
+
+  <h3>Royal Kingdom</h3>
+
+  <p>Royal Kingdom is a swap match-3, and over fifty minutes of it the moment-to-moment play is hard to tell apart from Royal Match. What I could see differ is the meta: a wider district-scale restoration view in place of room-by-room close-ups. The boss levels are the one place the board itself behaves differently. You are attacking a structure rather than clearing a goal, and where you make the break decides where the attack lands, so position becomes a decision Royal Match never asks the player to make. The animated rescue set pieces around them are not the difference; Royal Match and Toon Blast both run those.</p>
+
+  <p>I read the pair as a portfolio decision. Same verb, different meta, aimed at the second slot on a player's phone. It is also the clearest argument that a blast title is the open position, since it is the one question the existing engine cannot answer.</p>
+
+  <h3>What I have shipped, and what it is worth here</h3>
+
+  <p>I develop as <strong>Outwinder</strong>. Five games, three of them published: <em>Brick Multiplier</em> and <em>Stackline</em> on Google Play, and <em>Still Open: Taskbar Cafe Idle</em> on Steam. Two more are finished with their Steam pages live and their content public, waiting on release: <em>Not Yet</em>, a first-person psychological horror game, and <em>October</em>, a minimalist point-and-click narrative game I am considering bringing to mobile. I designed the mechanics, built the levels, wrote the store pages and shipped the updates on all of them, alone.</p>
+
+  <p>Two are relevant. <em>Brick Multiplier</em> is a casual mobile puzzle with a retention layer I built end to end: daily quests, streak rewards, leaderboards. <em>Stackline</em> is a one-tap timing game I built deliberately as a clone of a known-good design so I could work on feel, audio and camera without the design itself being a variable.</p>
+
+  <p>Their install bases are negligible and I have no retention or conversion data from them. What the experience is actually worth is narrower than that and more specific: I know what a daily-quest and streak system costs to specify, build and keep consistent across updates. Knowing what it is for is the easy half. The most useful thing I learned from shipping them was that I had assumed finishing the product was the job. Two finished, reasonably polished games reaching almost nobody is an unambiguous piece of feedback about where I had put my effort, and it is why I now run a content and store pipeline alongside development instead of after it.</p>
+</section>
+
+<section id="concept">
+  <div class="part-label">Part II</div>
+  <h2>The Concept</h2>
+
+  <p class="lead"><strong>Bloomrise</strong> is a casual tap-to-blast puzzle game set in a valley of abandoned glasshouses. Tap two or more adjacent flowers to blast them, and the tiles above fall into the gap. Every level you finish earns a Sprout, and Sprouts bring one more corner of the valley back into bloom.</p>
+
+  <p>The cast is small. Mira, a botanist who has inherited a ruined estate, and Burrow, a mole who does the digging and is confidently wrong about most things. The player restores the Glasshouse, then the Orchard, then the Terraces, and on up the valley. The theme is warm, character-led and deliberately familiar, and so is the core.</p>
+
+  <h3>The core, stated plainly</h3>
+
+  <p>Three power-ups, created by cluster size, on one axis with no exceptions.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Cluster</th><th>Power-up</th><th>Effect</th><th>Royal Match equivalent</th></tr></thead>
+    <tbody>
+      <tr><td class="num">5–6 tiles</td><td><strong>Ant Nest</strong></td><td>Ants pour out of the hole and sweep the row or column it formed in.</td><td>Rocket</td></tr>
+      <tr><td class="num">7–8 tiles</td><td><strong>Puffball</strong></td><td>5×5 spore burst. Strips one layer from every obstacle in range.</td><td>TNT</td></tr>
+      <tr><td class="num">9+ tiles</td><td><strong>Pollen Cloud</strong></td><td>Clears every tile of its own colour on the board.</td><td>Light Ball</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>That is Toon Blast's structure, and I chose the thresholds by measuring rather than by taste. I generated four-colour 8×8 boards, before any move had been made, and counted the connected same-colour groups on each one. The percentages below are the share of those boards that hold <em>at least one</em> group of a given size: 91% have a group of five or more sitting there already, 50% have one of seven or more, 20% have one of nine or more. This is a simulation rather than a probability calculation: I generated the boards and counted, because the closed form is hard and counting is ten lines. The script is <a href="sim/cluster_sim.py">sim/cluster_sim.py</a>.</p>
+
+  <p>That is what picks the thresholds. Nine sits at the top rung because roughly one board in five offers it outright, which is rare without being unreachable. The same numbers rule out a rung at three, because a group of three or more is on every board tested, and a power-up the player gets almost every move is not a reward. The two-tile gap between rungs is a design judgement rather than a measurement: a six-tile cluster and a seven-tile cluster are hard to tell apart by eye, and at one apart the player could not work out what a tap would make.</p>
+
+  <p>Dream's business is not mechanical novelty. Royal Kingdom is Royal Match again, and that is the point: this company's advantage is taking a proven verb and executing it past where anyone else can follow. A case study that hands them an exotic core is answering a question they did not ask.</p>
+
+  <h3>The Pollen Meter</h3>
+
+  <p>Everything above is Toon Blast's structure with different art on it. This next part is the one thing I added rather than borrowed, and I am putting it forward as a proposal rather than a finished answer. It sits beside the power-up ladder rather than inside it.</p>
+
+  <div class="callout">
+    <span class="callout-title">Pollen Meter</span>
+    <p>Every tile you clear adds pollen to a meter beside the board. When it fills, <strong>bees leave the hive and damage exactly one obstacle</strong>: one layer, one hit, the toughest one on the board. Then the meter empties and starts again.</p>
+    <p>Starting point for tuning: <strong>30 tiles per fill</strong>, which at an average of four or five tiles a move is roughly one release every seven moves, so two or three in a normal level. That number is a guess. The right one comes from watching real players, not from me.</p>
+  </div>
+
+  <p>It exists because a blast board gives the designer exactly one creation axis, cluster size, and that axis supports about three rungs before the top one stops appearing. Anything else I wanted the player to have had to come from somewhere other than the size of a tap.</p>
+
+  <p>What it adds is a second clock. The power-up ladder rewards the quality of a single move; the meter rewards the volume of a whole level. A player having a bad run still watches something fill, and the thing it gives them is small, free and aimed at the problem they are most stuck on.</p>
+
+  <p>It is deliberately the weakest help in the game: one obstacle, one layer, and no more. A meter that cleared broadly would compete with the continue offer, because it would make stalling the losing player's best move: running small safe clears to fill the meter instead of taking the risk the level is asking for. Capping the payout at one obstacle is what stops that, because filling the meter costs moves and what you get back is worth less than the moves you spent.</p>
+
+  <p>What I cannot tell you is whether it is fun. I will defend the reasoning above, but my confidence in this is lower than in anything else in this document, because every other decision here is either measured or taken from a game that has already proven it, and this one is neither. Two questions would settle it quickly: do players watch the meter at all, and does it change how they play when they are losing. If they do not notice it, the answer is not a bigger payout. It is to cut it, because the bigger payout is the version that competes with the continue offer.</p>
+
+  <h3>On the name</h3>
+
+  <p>Bloomrise is deliberately not a <em>Royal</em> title.</p>
+
+  <p>Royal Match and Royal Kingdom are both swap match-3, and for a player the word now signals that genre. Blast is a different verb, a faster session and a different habit. Putting it under the same brand spends the recognition that brand has built and teaches the player that the name no longer predicts the game. There is also a more literal collision: Royal Match already has areas called Garden, Zen Garden and Chess Garden, so a <em>Royal Garden</em> would read as one of its rooms rather than as a new title.</p>
+
+  <p>A second family in the portfolio is healthier than a third Royal. Whether it is worth building one is a business decision rather than a design one, and it belongs to people with numbers I do not have.</p>
+
+  <h3>How this design got here</h3>
+
+  <p>The core above is the fourth version. The three it replaced are more useful than the one that survived, so here they are in order.</p>
+
+  <h4>1. Seed &amp; Bloom, and the arithmetic that killed it</h4>
+
+  <p>The first version did not create power-ups by cluster size at all. Blasting five or more tiles dropped a <strong>Seed</strong> onto the board. The Seed stayed where it landed and did not fall with the other tiles. You fed it by blasting in any of the eight cells around it, and after three feeds it bloomed into a power-up. Which one you got depended on the colours you had fed it, and if all three feeds came from different colours you got the strongest of them, a <strong>Bloomstar</strong>.</p>
+
+  <p>I liked it, because it turned a reward into a commitment. You had to protect the Seed, and obstacles now had something to attack rather than only something to block.</p>
+
+  <p>Then I worked out the distribution. Three feeds on a five-colour board, roughly independent colours:</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Board</th><th>Calculation</th><th>Chance all three feeds differ</th></tr></thead>
+    <tbody>
+      <tr><td>5 colours</td><td class="num">1 × 4/5 × 3/5</td><td class="num">48%</td></tr>
+      <tr><td>4 colours</td><td class="num">1 × 3/4 × 2/4</td><td class="num">37.5%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The first feed can be any colour. The second has a 4 in 5 chance of differing from it, and the third a 3 in 5 chance of differing from both. So the rarest and strongest power-up in the game was appearing on nearly half of all Seeds, as the default outcome of not paying attention. I had written "hard to get by accident" next to it in my own notes. I changed the condition so that at least two of the three feeds had to come from a five-plus blast, built it, and measured it: 7.8% under greedy play, 18.3% when a player went after it deliberately.</p>
+
+  <p><strong>The rule was correct and I cut it anyway</strong>, for two reasons that have nothing to do with the arithmetic.</p>
+
+  <p>The first is that the whole game hung on this single creation rule, and I had no way of knowing whether it was fun, because no human had played it. What I could measure was the distribution. What I could not measure was the feel, and the feel was the part carrying the game.</p>
+
+  <p>The second is that it taxed every board. To keep the mechanic alive I had written a level-design rule: every level must contain a region where a Seed can survive and be fed for three moves. That is a permanent constraint on <em>every</em> board a level designer will ever make, paid to keep one mechanic alive. The part of the idea that worked survived anyway: the Seed became the <strong>Seedpod</strong>, a collectible goal item.</p>
+
+  <h4>2. Four power-ups, and the ladder that ran backwards</h4>
+
+  <p>The replacement mapped one-for-one onto Royal Match: Ant Nest for Rocket, Puffball for TNT, Pollen Cloud for Light Ball, Bee Hive for Propeller. But Royal Match gets four because swap gives it two creation axes, count <em>and</em> shape: four in a line, four in a square, five in an L, five in a row. A blast board has only count, which is why Toon Blast has three.</p>
+
+  <p>So the fourth needed a second axis, and I used position: a five-plus clear touching the top row made a Bee Hive instead of an Ant Nest. That broke immediately. A nine-tile clear at the top row would hand the player a Bee Hive instead of a Pollen Cloud, which means a better move paying out worse. I patched it by making position choose only within the seven-to-eight tier.</p>
+
+  <h4>3. The patch that showed the rule was wrong</h4>
+
+  <p>The patch worked and the rule was now correct, and that is when it became clear the rule should not exist. "Seven tiles makes a Puffball, unless it touches the top row, in which case it makes a Bee Hive, but nine always makes a Pollen Cloud" is a rule a player has to be taught and will still get wrong. A creation rule with a qualifier in it is a creation rule the board cannot teach on its own.</p>
+
+  <p>The obvious alternative was a fourth size tier at three or four tiles. I measured it before writing it down:</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Cluster</th><th>Per board, 4 colours</th><th>Boards with at least one</th></tr></thead>
+    <tbody>
+      <tr><td class="num">3+</td><td class="num">6.48</td><td class="num">100%</td></tr>
+      <tr><td class="num">5+</td><td class="num">1.85</td><td class="num">91%</td></tr>
+      <tr><td class="num">7+</td><td class="num">0.60</td><td class="num">50%</td></tr>
+      <tr><td class="num">9+</td><td class="num">0.21</td><td class="num">20%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Six and a half three-tile clusters on every board, and a three-plus cluster on every board tested. A tier there would hand the player a power-up on almost every move, which stops it being a reward and removes the only tension the core has: the decision to wait for a bigger cluster.</p>
+
+  <h4>4. Why the bees are not a booster either</h4>
+
+  <p>The next idea was to demote the Bee Hive to a purchasable booster. That is wrong for a different reason: the booster list already has <strong>Shears</strong>, which removes one tile or one obstacle layer for coins. Shears is this game's <strong>Royal Hammer</strong>, the in-level booster in Royal Match that clears one tile or one layer of any element without spending a move, and it is deliberately the same tool because that slot works. A second purchasable "remove one thing" is the same product twice, and a player cannot tell two similar rescue buttons apart under pressure.</p>
+
+  <p>What was actually good about the bees was never the purchase. It was that they arrive on their own, that they go to the thing you are most stuck on, and that you did not aim them. That is a meter, not a button. So it became one, capped at a single obstacle so it stays the smallest help in the game rather than an alternative to paying.</p>
+
+  <p>The most useful thing I can say about this document is that the core in it is not the most original idea I tried. Three versions came before it and I cut all three: one because I could not tell whether it was fun, one because the rule needed a qualifier, one because it duplicated a booster that already worked. What survived is conventional on purpose. I can take any of the three apart with you and tell you exactly where I stopped and why.</p>
+</section>
+
+<section id="first50">
+  <div class="part-label">Part III</div>
+  <h2>The First 50 Levels</h2>
+
+  <p class="lead">Toon Blast teaches nine elements inside its first 81 levels and then leans on composition. I have compressed that shape into fifty, arranged so no level asks the player to learn two things at once.</p>
+
+  <p>Standard board is <strong>8×8</strong> through level 31. Irregular board shapes begin at level 32.</p>
+
+  <h3>Colour count, measured</h3>
+
+  <p>Part I called colour count the quietest strong difficulty lever in the genre. Here is what it actually does, over one hundred thousand random boards per row.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Colours</th><th>Boards with a 5+ cluster<br><em>(an Ant Nest)</em></th><th>With a 7+<br><em>(a Puffball)</em></th><th>With a 9+<br><em>(a Pollen Cloud)</em></th></tr></thead>
+    <tbody>
+      <tr><td><strong>4</strong> <em>(levels 1–25)</em></td><td class="num">91.1%</td><td class="num">49.5%</td><td class="num">19.8%</td></tr>
+      <tr><td><strong>5</strong> <em>(levels 26+)</em></td><td class="num">70.7%</td><td class="num">23.0%</td><td class="num">6.0%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>One hundred thousand random boards per row, counting clusters present at a glance rather than ones the player builds over several moves, so these are floors and not the real rate. The shape is what matters. Adding the fifth colour cuts the supply of Ant Nests by about a quarter, roughly halves it for Puffballs, and takes Pollen Clouds from one board in five to one in fifteen.</p>
+
+  <p>Two decisions come out of that table. The fifth colour arrives once, at level 26, and nothing else difficult is introduced within three levels of it, because it is already a difficulty change disguised as a cosmetic one. And colour count belongs on every level's spec sheet next to the move budget, not buried in a theme setting, because it moves the top of the power-up ladder more than any obstacle does.</p>
+
+  <div class="callout">
+    <span class="callout-title">What this table cost me</span>
+    <p>I had originally written Seedpods as something a nine-plus clear drops. The table says a nine-plus cluster is sitting on one board in fifteen at five colours, so a collection goal built on it would be a goal the player cannot plan toward. I found this by playing the prototype and never collecting one.</p>
+    <p><strong>Seedpods are now placed on the board by the level designer</strong>, the way Toon Blast places its ducks. Every power-up combination drops one extra, which is surplus rather than supply: a combination is something the player builds on purpose, so it is still not a dice roll. The lesson generalises: a goal type needs a supply the designer controls, or it is not a goal, it is a wish.</p>
+  </div>
+
+  <h3>The five acts</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Levels</th><th>Act</th><th>What is being learned</th><th>Intended feel</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1–7</td><td><strong>The verb</strong></td><td>Tap adjacent tiles. Bigger clusters pay better.</td><td>Effortless. Failure here is a defect.</td></tr>
+      <tr><td class="num">8–19</td><td><strong>The obstacle</strong></td><td>Things sit on the board, and some need power-ups.</td><td>First real decisions. First intended loss at 14–16.</td></tr>
+      <tr><td class="num">20–31</td><td><strong>The pressure</strong></td><td>Something on the board is hunting your collectible. A fifth colour arrives.</td><td>First wall at 20–22. Teams unlock at 20.</td></tr>
+      <tr><td class="num">32–45</td><td><strong>Composition</strong></td><td>Power-ups combine, boards fragment, planning spans several moves.</td><td>Levels stop being solvable by reflex.</td></tr>
+      <tr><td class="num">46–50</td><td><strong>Chapter close</strong></td><td>Everything at once, on a board with a shape of its own.</td><td>Level 50 is the first Super Hard.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Introduction schedule</h3>
+
+  <p>Every new element gets two levels. A sandbox with roughly half again as many moves as the solution needs and no competing goal, then a test one to four levels later at a tight budget. No two elements are introduced in the same level; boosters may share a level with a new element because they are chosen before play begins and do not compete for attention on the board.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Level</th><th>Introduced</th><th>Type</th><th>Intent</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>Dry Leaf</strong></td><td>Obstacle</td><td>Adjacency affects things that are not tiles. One hit, no threat.</td></tr>
+      <tr><td class="num">2</td><td><strong>Ant Nest</strong></td><td>Power-up</td><td>Five tiles. The first reward for holding out for a bigger cluster.</td></tr>
+      <tr><td class="num">4</td><td><strong>Clay Pot</strong></td><td>Obstacle</td><td>Hit counts. One to three layers.</td></tr>
+      <tr><td class="num">7</td><td><strong>Puffball</strong></td><td>Power-up</td><td>Seven tiles. Teaches that the ladder has rungs.</td></tr>
+      <tr><td class="num">8</td><td><strong>Frost Glass</strong></td><td>Obstacle</td><td>An obstacle sitting on a playable tile.</td></tr>
+      <tr><td class="num">11</td><td><strong>Pollen Cloud</strong></td><td>Power-up</td><td>Nine tiles. The top of the size ladder, and rare enough to feel earned.</td></tr>
+      <tr><td class="num">14</td><td><strong>Root Knot</strong></td><td>Obstacle</td><td>Immune to adjacency; any power-up removes it. First intended loss, at 14–16.</td></tr>
+      <tr><td class="num">16</td><td><strong>Seedpod</strong></td><td>Collectible</td><td>Two are on the board at the start. Bring them to the bottom row. Third goal type.</td></tr>
+      <tr><td class="num">17</td><td><strong>Shears</strong></td><td>Booster</td><td>Remove any one tile or one obstacle layer.</td></tr>
+      <tr><td class="num">20</td><td><strong>Weevil</strong></td><td>Obstacle</td><td>A grub that starts three cells long, grows as it eats and shrinks as you hit it.</td></tr>
+      <tr><td class="num">23</td><td><strong>Pollen Meter</strong></td><td>System</td><td>Fills as you clear; when full, bees damage one obstacle layer. Introduced after the Weevil, so the first thing it ever helps with is a threat the player already fears.</td></tr>
+      <tr><td class="num">26</td><td><strong>Lavender</strong></td><td>Match element</td><td>The fifth colour, alone in its level. Power-up supply roughly halves here.</td></tr>
+      <tr><td class="num">30</td><td><strong>Combinations</strong></td><td>Core</td><td>A board built so two power-ups will end up adjacent. Nothing is explained.</td></tr>
+      <tr><td class="num">32</td><td><strong>Stone Planter</strong></td><td>Obstacle</td><td>First element that changes the board's shape. Irregular boards start here.</td></tr>
+      <tr><td class="num">38</td><td><strong>Creeping Ivy</strong></td><td>Obstacle</td><td>A clock that is not the move counter.</td></tr>
+      <tr><td class="num">41</td><td><strong>Thistle</strong></td><td>Obstacle</td><td>A goal that generates its own supply.</td></tr>
+      <tr><td class="num">46</td><td><em>First Hard level</em></td><td>Difficulty</td><td>Labelled, double Season keys.</td></tr>
+      <tr><td class="num">48</td><td><strong>Sun Lamp</strong></td><td>Obstacle</td><td>The only element that helps you, and the last to arrive.</td></tr>
+      <tr><td class="num">50</td><td><em>First Super Hard</em></td><td>Difficulty</td><td>Chapter close, irregular board, triple keys.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Goal types, in order</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>From</th><th>Goal</th><th>Why there</th></tr></thead>
+    <tbody>
+      <tr><td class="num">L1</td><td>Clear <em>n</em> tiles of a colour</td><td>The goal is the verb. No second idea in the level.</td></tr>
+      <tr><td class="num">L4</td><td>Clear all obstacles</td><td>Attention moves from the tiles to what sits on them.</td></tr>
+      <tr><td class="num">L16</td><td>Bring Seedpods to the bottom row</td><td>First time where you blast matters more than what.</td></tr>
+      <tr><td class="num">L41</td><td>Collect released items</td><td>A goal that makes its own supply, so the source has to be paced.</td></tr>
+      <tr><td class="num">L44</td><td>Two types at once</td><td>Only after each has been learned alone.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Boosters</h3>
+
+  <p>Boosters split into pre-level, chosen calmly on the start card, and in-level, spent under pressure. They are different decisions and the game should not present them as the same system. No booster costs a move.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Booster</th><th>When</th><th>Unlocks</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Shears</strong></td><td>In-level</td><td class="num">L17</td><td>Remove any one tile, or one layer of any obstacle, without spending a move. Royal Match's Royal Hammer.</td></tr>
+      <tr><td><strong>Watering Can</strong></td><td>Pre-level</td><td class="num">L23</td><td>Start with one Ant Nest already on the board.</td></tr>
+      <tr><td><strong>Colour Call</strong></td><td>In-level</td><td class="num">L28</td><td>Convert every tile of one colour inside a 3×3 to another colour. Builds a cluster where you need one.</td></tr>
+      <tr><td><strong>Burrow's Dig</strong></td><td>In-level</td><td class="num">L34</td><td>Tunnel a chosen row, stripping one layer from everything in it.</td></tr>
+      <tr><td><strong>Trowel</strong></td><td>Pre-level</td><td class="num">L34</td><td>Strip three random obstacle layers before the first move.</td></tr>
+      <tr><td><strong>Extra Moves</strong></td><td>On failure</td><td class="num">L6</td><td>The continue offer. Priced and escalating across attempts. See Part VI.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Where each unlock sits</h4>
+
+  <p>Every in-level booster unlocks immediately after a level designed to be lost at least once, because a rescue tool offered before the player knows they need rescuing reads as a sales pitch.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Intended loss</th><th>Cause</th><th>Booster unlocked next</th></tr></thead>
+    <tbody>
+      <tr><td class="num">L14–16</td><td>Root Knot, power-up required</td><td class="num">Shears, L17</td></tr>
+      <tr><td class="num">L20–22</td><td>Weevil, Seedpods under threat</td><td class="num">Watering Can, L23</td></tr>
+      <tr><td class="num">L27</td><td>Fifth colour, first level at the new supply</td><td class="num">Colour Call, L28</td></tr>
+      <tr><td class="num">L33</td><td>Stone Planter, board fragmentation</td><td class="num">Burrow's Dig &amp; Trowel, L34</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Refill, and why there is no reshuffle booster</h4>
+
+  <p>A blast board is dead only when no two orthogonally adjacent tiles share a colour. Across twenty thousand random 8×8 five-colour draws I did not produce one. Stone Planters split columns, so refill is specified per segment: each segment of a column fills from its own top, including one sitting under an immovable obstacle.</p>
+
+  <p>There is still a dead-board policy, because "effectively never" is not "never". If it happens the board reshuffles itself silently, obstacles keep their cells and their state, and the player is never told. Selling the player a booster for a problem the genre does not have would be worse than useless; it would say I had reasoned about blast games from the outside.</p>
+</section>
+
+<section id="catalogue">
+  <div class="part-label">Part IV</div>
+  <h2>Element Catalogue</h2>
+
+  <p class="lead">Part III said when each element arrives and why there. This is what each one is. The table below is the whole game on one screen; everything after it is the detail behind a row.</p>
+
+  <h3>Everything, at a glance</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Category</th><th>Name</th><th>Colour / Level</th><th>What it is</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="5"><strong>Match<br>elements</strong></td><td><img src="images/el_fern.png" class="tbl-icon" alt=""><strong>Fern</strong></td><td>Green</td><td>Feathery frond, many fine leaflets. The default.</td></tr>
+      <tr><td><img src="images/el_poppy.png" class="tbl-icon" alt=""><strong>Poppy</strong></td><td>Red</td><td>Four wide petals, a shallow bowl.</td></tr>
+      <tr><td><img src="images/el_daisy.png" class="tbl-icon" alt=""><strong>Daisy</strong></td><td>Yellow</td><td>Radial disc, many thin petals.</td></tr>
+      <tr><td><img src="images/el_bluebell.png" class="tbl-icon" alt=""><strong>Bluebell</strong></td><td>Blue</td><td>Hanging bell on a single stem.</td></tr>
+      <tr><td><img src="images/el_lavender.png" class="tbl-icon" alt=""><strong>Lavender</strong></td><td>Purple, from L26</td><td>Vertical spike of small buds.</td></tr>
+
+      <tr><td rowspan="4"><strong>Power-ups</strong></td><td><img src="images/pu_antnest.png" class="tbl-icon" alt=""><strong>Ant Nest</strong></td><td class="num">5 tiles · L2</td><td>Sweeps the row or column it formed in.</td></tr>
+      <tr><td><img src="images/pu_puffball.png" class="tbl-icon" alt=""><strong>Puffball</strong></td><td class="num">7–8 tiles · L7</td><td>5×5 blast, strips one obstacle layer.</td></tr>
+      <tr><td><img src="images/pu_pollencloud.png" class="tbl-icon" alt=""><strong>Pollen Cloud</strong></td><td class="num">9+ tiles · L11</td><td>Clears every tile of its own colour.</td></tr>
+      <tr><td><img src="images/pu_beehive.png" class="tbl-icon" alt=""><strong>Pollen Meter</strong></td><td class="num">meter · L23</td><td>Fills from cleared tiles; on full, bees damage one layer of the toughest obstacle.</td></tr>
+
+      <tr><td><strong>Collectible</strong></td><td><img src="images/seedpod.png" class="tbl-icon" alt=""><strong>Seedpod</strong></td><td class="num">L16</td><td>Placed by the level designer; power-up combinations drop extras. Bring it to the bottom row.</td></tr>
+
+      <tr><td rowspan="9"><strong>Obstacles</strong></td><td><strong>Dry Leaf</strong></td><td class="num">L1</td><td>One hit from an adjacent blast.</td></tr>
+      <tr><td><strong>Clay Pot</strong></td><td class="num">L4</td><td>One to three layers, one per adjacent blast.</td></tr>
+      <tr><td><strong>Frost Glass</strong></td><td class="num">L8</td><td>Sits on a playable tile; clear the tile beneath.</td></tr>
+      <tr><td><strong>Root Knot</strong></td><td class="num">L14</td><td>Immune to adjacency. Any power-up removes it.</td></tr>
+      <tr><td><strong>Weevil</strong></td><td class="num">L20</td><td>Starts three cells long, capped at six. Moves at the end of your move, eating the tile its head enters, and grows a segment every third tile. Each hit takes a segment off the tail.</td></tr>
+      <tr><td><strong>Stone Planter</strong></td><td class="num">L32</td><td>2×2, ignores gravity, five hits. Splits columns.</td></tr>
+      <tr><td><strong>Creeping Ivy</strong></td><td class="num">L38</td><td>Covers a tile; spreads every three moves unless hit.</td></tr>
+      <tr><td><strong>Thistle</strong></td><td class="num">L41</td><td>Releases one thistledown per hit; collect them all.</td></tr>
+      <tr><td><strong>Sun Lamp</strong></td><td class="num">L48</td><td>Toggles each move. While lit, cleared tiles count double toward the Pollen Meter.</td></tr>
+
+      <tr><td rowspan="6"><strong>Boosters</strong></td><td><strong>Shears</strong></td><td class="num">in-level · L17</td><td>Remove one tile or one obstacle layer.</td></tr>
+      <tr><td><strong>Watering Can</strong></td><td class="num">pre-level · L23</td><td>Start with an Ant Nest on the board.</td></tr>
+      <tr><td><strong>Colour Call</strong></td><td class="num">in-level · L28</td><td>Recolour one colour inside a 3×3.</td></tr>
+      <tr><td><strong>Burrow's Dig</strong></td><td class="num">in-level · L34</td><td>Strip one layer along a chosen row.</td></tr>
+      <tr><td><strong>Trowel</strong></td><td class="num">pre-level · L34</td><td>Strip three random obstacle layers at the start.</td></tr>
+      <tr><td><strong>Extra Moves</strong></td><td class="num">on failure · L6</td><td>The continue offer. Five moves, priced.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Match elements</h3>
+
+  <p>Five colours. The constraint I set myself is that every tile must be identifiable with the colour stripped out, so silhouette comes first and hue second. A colour-matching game that is unplayable for the roughly 8% of men with colour vision deficiency has a self-inflicted audience cap, and the fix costs nothing if the shapes are designed properly at the start.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Element</th><th>Colour</th><th>Silhouette</th><th>Reads as</th></tr></thead>
+    <tbody>
+      <tr><td><img src="images/el_fern.png" class="tbl-icon" alt=""><strong>Fern</strong></td><td>Green</td><td>Feathery frond, many fine leaflets</td><td>Growth, the default</td></tr>
+      <tr><td><img src="images/el_poppy.png" class="tbl-icon" alt=""><strong>Poppy</strong></td><td>Red</td><td>Four wide petals, a shallow bowl</td><td>Heat, force</td></tr>
+      <tr><td><img src="images/el_daisy.png" class="tbl-icon" alt=""><strong>Daisy</strong></td><td>Yellow</td><td>Radial disc, many thin petals</td><td>Spread</td></tr>
+      <tr><td><img src="images/el_bluebell.png" class="tbl-icon" alt=""><strong>Bluebell</strong></td><td>Blue</td><td>Hanging bell on a single stem</td><td>Flow, downward</td></tr>
+      <tr><td><img src="images/el_lavender.png" class="tbl-icon" alt=""><strong>Lavender</strong></td><td>Purple</td><td>Vertical spike of small buds</td><td>Rarity</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The test is simple and worth running on the first art pass: render all five in greyscale at 44 px and ask someone to name them. If they cannot, the silhouettes are not doing their job and no amount of colour tuning will fix it later.</p>
+
+  <h3>Power-ups</h3>
+
+  <p>Three come from cluster size, one from position. Here is what each actually does on a standard 8×8 board at five colours, because a ladder built on vague descriptions is a ladder nobody can tune.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Power-up</th><th>Created by</th><th>Clears</th><th>Converts</th><th>Job</th></tr></thead>
+    <tbody>
+      <tr><td><img src="images/pu_antnest.png" class="tbl-icon" alt=""><strong>Ant Nest</strong></td><td class="num">5 tiles</td><td class="num">8</td><td>–</td><td>Reach across the board</td></tr>
+      <tr><td><img src="images/pu_puffball.png" class="tbl-icon" alt=""><strong>Puffball</strong></td><td class="num">7–8 tiles</td><td class="num">≈25</td><td>–</td><td>Force, and obstacle removal</td></tr>
+      <tr><td><img src="images/pu_pollencloud.png" class="tbl-icon" alt=""><strong>Pollen Cloud</strong></td><td class="num">9+ tiles</td><td class="num">≈13</td><td>–</td><td>Act on the whole board by colour</td></tr>
+      
+    </tbody>
+  </table>
+  </div>
+
+  <p>Three rungs is what one axis supports. Everything else the player gets comes from the Pollen Meter, the boosters or the level layout, and keeping those out of the ladder is what lets the ladder stay legible: cluster size in, power-up out, no qualifiers.</p>
+
+  <p>Pollen Cloud sits at the top because it acts on the board by colour rather than by geometry, which is the same principle Royal Match's Light Ball and Toon Blast's Disco Ball are built on. That is also why nothing needs to sit above it: the top of a power-up ladder should be a thing that acts on the other rungs.</p>
+
+  <h4>Combinations</h4>
+
+  <p>Two power-ups in adjacent cells combine when either is tapped.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Combination</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><img src="images/pu_antnest.png" class="tbl-icon" alt=""><img src="images/pu_antnest.png" class="tbl-icon" alt=""> Ant Nest + Ant Nest</td><td>Clears the full row <em>and</em> the full column.</td></tr>
+      <tr><td><img src="images/pu_antnest.png" class="tbl-icon" alt=""><img src="images/pu_puffball.png" class="tbl-icon" alt=""> Ant Nest + Puffball</td><td>The line clears, and a 5×5 detonates at each end of it.</td></tr>
+      <tr><td><img src="images/pu_puffball.png" class="tbl-icon" alt=""><img src="images/pu_puffball.png" class="tbl-icon" alt=""> Puffball + Puffball</td><td>7×7, strips two obstacle layers.</td></tr>
+      <tr><td><img src="images/pu_pollencloud.png" class="tbl-icon" alt=""><img src="images/pu_antnest.png" class="tbl-icon" alt=""> Pollen Cloud + Ant Nest</td><td>Every tile of the chosen colour becomes an Ant Nest, then all fire.</td></tr>
+      <tr><td><img src="images/pu_pollencloud.png" class="tbl-icon" alt=""><img src="images/pu_puffball.png" class="tbl-icon" alt=""> Pollen Cloud + Puffball</td><td>Every tile of the chosen colour becomes a Puffball, then all fire.</td></tr>
+      <tr><td><img src="images/pu_pollencloud.png" class="tbl-icon" alt=""><img src="images/pu_pollencloud.png" class="tbl-icon" alt=""> Pollen Cloud + Pollen Cloud</td><td>Clears the board and strips one layer from every obstacle.</td></tr>
+      
+      
+      
+      
+    </tbody>
+  </table>
+  </div>
+
+  <p>Every combination drops a Seedpod. That is the quiet reason to learn them: a combination is the one Seedpod source the player controls, which is why it is the only one I let exist beside the designer's.</p>
+
+  <h3>Seedpod</h3>
+
+  <div class="cards">
+    <div class="card">
+      <h5><img src="images/seedpod.png" class="tbl-icon" alt="">Seedpod <span class="tag">Collectible · L16</span></h5>
+      <p><strong>Placed on the board</strong> by the level designer, so the supply the goal depends on is authored rather than random. Every power-up combination drops one extra. That is surplus, not supply: a combination is deliberate, so the goal never rests on a lucky board.</p>
+      <p><strong>Behaves like</strong> a normal occupant: it falls with gravity, cannot be matched, and is not destroyed by blasts or power-ups.</p>
+      <p><strong>Collected</strong> by bringing it down to the bottom row, at which point it leaves the board.</p>
+      <p><strong>Lost</strong> only to a Weevil.</p>
+      <p class="why">It is the one object that connects the board to the meta. Everything else the player does converts to a Sprout at the end of the level; a Seedpod is something they physically carried down the board and then see planted in the garden. That is worth more to the restoration fantasy than another currency would be.</p>
+    </div>
+  </div>
+
+  <h3>Obstacles</h3>
+
+  <p>Nine across the first fifty levels: eight below, plus the Weevil, which gets its own entry because it is the only one that moves.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Level</th><th>Obstacle</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>Dry Leaf</strong></td><td>One hit from an adjacent blast. Never a barrier, only a target.</td></tr>
+      <tr><td class="num">4</td><td><strong>Clay Pot</strong></td><td>One to three layers, one removed per adjacent blast.</td></tr>
+      <tr><td class="num">8</td><td><strong>Frost Glass</strong></td><td>Sits on a playable tile. Clear the tile beneath to remove it; the tile stays matchable while covered.</td></tr>
+      <tr><td class="num">14</td><td><strong>Root Knot</strong></td><td>Immune to adjacent blasts. Removed by one hit from <em>any</em> power-up, deliberately, so the first hard gate never depends on rolling a particular colour.</td></tr>
+      <tr><td class="num">32</td><td><strong>Stone Planter</strong></td><td>2×2, ignores gravity, five hits. Splits columns, so it changes board topology rather than its contents. Used sparingly: fragmentation is the least readable kind of difficulty.</td></tr>
+      <tr><td class="num">38</td><td><strong>Creeping Ivy</strong></td><td>Covers a tile and makes it unplayable. Spreads to one neighbour every three moves unless hit. A clock that is not the move counter.</td></tr>
+      <tr><td class="num">41</td><td><strong>Thistle</strong></td><td>Releases one thistledown per hit; they drift and must be collected; the thistle breaks when empty. A goal that generates its own supply, so pacing the source is the puzzle.</td></tr>
+      <tr><td class="num">48</td><td><strong>Sun Lamp</strong></td><td>Toggles on and off each move. While lit, every tile cleared counts double toward the Pollen Meter, so the puzzle is timing your largest clear to a lit move. The only element that helps, and the last to arrive.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h5>Weevil <span class="tag t">L20 · the only one that moves</span></h5>
+      <p><strong>What it is:</strong> a grub, the one living thing on the board, <strong>three cells long to start with</strong>. The level designer places it along a board edge, the same way Seedpods are placed, and it never respawns. <strong>It moves at the end of your move, never before it</strong>, so the board you are looking at is always the board you are about to act on. The head enters the next cell toward your nearest Seedpod and eats the tile there, the tail leaves its last cell, and that cell collapses like any other. It does not fall with gravity, it cannot pass through immovable obstacles, and it does not eat them.</p>
+      <p><strong>It grows as it feeds and shrinks as you fight it.</strong> Every third tile it eats adds a segment. Every hit takes one off the tail, and it keeps moving while it shrinks. Kill it by taking the last segment. That gives the player a live number on the board instead of a hidden one: a Weevil getting longer is a level getting away from them, and a Weevil getting shorter is progress they can see without a health bar.</p>
+      <p><strong>It caps at six cells.</strong> That cap is mine rather than the idea's, and it is there because unbounded growth breaks the board: at one segment per three moves an untouched Weevil would own a whole row by the end of a normal level, and a puzzle you cannot recover from is not a puzzle. Six is wide enough to be a wall and narrow enough to play around. Never more than one per level before level 40.</p>
+      <p><strong>A level with a Weevil always carries one more Seedpod than its goal requires.</strong> Losing one has to cost the player something real without quietly making the level unwinnable, because an unwinnable board the player cannot recognise is the worst thing a puzzle can do to them.</p>
+      <p class="why">Every other obstacle in the game is static: it sits there and you deal with it. The Weevil moves, which in a blast game is a specific kind of pressure rather than a general one. Part I argues that difficulty here is about denying contiguity, and a three-cell Weevil is a wall that travels: it cuts the board somewhere different every move, so the board the player was reading two moves ago is not the board in front of them. At one cell it would be a nuisance. At three it is a shape the player has to plan around, which is the point. It also gives them a countdown they can read straight off the board, and a real choice between defending something they already earned and finishing the level. It is the only reason a collection goal has tension rather than being bookkeeping.</p>
+      <p class="why"><strong>What I am risking here.</strong> This is the one element where I reached past what I could see working in the two games I studied. I have not come across a moving obstacle in Royal Match or Toon Blast, in the levels I played or in the community documentation I searched, which is not the same as saying there is none. That cuts both ways. A board that changes between the player's moves is the thing a puzzle player least expects, which is what makes the Weevil interesting and also what could sink it, because a player who cannot trust the board to stay still stops planning and starts reacting. There is a quieter argument against it too. Peak has had years and thousands of levels of Toon Blast to ship something like this, and I have not run into it. Either I have not played far enough to meet it, or it was tried and did not hold. The second is a real possibility and I would rather say so out loud than pretend I had not thought of it. One number from a first playable would settle it, which is how often the player kills the Weevil on sight. If that is close to every time then it is not a decision, it is a two-move tax, and it should go. I kept it because a collection goal with nothing threatening it is bookkeeping, and because this is the kind of idea worth being wrong about early rather than never trying.</p>
+    </div>
+  </div>
+</section>
+
+<section id="art">
+  <div class="part-label">Part V</div>
+  <h2>Art, Animation &amp; Audio</h2>
+
+  <p class="lead">Part I argued that in a blast game the effects are not decoration, they are how the player keeps their model of a board that changes fifteen cells at a time. This is the spec that follows from that.</p>
+
+  <h3>Art direction</h3>
+
+  <p>Flat-forward, closer to Toon Blast than to Royal Match, for production reasons. Bloomrise needs roughly nine obstacle families in its first fifty levels and many more behind that, and a flat idiom keeps the cost of the fiftieth obstacle close to the cost of the fifth. The fidelity budget goes instead to the garden restoration scenes, which is where the meta has to pay off visually.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Layer</th><th>Treatment</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>Board background</td><td>Desaturated, low contrast, no detail above 15% opacity</td><td>Tiles must pop off it. Anything decorative here competes with the only thing being read.</td></tr>
+      <tr><td>Match tiles</td><td>Flat fill, one highlight, heavy silhouette difference</td><td>Quarter-second identification. Playable in greyscale.</td></tr>
+      <tr><td>Power-ups &amp; Seedpods</td><td>Warmest things on the board, physically larger, slight idle motion</td><td>These are the objects the player is steering toward. They have to draw the eye without being tapped.</td></tr>
+      <tr><td>Obstacles</td><td>Muted, cooler than tiles, material clearly stated</td><td>They should read as scenery that is in the way, not as things to match.</td></tr>
+      <tr><td>Saturated colour</td><td>Reserved for progress, rewards and offers only</td><td>If everything is loud, nothing signals.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Animation timing</h3>
+
+  <p>Budgets are from tap to a fully settled, tappable board. Anything over these numbers makes the game feel slow, anything under makes it unreadable.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Event</th><th>Budget</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Blast, 2–4 tiles</td><td class="num">≤ 350 ms</td><td>Pop, then collapse. No hold.</td></tr>
+      <tr><td>Blast, 5+ tiles</td><td class="num">≤ 600 ms</td><td>Includes a 120 ms hold before the power-up forms, so the player sees what they earned.</td></tr>
+      <tr><td>Seedpod drop</td><td class="num">≤ 450 ms</td><td>Runs in parallel with the collapse, never after it.</td></tr>
+      <tr><td>Seedpod collected</td><td class="num">≤ 700 ms</td><td>The only routine event that gets anticipation. It is the one thing the player carried across the board.</td></tr>
+      <tr><td>Single power-up</td><td class="num">≤ 900 ms</td><td>Trail must remain visible for 200 ms after the clear.</td></tr>
+      <tr><td>Combination</td><td class="num">≤ 1400 ms</td><td>Camera performs a short settle and return, never a cut.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Collapse is staggered per column, not simultaneous. Columns settle left to right with about 30 ms between them, which is short enough to read as one motion and long enough to give the eye an order.</p>
+
+  <h3>Particles</h3>
+
+  <p>Tiered, so that a big clear is distinguishable from a small one by kind. The failure mode to avoid is fifteen simultaneous full bursts, which is visual mud and hides the board underneath the celebration of clearing it.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Tier</th><th>Trigger</th><th>Budget</th><th>Screen effects</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1 · Pop</strong></td><td>Any ordinary blast</td><td class="num">4–6 particles per tile, 250 ms life</td><td>None</td></tr>
+      <tr><td><strong>2 · Form</strong></td><td>Power-up created</td><td class="num">Soil puff, 8 particles, one ring</td><td>None. A brief warm glow on the cell.</td></tr>
+      <tr><td><strong>3 · Collect</strong></td><td>Seedpod reaches the bottom row</td><td class="num">Petal burst, 20 particles, 600 ms</td><td>Light flare on the cell, no shake</td></tr>
+      <tr><td><strong>4 · Detonation</strong></td><td>Power-up fires</td><td class="num">40+ particles, trails, debris</td><td>Light, 2 px shake, 80 ms time dilation</td></tr>
+      <tr><td><strong>5 · Combination</strong></td><td>Two power-ups</td><td class="num">Full budget, layered</td><td>Light, 5 px shake, camera settle-and-return</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Hard cap: no more than 250 live particles at any time regardless of how many events fired. Above that, tiers 1 and 2 are dropped first, because the small pops are the ones nobody is watching during a chain.</p>
+
+  <p>Every particle that survives at speed has to carry information. Rocket-style trails exist so the player can see which line was cleared after the fact. Debris colour matches the obstacle material so the player learns what broke without reading a counter. An effect that does neither does not ship.</p>
+
+  <h3>Audio</h3>
+
+  <p>This is where I got it wrong in <em>Stackline</em>, described in Part I: every falling fragment got its own sound at full volume, and at speed the game became unlistenable. The rule below is what fixed it there, and it is the rule I would build this game's audio on.</p>
+
+  <div class="callout">
+    <span class="callout-title">Density rule</span>
+    <p><strong>Per-event loudness falls as event count rises, and the total loudness of a single clear is capped no matter how many tiles it destroyed.</strong> A twenty-tile clear reads as bigger than a five-tile clear through pitch, duration and low end, never through raw volume.</p>
+    <p>The cost of getting this wrong is a muted player, which is why the cap is a rule rather than a preference.</p>
+  </div>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Layer</th><th>Design</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Tile pop</strong></td><td>One short sample, pitch stepped up through the cluster so a big clear plays a rising figure. Overlapping voices are attenuated, not stacked. Maximum eight simultaneous voices.</td></tr>
+      <tr><td><strong>Power-up forms</strong></td><td>Low, soft, distinct from everything else. It is the sound of something being earned and it should never be lost inside the clear that produced it.</td></tr>
+      <tr><td><strong>Seedpod falls</strong></td><td>A short descending figure, repeated one step lower each row it drops, so the player can hear it travelling without watching it.</td></tr>
+      <tr><td><strong>Seedpod collected</strong></td><td>Resolves the falling figure. This is the only routine audio event allowed to duck the music.</td></tr>
+      <tr><td><strong>Power-up</strong></td><td>Layered: an attack, a body tied to the power-up's verb, and a tail that survives the visual.</td></tr>
+      <tr><td><strong>Music</strong></td><td>Warm and low energy, ducked 6 dB during any tier 4 or 5 event, restored over 400 ms.</td></tr>
+      <tr><td><strong>Failure</strong></td><td>Quiet. Not a sting. A loss screen that shouts is the one a player closes the app on.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Haptics follow the same tiering and are off by default above tier 3, because continuous haptic feedback drains battery and is the second thing players turn off. Root and bloom get a light tap, detonations a medium one, and nothing else vibrates.</p>
+
+  <h3>Accessibility, treated as a feature</h3>
+
+  <p>Silhouette-first tiles mean the game is playable without colour. On top of that: a colour-blind mode that adds a small glyph to each tile type, a reduced-motion setting that removes shake and time dilation while keeping collapse timing intact, and an option to disable the background idle animation on the garden view. None of these is expensive, and the first one is close to free if the silhouettes are designed properly at the start.</p>
+</section>
+
+<section id="meta">
+  <div class="part-label">Part VI</div>
+  <h2>Meta-Game &amp; Economy</h2>
+
+  <p class="lead">Royal Match and Toon Blast both give you a star for finishing a level, and they mean opposite things by it. That difference decided Bloomrise's meta.</p>
+
+  <p>In Royal Match a star is a <strong>construction currency</strong>. You earn it and you spend it on restoration tasks, so your balance goes up and down and the meta consumes your play. In Toon Blast the same star does double duty: it fills a chest you empty for rewards, and it <strong>accumulates</strong> into a rolling tournament ranking against other players. The competitive use is the one the game builds urgency around.</p>
+
+  <p>Spending creates ownership. Ranking creates urgency. Toon Blast runs both from one currency; Royal Match runs only the first. Either is fine, but a game has to know which one is load-bearing, because that decides what the meta is <em>for</em>.</p>
+
+  <p>Bloomrise makes spending load-bearing and keeps ranking peripheral. The reason comes from the core mechanic: a level already generates its own urgency, with a move budget running down, a collection goal to carry and a Weevil walking toward it. The meta does not need to add more of that. It needs to supply the opposite, which is a calm reason to open the app tomorrow.</p>
+
+  <h3>The core loop</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Step</th><th>System</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Play a level</td><td>A life is spent only on failure, as in both reference games.</td></tr>
+      <tr><td class="num">2</td><td>Earn a Sprout</td><td>One per level, first clear only. Never purchasable, at any price.</td></tr>
+      <tr><td class="num">3</td><td>Spend it</td><td>Each garden holds six to nine restoration tasks costing one to three Sprouts. The player picks the order.</td></tr>
+      <tr><td class="num">4</td><td>Finish the garden</td><td>Garden Chest, a short scene, the next garden opens.</td></tr>
+      <tr><td class="num">5</td><td>Unlock a Cultivar</td><td>A permanent plant that changes something in the levels that follow.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Cultivars, and when I would kill them</h3>
+
+  <p>In Royal Match restoration is cosmetic. Finishing the Dining Room does not change how a level plays, which is a safe design that works, but it does mean the meta is a reward for playing rather than a part of playing.</p>
+
+  <p>In Bloomrise, completing a garden unlocks a <strong>Cultivar</strong>. A Cultivar is a plant you have grown back, and it changes one rule of the game permanently from then on. It is not a booster, because you never spend it or buy it, and it is not a power-up, because it is never created on the board. It is a standing clause that applies in every level you play afterwards.</p>
+
+  <p>The Glasshouse gives <strong>Moonflower</strong>: once per level you may take back your last move. The Orchard gives <strong>Thornwood</strong>: a Puffball that detonates with no obstacle inside its 5&times;5 drops a Seedpod instead of clearing empty tiles.</p>
+
+  <p>Neither adds force. Moonflower buys back a mistake, Thornwood turns a wasted power-up into progress on a goal, and both are worth exactly nothing to a player who was not going to make that mistake or waste that Puffball. That is the whole point: they change how a level is solved, not how much power is brought into it. It is the only version of this feature I can cap safely.</p>
+
+  <p>This gives the meta a reason to exist for players who have no interest in decorating, and it keeps the fantasy coherent: you are a botanist, and the gardens you revive grow you things.</p>
+
+  <h4>The garden as a second kind of play</h4>
+
+  <p>Neither of these games keeps the player inside the core verb the whole time. Royal Match ships the rescue puzzles its advertising is built on as a separate mode, unlocked past a level threshold. I have not reached it myself and I am going on published descriptions, so treat that detail as second-hand, but the shape of the decision is clear enough to borrow: a second kind of puzzle, bounded, sitting beside the campaign instead of inside it.</p>
+
+  <p>Bloomrise should have one, and the garden is where it belongs. The direction I would take is a short puzzle that is not a match at all, set in the garden being restored, entered from the map rather than the level path, and paying into the same economy the campaign already uses rather than a currency of its own. That last part is the design decision worth stating now: a second mode that pays into its own pot competes with the campaign, while one that pays into the same pot feeds it. I am not specifying the mode here. It is real scope and it needs its own document, and a case study that sketches a second game in two paragraphs would not be honest about what that costs.</p>
+
+  <div class="callout warn">
+    <span class="callout-title">The cost, and the kill condition</span>
+    <p>It couples difficulty tuning to meta pace. Once player power grows with garden completion, every level has to be tuned against a range of player strength. Someone who rushed the campaign and someone who backfilled every garden reach level 120 with different toolkits.</p>
+    <p>Two mitigations ship together. Cap total Cultivar effect so the gap between a minimum-power and maximum-power player never exceeds about one move's worth of advantage, and make Cultivars situational rather than additive, so they change how a level is solved instead of how much force is brought to it. A third option, gating campaign progress on garden completion, closes the gap entirely and is held in reserve because it is the least respectful of the player's time.</p>
+    <p><strong>Kill condition:</strong> if the fail-rate spread between the top and bottom Cultivar quartile at a fixed level exceeds ten points, the feature reverts to cosmetic.</p>
+  </div>
+
+  <h3>Supporting systems</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>System</th><th>Unlocks</th><th>Design</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Lives</strong></td><td>–</td><td>Five maximum, one per 25 minutes, lost on failure only. Refillable with coins or by asking a Greenhouse. Cap rises to eight during an active Season.</td></tr>
+      <tr><td><strong>Greenhouses</strong></td><td class="num">L20</td><td>Teams, gated at the same level as the Weevil so the social unlock lands on the first real difficulty step. Members send lives from level 20, so the chat has something to be about from day one.</td></tr>
+      <tr><td><strong>Seasons</strong></td><td class="num">L35</td><td>Thirty-step monthly track. Keys from levels, double from Hard, triple from Super Hard. Free and premium lanes.</td></tr>
+      <tr><td><strong>Valley Bloom</strong></td><td class="num">L45</td><td>The only competitive surface. A 48-hour Sprout race in groups of 50. Deliberately peripheral.</td></tr>
+      <tr><td><strong>Burrow's Delivery</strong></td><td class="num">L8</td><td>Daily gift with a visible preview of tomorrow's. The cheapest retention mechanism that exists, and the first one I would build.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Economy</h3>
+
+  <p>One soft currency, <strong>Coins</strong>, bought directly with money and earned slowly in play. No hard currency and no second premium tier.</p>
+
+  <p>The argument for a single currency is that every conversion layer you add buys obfuscation at the cost of trust, and in a genre where the paying player is frequently an adult who is fully aware of what they are doing, obfuscation is a poor trade. Royal Match runs one currency at enormous scale, which is reasonable evidence that the simple structure is not leaving much on the table.</p>
+
+  <p>Everything below is a starting point with reasoning attached, not a validated number. I have no telemetry, and prices are the part of this document I would expect to be wrong first.</p>
+
+  <h4>Sources and sinks</h4>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Coins in</th><th>Roughly</th><th>Coins out</th><th>Roughly</th></tr></thead>
+    <tbody>
+      <tr><td>First clear of a level</td><td class="num">20</td><td>Continue, first in a level</td><td class="num">600</td></tr>
+      <tr><td>Daily gift</td><td class="num">50–150</td><td>Continue, second</td><td class="num">900</td></tr>
+      <tr><td>Garden Chest</td><td class="num">400</td><td>Continue, third and beyond</td><td class="num">1,400</td></tr>
+      <tr><td>Season track, free lane</td><td class="num">~1,200 / month</td><td>Life refill</td><td class="num">900</td></tr>
+      <tr><td>Greenhouse chest</td><td class="num">200 / week</td><td>Pre-level booster</td><td class="num">300–500</td></tr>
+      <tr><td>Valley Bloom, top 10</td><td class="num">250–1,000</td><td>In-level booster</td><td class="num">150–400</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Summing the left column for an active player who clears eight new levels a day: 160 from first clears, about 100 from the daily gift, roughly 40 a day amortised from the free Season lane, about 29 from the weekly Greenhouse chest, and roughly 200 amortised from Garden Chests (one garden every two days at this pace). Call it <strong>530 coins a day</strong>, against a 600-coin continue.</p>
+
+  <p>That is the shape I want: a free player nearly covers one continue a day but not quite, so the wall is real but never total. Note that first-clear income is capped by content rather than by skill, which matters, because it means a strong player cannot farm the economy open. If free income drifts much above one continue a day the offer loses its weight; much below and the fail screen starts producing uninstalls instead of purchases.</p>
+
+  <h4>The continue offer</h4>
+
+  <p>This is the single most commercially important screen in a casual puzzle game, and it is the one place where the design has to be honest about what it is doing.</p>
+
+  <p>On failure the board stays visible behind the panel, the remaining goal is shown as a count rather than a percentage, and the offer is five extra moves for coins.</p>
+
+  <p>The price escalates across <em>attempts at the same level</em>, 600 then 900 then 1,400, and resets when the player leaves it. So the second tier is only ever reached by a player who bought five moves, came close again, and failed again. Escalation is not a squeeze on a desperate player; it is a brake on a player who is about to spend four thousand coins on one level.</p>
+
+  <p><strong>Two rules I would hold.</strong> The continue is never offered when the player is further than roughly one move from finishing, because an offer the player can see is hopeless reads as the game trying it on. And the button that declines is a normal button, the same size and legibility as the one that accepts. The genre is full of grey four-point <em>no thanks</em> links, and they earn a rounding error at the cost of exactly the goodwill this game's warm tone is trying to build.</p>
+
+  <h4>Offers, and when they appear</h4>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Offer</th><th>First shown</th><th>Reasoning</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Continue</strong></td><td class="num">L6, on first failure</td><td>The player has to have wanted something before they are sold it.</td></tr>
+      <tr><td><strong>Starter pack</strong></td><td class="num">After the first two-loss level, usually L20–22</td><td>Not at install. A pack offered before the player has felt a wall is noise, and it trains them to dismiss offers.</td></tr>
+      <tr><td><strong>Seed Jar</strong> (piggy bank)</td><td class="num">L25</td><td>Fills with coins as levels are completed and is unlocked by a single purchase. It works because the contents were earned, which makes it the least resented offer in the genre.</td></tr>
+      <tr><td><strong>Season premium lane</strong></td><td class="num">L35</td><td>Only once the free lane has been visibly progressing for a few days.</td></tr>
+      <tr><td><strong>Coin packs</strong></td><td class="num">Always, in Shop</td><td>Never interrupts play. Reachable, not pushed.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Advertising</h4>
+
+  <p>Rewarded video only at launch. No interstitials at launch.</p>
+
+  <p><strong>One thing I want to be careful about.</strong> Dream's no-ads position is well known, and <a href="https://felixbraberg.substack.com/p/dream-games-brings-interstitial-ads" target="_blank" rel="noopener">published coverage</a> reports that it changed: interstitial and rewarded ads were added to Royal Match in May 2026, after the same model had been running in Royal Kingdom. I did not see a single ad in my own play, and the same coverage describes an early test rather than a finished rollout, so my honest reading is a limited experiment I was not part of. I am going on published sources here, not on something I experienced, and I would want to be corrected on it.</p>
+
+  <p>The question it raises is worth answering either way, and my answer is that a launch title and a mature one are not the same asset. If Royal Match is testing this, it is testing it on a game that has spent years earning the player's trust, and that trust is the thing being spent here. You can only spend what you have already built. A new game has not built any of it yet. Interstitials are also a lever you can pull later and cannot un-pull, because the players who leave over them do not come back to check whether you changed your mind. So the position is about sequence rather than principle: rewarded first, interstitials only if the numbers later say the trade is worth it.</p>
+
+  <p>I have made a smaller version of this call myself. My Google Play games do carry ads, and the rule I wrote for them was that a new player sees none on their first day. The reasoning holds at any size: the first session is where you find out whether someone comes back at all, and it is the worst session in the game to spend on a few cents of ad revenue.</p>
+
+  <p>One thing to name before someone else does. The design's whole premise is that a player who wants a power-up now cannot have one, and <strong>Sunbeam sells exactly that</strong>: a coin price on the three moves of patience the game is built from. That is either the sharpest monetisation surface in the product or the thing that quietly dissolves it, depending entirely on price and frequency. It is the one item I would hold out of the first launch and add later with a tight cap.</p>
+
+  <p>Three placements: one free life when empty, once every four hours; doubling a Garden Chest; one free pre-level booster per day. Each is opt-in, each arrives at a moment the player already wants something, and none of them interrupts a level.</p>
+
+  <p>The reasoning is about which number is bigger. In a casual puzzle game like this one, nearly all the revenue comes from players buying things, not from advertising. A forced interstitial earns a small amount of ad money by costing you sessions, and sessions are what the purchase revenue is built out of, so it takes from the large number to feed the small one. Rewarded video runs the other way: it gives a player who has never paid a way to stay in the loop, and a player still in the loop can still decide to pay later.</p>
+
+  <h4>What I would instrument before launch</h4>
+
+  <p>Two obvious ones first: what share of players ever pay at all, and how much a paying player spends. Beyond those, four that say more about whether the economy is healthy. How often a continue offer is shown versus accepted, split by how close the player was to finishing. How many coins players are holding at every tenth level. How many coins a player earns against how many they spend in a week. And the share of failures where the player had no coins at all and could not have taken the offer even if they had wanted to. That last one is usually the first sign that an economy is starving players rather than converting them.</p>
+
+  <h4>What I left out</h4>
+
+  <p>Royal Match runs a large and varied live event calendar. Bloomrise ships with two concurrent event surfaces and a cap written into the home screen spec.</p>
+
+  <p>That is a claim about order. An event calendar is a live-ops capability built out of measurement, and specifying fifteen events for a game that has not launched would be describing a mature product's surface with none of the machinery underneath it. Bloomrise ships two, instruments them properly, and earns the third.</p>
+</section>
+
+<section id="leveldesign">
+  <div class="part-label">Part VII</div>
+  <h2>Level Design Strategy</h2>
+
+  <p class="lead">A blast board is never the same twice. Tiles refill at random from above, so nobody, including the person who built the level, can know what the board will look like after the first move. That single fact decides how levels have to be tuned, and it rules out the method most people reach for first.</p>
+
+  <h3>Why "solve it and add slack" does not work here</h3>
+
+  <p>The instinct from deterministic puzzle design is to solve the level optimally, count the moves, and set the budget at some multiple. There is no such number in a blast game. The same board, played identically, produces a different move count every run, because what falls into the gap decides what is available next.</p>
+
+  <p>What exists instead is a distribution, and the budget is a choice of percentile within it.</p>
+
+  <h4>The authoring pipeline</h4>
+
+  <ol>
+    <li><strong>Pick the teaching job.</strong> One per level: introduce an element, test an element, combine two known elements, or apply pressure to a known combination. A level without one is filler.</li>
+    <li><strong>Build the board.</strong> Shape, obstacles, colour count, goal, Seedpod and Weevil placement.</li>
+    <li><strong>Run the solver.</strong> An automated player with a fixed heuristic policy, two thousand trials per level. It produces a distribution of moves-to-goal, not a number.</li>
+    <li><strong>Set the budget at a percentile</strong> chosen from the band's target fail rate, adjusted by the bot-to-human offset.</li>
+    <li><strong>Playtest cold.</strong> If a human fails for a reason the level was not about, the level is wrong.</li>
+    <li><strong>Ship and measure.</strong> Fail rate and quit rate per level, per attempt number.</li>
+  </ol>
+
+  <h4>The bot-to-human offset</h4>
+
+  <p>A heuristic bot is worse than a strong player and better than a weak one, so its distribution is not the player's. The offset gets measured once against live data from the first few hundred shipped levels, then reused: compare the bot's median move count to the observed player median at the same level and carry that ratio forward.</p>
+
+  <p>Before there is live data the offset is a guess, which means the first fifty levels will need retuning after launch. That is worth writing down now.</p>
+
+  <h4>Budget percentiles by band</h4>
+
+  <p><strong>Percentile here means this.</strong> The solver plays the same level thousands of times, and because the board refills at random each attempt needs a different number of moves. What comes out is a spread, not a single answer. Setting the budget at the 80th percentile means eight attempts in ten finished inside it. A high percentile is generous, a low one is tight. The numbers below are hand-picked starting points rather than measurements: they are where I would begin, and the first live cohort would move every one of them.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Levels</th><th>Budget set at</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1–10</td><td class="num">99th percentile</td><td>Almost every run wins. Failure here is an onboarding defect, not difficulty.</td></tr>
+      <tr><td class="num">11–25</td><td class="num">85th</td><td>A few wasted moves start to matter.</td></tr>
+      <tr><td class="num">26–40</td><td class="num">75th</td><td>The player has to be roughly efficient.</td></tr>
+      <tr><td class="num">41–50</td><td class="num">65th</td><td>Near-efficient play required. Difficulty is slack removed, not obstacles added.</td></tr>
+      <tr><td>Hard</td><td class="num">50th</td><td>The median run fails. That is what the label means.</td></tr>
+      <tr><td>Super Hard</td><td class="num">30th</td><td>Most runs fail without a power-up chain or a booster. Honest about what it is.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Where difficulty should come from</h3>
+
+  <p>The obvious lever is obstacles, and it is the wrong one. Every obstacle teaches something specific, so adding one to make a level harder also changes what that level is for, and that breaks the teaching order in Part III. It also crowds the board. A crowded board is harder to read without being harder to solve, and a player who loses because they could not see the move reads that as the game being unfair.</p>
+
+  <p>Move budget and colour count are the right levers, because neither one touches what the level teaches or how it looks. Both are a single number in a config file, so either can be retuned after launch without asking anyone to draw anything. Colour count is the strongest of the two and the quietest: going from four colours to five makes clusters smaller and power-ups rarer, the level gets meaningfully harder, and the player never sees what changed.</p>
+
+  <h3>The difficulty rhythm</h3>
+
+  <p>A flat ramp is exhausting. The player needs a level they can win cleanly right after one that cost them something. The repeating unit across the first fifty:</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Position</th><th>Role</th><th>Difficulty</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1–2</td><td>Recovery. Clean win, rhythm restored.</td><td>Low</td></tr>
+      <tr><td class="num">3–4</td><td>Teaching. New element, forgiving frame.</td><td>Low–medium</td></tr>
+      <tr><td class="num">5–6</td><td>Application. The new element at a real budget.</td><td>Medium</td></tr>
+      <tr><td class="num">7</td><td>Spike. Two systems at once.</td><td>High</td></tr>
+      <tr><td class="num">8–10</td><td>Consolidation. Varied boards, nothing new.</td><td>Medium, descending</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Every fifteen to twenty levels the spike becomes a labelled <strong>Hard</strong>, and every fifty a <strong>Super Hard</strong>. Both pay extra Season keys, following Royal Match, so the wall is something the player wants to arrive at rather than something that happens to them.</p>
+
+  <h3>Designing boards for power-up supply</h3>
+
+  <p>The one thing a board layout can quietly break is the player's route to a power-up, and it breaks without ever looking broken.</p>
+
+  <div class="callout warn">
+    <span class="callout-title">The open-area rule</span>
+    <p><strong>Every level must contain at least one contiguous open region of nine or more cells.</strong> Below that, five-plus clusters stop forming reliably and the player can no longer reach a power-up by playing well, only by waiting for the refill to be kind.</p>
+    <p>A board too fragmented to build anything switches the reward loop off. The player will not be able to say why the level feels bad; they will just stop playing it. This is the cheapest thing in the game to check automatically and the most expensive to discover from a churn graph.</p>
+  </div>
+
+  <p>Beyond that, every level gets classified on a second axis, chosen deliberately and written on its spec sheet:</p>
+
+  <ul>
+    <li><strong>Open.</strong> Few obstacles, four colours, large contiguous areas. Power-ups are frequent and the puzzle is which one to aim for and where to spend it. These should dominate the first twenty-five levels.</li>
+    <li><strong>Tight.</strong> Fragmented by Stone Planters, five colours, a Weevil on the board. Reaching a power-up at all is the challenge. Used sparingly, and never in a level that introduces something else.</li>
+    <li><strong>Fast.</strong> Short budgets where the level resolves in a handful of moves and power-ups barely feature. Legitimate as a change of pace, but more than one in ten and the ladder stops being the game.</li>
+  </ul>
+
+  <p>Level 35, the combination tutorial, is the hardest board in the first fifty to author and the reason it is scheduled. It is a narrow eight-wide board with two guaranteed open columns side by side, obstacle placement that funnels large clusters into both, and a budget generous enough that a player will make two power-ups before they are forced to spend one. Nothing explains the combination. The board makes it likely and the player discovers it.</p>
+
+  <h3>What I would measure</h3>
+
+  <p>These targets are starting hypotheses. I have no telemetry from either reference game, and a first live cohort would correct them within a week.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Band</th><th>Target fail rate</th><th>If above</th><th>If below</th></tr></thead>
+    <tbody>
+      <tr><td class="num">L1–10</td><td class="num">&lt; 5%</td><td>Raise the percentile. This is an onboarding leak and the highest-priority fix in the game.</td><td>–</td></tr>
+      <tr><td class="num">L11–25</td><td class="num">10–20%</td><td>Raise the offending level only.</td><td>Below 8%, the band is not teaching pressure.</td></tr>
+      <tr><td class="num">L26–50</td><td class="num">20–35%</td><td>Check quit rate first.</td><td>Lower the percentile.</td></tr>
+      <tr><td>Hard</td><td class="num">45–60%</td><td>–</td><td>It is not hard and the extra keys are being given away.</td></tr>
+      <tr><td>Super Hard</td><td class="num">65–75%</td><td>Above 85%, cut it regardless of how good the board is.</td><td>–</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Fail rate on its own is not a diagnosis. What matters is fail rate paired with quit rate at the same level. A level with 50% failure that players immediately retry is a wall they want to climb. A level with 30% failure that a third of players never return from is a churn point, and it is doing far more damage.</p>
+
+  <h3>Two things this design does not solve</h3>
+
+  <p><strong>Power-up supply decays inside a level.</strong> A fresh board is cluster-rich and a played-out one is not, so the ladder is most reachable in the first third of a level and least reachable in the last third, which is exactly when a player behind on goals needs a rescue. The percentile pipeline above tunes the median of a distribution; this is a problem with the shape of that distribution, not its middle. I do not have a fix I believe in yet. The candidates are a late-level threshold reduction, or an obstacle that injects large same-colour groups near the end, and both need a solver before they are worth arguing about.</p>
+
+  <p><strong>The Pollen Meter is the only system here that could carry a second chapter, and one is not enough.</strong> It is the single thing that hands the player something from outside the power-up ladder. Everything else is the genre's standard vocabulary executed carefully. Fifty levels is comfortable on that basis and five hundred is not, so chapters two and three would need at least one more system of the same kind: something that pays out on <em>when</em> a player cleared or on <em>how much</em> they have cleared, rather than on the size of a single tap. Designing that is not in this document, and I would want a live fail-rate curve before attempting it.</p>
+
+  <p>One metric matters more than the rest and it is cheap to collect: <strong>power-ups created per level</strong>, split by type. If a band's Ant Nest count is healthy but its Puffball count is near zero, the boards in that band are too fragmented to build anything large and the difficulty is coming from the layout rather than from the budget. Loosening the move budget will not fix that; the boards have to be rebuilt. The same signal at the Pollen Cloud end tells you the ceiling of the ladder is unreachable and the top rung is decorative.</p>
+</section>
+
+<section id="ui">
+  <div class="part-label">Part VIII</div>
+  <h2>UI Wireframes</h2>
+
+  <p class="lead">Four screens. All drawn to phone proportions, because a layout that only works on a review monitor is not a layout.</p>
+
+  <p>They are grey boxes on purpose. The art exists and is shown in Parts IV and V, but dropping it in here would make these mockups rather than wireframes, and a reader could no longer tell which decisions I am actually making. The board below is not filler either: it shows a five-cluster the player could take, a Seedpod two rows above the bottom, and a Weevil on its way to eat it.</p>
+
+  <style>
+    .wf-grid{display:grid;gap:34px;margin:30px 0}
+    @media(min-width:760px){.wf-grid{grid-template-columns:1fr 1fr;gap:28px}}
+    .wf-frame{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 14px}
+    .wf-frame svg{display:block;width:100%;height:auto;max-width:320px;margin:0 auto}
+    .wf-title{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.06em;
+      text-transform:uppercase;color:var(--ink-3);margin-bottom:12px;text-align:center}
+    .wf-notes{margin:16px 0 0 0}
+    .wf-notes li{font-family:var(--sans);font-size:14.5px;line-height:1.55;margin-bottom:9px;
+      list-style:none;padding-left:26px;position:relative;color:var(--ink-2)}
+    .wf-notes li b{position:absolute;left:0;top:1px;width:19px;height:19px;border-radius:50%;
+      background:var(--green);color:#fff;font-size:11px;font-weight:700;
+      display:flex;align-items:center;justify-content:center}
+    .f{fill:none}
+    .sol{stroke:#1e2419;stroke-width:1.6}
+    .dsh{stroke:#8d9687;stroke-width:1.2;stroke-dasharray:4 3}
+    .fl{fill:#ecefe9}
+    .lbl{font:500 9.5px system-ui,sans-serif;fill:#5c6656}
+    .lbl-s{font:500 8px system-ui,sans-serif;fill:#828c7c}
+    .lbl-b{font:700 12px system-ui,sans-serif;fill:#1e2419}
+    .nm{font:700 9px system-ui,sans-serif;fill:#fff}
+  </style>
+
+  <div class="wf-grid">
+
+    <div>
+    <div class="wf-frame">
+      <div class="wf-title">Home Screen</div>
+      <svg viewBox="0 0 320 624" role="img" aria-label="Home screen wireframe">
+        <rect x="1" y="1" width="318" height="622" rx="26" fill="#f7f5f0" class="sol"/>
+        <rect x="14" y="16" width="92" height="30" rx="15" class="fl dsh"/>
+        <text x="24" y="35" class="lbl">♥♥♥♥♡ 24:10</text>
+        <rect x="114" y="16" width="76" height="30" rx="15" class="fl dsh"/>
+        <text x="126" y="35" class="lbl">◎ 1,240</text>
+        <circle cx="290" cy="31" r="15" class="fl dsh"/><text x="285" y="35" class="lbl">⚙</text>
+
+        <rect x="14" y="58" width="292" height="264" rx="10" class="fl dsh"/>
+        <text x="26" y="78" class="lbl-s">GARDEN VIEW · THE GLASSHOUSE</text>
+        <rect x="40" y="96" width="106" height="82" rx="6" class="f dsh"/>
+        <rect x="160" y="96" width="120" height="120" rx="6" class="f dsh"/>
+        <rect x="40" y="192" width="106" height="72" rx="6" class="f dsh"/>
+        <text x="60" y="142" class="lbl-s">restored</text>
+        <text x="196" y="160" class="lbl-s">in progress</text>
+        <text x="66" y="232" class="lbl-s">locked</text>
+        <rect x="160" y="230" width="120" height="34" rx="17" fill="#2f6b3f"/>
+        <text x="184" y="252" class="nm">RESTORE · 2 ✿</text>
+        <circle cx="291" cy="73" r="9" fill="#2f6b3f"/><text x="288" y="77" class="nm">1</text>
+
+        <rect x="14" y="334" width="140" height="62" rx="9" class="fl dsh"/>
+        <text x="26" y="354" class="lbl-s">SEASON · 12/30</text>
+        <rect x="26" y="362" width="116" height="7" rx="3.5" fill="#d8d3c7"/>
+        <rect x="26" y="362" width="46" height="7" rx="3.5" fill="#b8562f"/>
+        <text x="26" y="388" class="lbl-s">ends in 6d</text>
+        <rect x="166" y="334" width="140" height="62" rx="9" class="fl dsh"/>
+        <text x="178" y="354" class="lbl-s">VALLEY BLOOM</text>
+        <text x="178" y="371" class="lbl-s">rank 7 of 50</text>
+        <text x="178" y="388" class="lbl-s">ends in 31:04</text>
+        <circle cx="160" cy="326" r="9" fill="#2f6b3f"/><text x="157" y="330" class="nm">2</text>
+
+        <rect x="14" y="410" width="292" height="36" rx="8" class="fl dsh"/>
+        <text x="26" y="433" class="lbl">✿ 14 Sprouts · Glasshouse 4 / 7 tasks</text>
+
+        <rect x="60" y="466" width="200" height="66" rx="33" fill="#2f6b3f"/>
+        <text x="126" y="497" style="font:700 15px system-ui,sans-serif" fill="#fff">PLAY</text>
+        <text x="118" y="515" style="font:600 10.5px system-ui,sans-serif" fill="#cfe2d1">LEVEL 51</text>
+        <circle cx="271" cy="474" r="9" fill="#2f6b3f"/><text x="268" y="478" class="nm">3</text>
+
+        <line x1="14" y1="556" x2="306" y2="556" class="dsh"/>
+        <g class="lbl-s">
+          <rect x="30" y="568" width="60" height="34" rx="7" class="f dsh"/><text x="38" y="589">GLASSHOUSE</text>
+          <rect x="130" y="568" width="60" height="34" rx="7" class="f dsh"/><text x="152" y="589">TASKS</text>
+          <rect x="230" y="568" width="60" height="34" rx="7" class="f dsh"/><text x="251" y="589">SHOP</text>
+        </g>
+        <circle cx="16" cy="585" r="9" fill="#2f6b3f"/><text x="13" y="589" class="nm">4</text>
+      </svg>
+    </div>
+    <ul class="wf-notes">
+      <li><b>1</b><strong>The garden is the screen, not a tab.</strong> What the player is working toward takes the largest area and is visible before anything is tapped. Restoration behind a menu becomes a chore.</li>
+      <li><b>2</b><strong>Two event surfaces, capped by spec.</strong> A third does not get added without one being removed. This is the concrete answer to the criticism of Royal Match's home screen in Part I.</li>
+      <li><b>3</b><strong>PLAY never moves.</strong> Largest element, highest contrast, thumb-reachable, never displaced by an event. A returning player should be inside a level in under three seconds without reading anything.</li>
+      <li><b>4</b><strong>Three destinations.</strong> Everything else is reachable from the garden. A five-item bottom bar is a bottom bar with two dead items.</li>
+    </ul>
+    </div>
+
+    <div>
+    <div class="wf-frame">
+      <div class="wf-title">Gameplay Screen</div>
+      <svg viewBox="0 0 320 624" role="img" aria-label="Gameplay screen wireframe">
+        <rect x="1" y="1" width="318" height="622" rx="26" fill="#f7f5f0" class="sol"/>
+
+        <circle cx="26" cy="36" r="15" class="fl dsh"/><text x="22" y="41" class="lbl">&#8249;</text>
+        <circle cx="64" cy="36" r="17" fill="#e8ecdf" stroke="#8d9687" stroke-width="1.3"/>
+        <circle cx="58.5" cy="33" r="2.2" fill="#3a4436"/><circle cx="69.5" cy="33" r="2.2" fill="#3a4436"/>
+        <path d="M 57 41 Q 64 46 71 41" fill="none" stroke="#3a4436" stroke-width="1.3"/>
+        <circle cx="82" cy="20" r="9" fill="#2f6b3f"/><text x="79" y="24" class="nm">1</text>
+
+        <rect x="90" y="16" width="134" height="40" rx="9" class="fl dsh"/>
+        <text x="98" y="30" class="lbl-s">GOALS</text>
+        <rect x="98" y="36" width="24" height="14" rx="3" class="f dsh"/><text x="126" y="48" class="lbl">12</text>
+        <rect x="150" y="36" width="24" height="14" rx="3" class="f dsh"/><text x="178" y="48" class="lbl">3</text>
+        <rect x="232" y="16" width="76" height="40" rx="9" class="fl dsh"/>
+        <text x="244" y="30" class="lbl-s">MOVES</text>
+        <text x="252" y="50" style="font:700 18px system-ui,sans-serif" fill="#1e2419">18</text>
+        <circle cx="228" cy="14" r="9" fill="#2f6b3f"/><text x="225" y="18" class="nm">2</text>
+
+        <rect x="10" y="68" width="300" height="300" rx="10" class="f dsh"/>
+        <g class="f" stroke="#c3cabc" stroke-width="1">
+          <rect x="18" y="76" width="284" height="284" rx="6"/>
+          <line x1="53.5" y1="76" x2="53.5" y2="360"/><line x1="89.0" y1="76" x2="89.0" y2="360"/><line x1="124.5" y1="76" x2="124.5" y2="360"/><line x1="160.0" y1="76" x2="160.0" y2="360"/><line x1="195.5" y1="76" x2="195.5" y2="360"/><line x1="231.0" y1="76" x2="231.0" y2="360"/><line x1="266.5" y1="76" x2="266.5" y2="360"/>
+          <line x1="18" y1="111.5" x2="302" y2="111.5"/><line x1="18" y1="147.0" x2="302" y2="147.0"/><line x1="18" y1="182.5" x2="302" y2="182.5"/><line x1="18" y1="218.0" x2="302" y2="218.0"/><line x1="18" y1="253.5" x2="302" y2="253.5"/><line x1="18" y1="289.0" x2="302" y2="289.0"/><line x1="18" y1="324.5" x2="302" y2="324.5"/>
+        </g>
+        <g class="wf-tiles">
+          <circle cx="35.75" cy="93.75" r="7" fill="#c2cbbb"/>
+          <circle cx="71.25" cy="93.75" r="7" fill="#d3cbba"/>
+          <circle cx="106.75" cy="93.75" r="7" fill="#b6bfc7"/>
+          <circle cx="142.25" cy="93.75" r="7" fill="#c2cbbb"/>
+          <circle cx="177.75" cy="93.75" r="7" fill="#d3cbba"/>
+          <circle cx="213.25" cy="93.75" r="7" fill="#b6bfc7"/>
+          <circle cx="248.75" cy="93.75" r="7" fill="#d3cbba"/>
+          <circle cx="284.25" cy="93.75" r="7" fill="#c2cbbb"/>
+          <circle cx="35.75" cy="129.25" r="7" fill="#b6bfc7"/>
+          <circle cx="71.25" cy="129.25" r="7" fill="#c2cbbb"/>
+          <circle cx="106.75" cy="129.25" r="7" fill="#d3cbba"/>
+          <circle cx="142.25" cy="129.25" r="7" fill="#b6bfc7"/>
+          <circle cx="177.75" cy="129.25" r="7" fill="#c2cbbb"/>
+          <circle cx="213.25" cy="129.25" r="7" fill="#d3cbba"/>
+          <circle cx="248.75" cy="129.25" r="7" fill="#c2cbbb"/>
+          <circle cx="284.25" cy="129.25" r="7" fill="#b6bfc7"/>
+          <circle cx="35.75" cy="164.75" r="7" fill="#d3cbba"/>
+          <circle cx="71.25" cy="164.75" r="7" fill="#b6bfc7"/>
+          <circle cx="106.75" cy="164.75" r="7" fill="#c2cbbb"/>
+          <circle cx="213.25" cy="164.75" r="7" fill="#c2cbbb"/>
+          <circle cx="248.75" cy="164.75" r="7" fill="#b6bfc7"/>
+          <circle cx="284.25" cy="164.75" r="7" fill="#d3cbba"/>
+          <circle cx="35.75" cy="200.25" r="7" fill="#c2cbbb"/>
+          <circle cx="71.25" cy="200.25" r="7" fill="#d3cbba"/>
+          <circle cx="106.75" cy="200.25" r="7" fill="#b6bfc7"/>
+          <circle cx="142.25" cy="200.25" r="7" fill="#d3cbba"/>
+          <circle cx="177.75" cy="200.25" r="7" fill="#b6bfc7"/>
+          
+          
+          <circle cx="35.75" cy="235.75" r="7" fill="#b6bfc7"/>
+          <circle cx="71.25" cy="235.75" r="7" fill="#c2cbbb"/>
+          <circle cx="106.75" cy="235.75" r="7" fill="#d3cbba"/>
+          <circle cx="142.25" cy="235.75" r="7" fill="#c2cbbb"/>
+          <circle cx="177.75" cy="235.75" r="7" fill="#d3cbba"/>
+          <circle cx="213.25" cy="235.75" r="7" fill="#b6bfc7"/>
+          <circle cx="248.75" cy="235.75" r="7" fill="#d3cbba"/>
+          <circle cx="284.25" cy="235.75" r="7" fill="#c2cbbb"/>
+          <circle cx="35.75" cy="271.25" r="7" fill="#d3cbba"/>
+          <circle cx="71.25" cy="271.25" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="106.75" cy="271.25" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="142.25" cy="271.25" r="7" fill="#b6bfc7"/>
+          <circle cx="177.75" cy="271.25" r="7" fill="#c2cbbb"/>
+          <circle cx="213.25" cy="271.25" r="7" fill="#d3cbba"/>
+          <circle cx="35.75" cy="306.75" r="7" fill="#c2cbbb"/>
+          <circle cx="71.25" cy="306.75" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="106.75" cy="306.75" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="142.25" cy="306.75" r="7" fill="#d3cbba"/>
+          <circle cx="177.75" cy="306.75" r="7" fill="#b6bfc7"/>
+          <circle cx="213.25" cy="306.75" r="7" fill="#c2cbbb"/>
+          <circle cx="248.75" cy="306.75" r="7" fill="#b6bfc7"/>
+          <circle cx="284.25" cy="306.75" r="7" fill="#d3cbba"/>
+          <circle cx="35.75" cy="342.25" r="7" fill="#b6bfc7"/>
+          <circle cx="71.25" cy="342.25" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="106.75" cy="342.25" r="7" fill="#c2cbbb"/>
+          <circle cx="142.25" cy="342.25" r="7" fill="#b6bfc7"/>
+          <circle cx="177.75" cy="342.25" r="7" fill="#d3cbba"/>
+          <circle cx="213.25" cy="342.25" r="7" fill="#c2cbbb"/>
+          <circle cx="248.75" cy="342.25" r="7" fill="#d3cbba"/>
+          <circle cx="284.25" cy="342.25" r="7" fill="#b6bfc7"/>
+        </g>
+        <path d="M 54 254 H 124 V 324 H 89 V 359 H 54 Z" fill="none" stroke="#5f7d4e"
+              stroke-width="1.4" stroke-dasharray="4 3"/>
+        <text x="56" y="248" style="font:700 9px system-ui,sans-serif" fill="#5f7d4e">5 TILES &#183; ANT NEST</text>
+
+        <rect x="128" y="151" width="28" height="28" rx="5" fill="#f5e4da" stroke="#b8562f" stroke-width="1.5"/>
+        <text x="137" y="171" style="font:700 12px system-ui,sans-serif" fill="#b8562f">&#10041;</text>
+        <rect x="164" y="151" width="28" height="28" rx="6" fill="#f2e7cf" stroke="#8a6b3a" stroke-width="1.5"/>
+        <text x="172" y="171" style="font:700 13px system-ui,sans-serif" fill="#8a6b3a">&#10086;</text>
+        <circle cx="200" cy="150" r="9" fill="#2f6b3f"/><text x="197" y="154" class="nm">3</text>
+
+        <rect x="200" y="188" width="97" height="25" rx="12.5" fill="#e6ded0" stroke="#6b5636" stroke-width="1.5"/>
+        <line x1="232" y1="190" x2="232" y2="211" stroke="#6b5636" stroke-width="1" opacity="0.55"/>
+        <line x1="264" y1="190" x2="264" y2="211" stroke="#6b5636" stroke-width="1" opacity="0.55"/>
+        <circle cx="210" cy="196.5" r="1.7" fill="#6b5636"/><circle cx="210" cy="204.5" r="1.7" fill="#6b5636"/>
+        <path d="M 198 195 C 192 186 190 180 189 175" fill="none" stroke="#6b5636" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <path d="M 185 179 L 188.5 172 L 193 178" fill="none" stroke="#6b5636" stroke-width="1.2"/>
+        <text x="222" y="230" style="font:700 8.5px system-ui,sans-serif" fill="#6b5636">WEEVIL &#183; 3 OF 6</text>
+
+        <circle cx="248.75" cy="271.25" r="7" fill="#d3cbba"/><circle cx="284.25" cy="271.25" r="7" fill="#b6bfc7"/>
+
+        <rect x="10" y="382" width="146" height="44" rx="9" class="fl dsh"/>
+        <text x="20" y="400" class="lbl-s">SEEDPODS</text>
+        <text x="20" y="415" class="lbl-s">&#10086; 1 on board &#183; 2 of 3</text>
+        <rect x="164" y="382" width="146" height="44" rx="9" class="fl dsh"/>
+        <text x="174" y="400" class="lbl-s">POLLEN METER</text>
+        <rect x="174" y="407" width="126" height="8" rx="4" fill="#d8d3c7"/>
+        <rect x="174" y="407" width="79" height="8" rx="4" fill="#c98a1e"/>
+        <circle cx="306" cy="378" r="9" fill="#2f6b3f"/><text x="303" y="382" class="nm">4</text>
+
+        <line x1="10" y1="460" x2="310" y2="460" class="dsh"/>
+        <g class="lbl-s" text-anchor="middle">
+          <rect x="12" y="480" width="68" height="78" rx="10" class="fl dsh"/>
+          <text x="46" y="514">&#9986;</text><text x="46" y="538">SHEARS</text>
+          <rect x="88" y="480" width="68" height="78" rx="10" class="fl dsh"/>
+          <text x="122" y="514">&#9681;</text><text x="122" y="538">COLOUR</text>
+          <rect x="164" y="480" width="68" height="78" rx="10" class="fl dsh"/>
+          <text x="198" y="514">&#9935;</text><text x="198" y="538">DIG</text>
+          <rect x="240" y="480" width="68" height="78" rx="10" class="fl dsh"/>
+          <text x="274" y="514">&#9728;</text><text x="274" y="538">SUNBEAM</text>
+        </g>
+        <circle cx="14" cy="478" r="9" fill="#2f6b3f"/><text x="11" y="482" class="nm">5</text>
+        <text x="160" y="590" class="lbl-s" text-anchor="middle">no booster costs a move</text>
+      </svg>
+    </div>
+    <ul class="wf-notes">
+  <li><b>1</b><strong>Mira, top left, idling.</strong> It is one of the game's own two characters rather than a generic avatar, which is what Royal Match does with its king and Toon Blast does with its cast: the face on the playing screen is the same face from the story, so the player is tied to the game's world while they are working. She blinks, watches the board, and reacts when a power-up fires. It is the only animation on this screen that is not feedback, and it is the cheapest place to put the warmth the theme promises. The level number sits with her rather than taking a row of its own.</li>
+  <li><b>2</b><strong>Goals left, moves right, one row, above the board.</strong> The two numbers checked between every tap are never under the player's own hand. Moves is the largest number on screen after the board.</li>
+  <li><b>3</b><strong>Power-ups and Seedpods are the warmest things on the board.</strong> They are larger than a tile, they carry a soft glow a tile never gets, and they idle very slightly. Everything the player is steering toward should be findable without reading a label.</li>
+  <li><b>4</b><strong>Two slow counters share one strip.</strong> On the left, Seedpods: a collection goal the player cannot audit is a goal they stop trusting, so the strip says in words what the board says in position. On the right, the Pollen Meter, which is the only thing on this screen that moves on its own. It is a bar rather than a number because the player never needs its exact value, only whether it is nearly full.</li>
+  <li><b>5</b><strong>Four booster slots, fixed, thumb-reachable, none costing a move.</strong> Nothing interactive sits in the bottom corners where a resting thumb would hit it.</li>
+</ul>
+    </div>
+
+    <div>
+    <div class="wf-frame">
+      <div class="wf-title">Level Start Card</div>
+      <svg viewBox="0 0 320 400" role="img" aria-label="Level start card wireframe">
+        <rect x="1" y="1" width="318" height="398" rx="20" fill="#e8e5dd" class="sol"/>
+        <text x="20" y="26" class="lbl-s">HOME SCREEN DIMMED BEHIND</text>
+        <rect x="24" y="44" width="272" height="310" rx="14" fill="#faf8f4" stroke="#1e2419" stroke-width="1.6"/>
+        <text x="120" y="76" class="lbl-b">LEVEL 51</text>
+        <rect x="46" y="94" width="228" height="56" rx="8" class="fl dsh"/>
+        <text x="58" y="112" class="lbl-s">GOALS</text>
+        <rect x="58" y="120" width="26" height="20" rx="4" class="f dsh"/><text x="90" y="135" class="lbl">12</text>
+        <rect x="140" y="120" width="26" height="20" rx="4" class="f dsh"/><text x="172" y="135" class="lbl">3</text>
+        <text x="216" y="135" class="lbl">24 moves</text>
+        <text x="58" y="176" class="lbl-s">START WITH A BOOST</text>
+        <g class="lbl-s" text-anchor="middle">
+          <rect x="58" y="188" width="64" height="62" rx="10" class="fl dsh"/>
+          <text x="90" y="214">✿</text><text x="90" y="232">WATERING</text><text x="90" y="244">◎ 400</text>
+          <rect x="128" y="188" width="64" height="62" rx="10" class="fl dsh"/>
+          <text x="160" y="214">⛏</text><text x="160" y="232">TROWEL</text><text x="160" y="244">◎ 300</text>
+          <rect x="198" y="188" width="64" height="62" rx="10" class="fl dsh"/>
+          <text x="230" y="214">?</text><text x="230" y="232">LOCKED</text>
+        </g>
+        <circle cx="52" cy="180" r="9" fill="#2f6b3f"/><text x="49" y="184" class="nm">1</text>
+        <rect x="58" y="274" width="204" height="48" rx="24" fill="#2f6b3f"/>
+        <text x="142" y="303" style="font:700 14px system-ui,sans-serif" fill="#fff">START</text>
+        <text x="108" y="342" class="lbl-s">◎ 1,240 available</text>
+      </svg>
+    </div>
+    <ul class="wf-notes">
+      <li><b>1</b><strong>Pre-level boosters live here and nowhere else.</strong> This is a calm decision made with full information: the goals and move count are on the same card, so the player can judge whether they need help before they need it. Selling the same thing mid-level, under pressure, would be a different and worse product.</li>
+    </ul>
+    </div>
+
+    <div>
+    <div class="wf-frame">
+      <div class="wf-title">Failure &amp; Continue</div>
+      <svg viewBox="0 0 320 400" role="img" aria-label="Failure and continue screen wireframe">
+        <rect x="1" y="1" width="318" height="398" rx="20" fill="#e8e5dd" class="sol"/>
+        <text x="20" y="26" class="lbl-s">BOARD STILL VISIBLE, DIMMED</text>
+        <rect x="24" y="44" width="272" height="310" rx="14" fill="#faf8f4" stroke="#1e2419" stroke-width="1.6"/>
+        <text x="106" y="76" class="lbl-b">OUT OF MOVES</text>
+        <rect x="46" y="94" width="228" height="58" rx="8" class="fl dsh"/>
+        <text x="58" y="112" class="lbl-s">STILL NEEDED</text>
+        <rect x="58" y="120" width="26" height="20" rx="4" class="f dsh"/>
+        <text x="92" y="135" style="font:700 13px system-ui,sans-serif" fill="#b8562f">2</text>
+        <text x="120" y="135" class="lbl">Seedpods left</text>
+        <circle cx="286" cy="104" r="9" fill="#2f6b3f"/><text x="283" y="108" class="nm">1</text>
+
+        <rect x="46" y="172" width="228" height="56" rx="28" fill="#b8562f"/>
+        <text x="96" y="196" style="font:700 13px system-ui,sans-serif" fill="#fff">+5 MOVES</text>
+        <text x="122" y="214" style="font:600 11px system-ui,sans-serif" fill="#f5d9cc">◎ 600</text>
+        <circle cx="286" cy="172" r="9" fill="#2f6b3f"/><text x="283" y="176" class="nm">2</text>
+
+        <rect x="46" y="244" width="228" height="56" rx="28" fill="#faf8f4" stroke="#4a5443" stroke-width="2"/>
+        <text x="122" y="277" style="font:700 13px system-ui,sans-serif" fill="#1e2419">GIVE UP</text>
+        <circle cx="286" cy="244" r="9" fill="#2f6b3f"/><text x="283" y="248" class="nm">3</text>
+        <text x="72" y="322" class="lbl-s">Retrying costs 1 life. Next continue would cost ◎ 900.</text>
+      </svg>
+    </div>
+    <ul class="wf-notes">
+      <li><b>1</b><strong>Show exactly how close, as a count.</strong> "Two Seedpods left" is information. A percentage bar at 92% is a sales technique, and players know the difference.</li>
+      <li><b>2</b><strong>The offer, priced and escalating.</strong> 600, then 900, then 1,400 within the same level, reset on leaving. It is never shown at all when the player is more than roughly one move from finishing, because an offer that cannot plausibly succeed converts once and costs trust permanently.</li>
+      <li><b>3</b><strong>Declining is a real button.</strong> Same size, same legibility, same reachability as accepting. The genre is full of four-point grey <em>no thanks</em> links; they earn a rounding error and spend exactly the goodwill this game's tone is built on.</li>
+    </ul>
+    </div>
+
+  </div>
+
+  <p>The part of this I am least sure about is that strip. It costs 40 px of vertical space on a phone, which on an 8×8 board is most of a row. The Pollen Meter has to live somewhere, but the Seedpod half may be redundant: if a first playable shows players tracking their Seedpods from the board alone, that half gets deleted and the meter takes the full width. A bigger board beats a label that repeats what the board already says.</p>
+</section>
+
+<section id="prototype">
+  <div class="part-label">Appendix</div>
+  <h2>Playable Prototype</h2>
+
+  <p class="lead"><strong>The case did not ask for a prototype.</strong> I built one anyway, for myself, because I wanted to measure the core rather than guess at it. It is deliberately basic and it is not meant as a display of craft: there is no real interface, no art pass, no onboarding, and the feel is almost certainly wrong in places that one session with a real player would expose. What it is good for is narrow, and it is the reason it exists: it shows that the rules in Part IV hold together when they actually run, and it is where the cluster numbers and the dead-board figures in this document came from.</p>
+
+  <p><strong>Tap two or more adjacent matching tiles.</strong> Five tiles makes an <strong>Ant Nest</strong>, seven a <strong>Puffball</strong>, nine a <strong>Pollen Cloud</strong>. One axis, three rungs, no exceptions. Beside the board a <strong>Pollen Meter</strong> fills with every tile you clear; when it fills, bees damage one layer of the toughest obstacle on the board and it empties again.</p>
+
+  <p><strong>Seedpods</strong> start on the board and are collected by clearing a path to the bottom row; power-up combinations drop extras. The level below is the real thing: a move budget, two obstacles and three goals, running the four-colour set that levels 1&ndash;25 use.</p>
+
+  <style>
+    .proto{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin:26px 0}
+    .proto-hud{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;align-items:center;font-family:var(--sans)}
+    .hud-chip{background:var(--paper-2);border:1px solid var(--line);border-radius:7px;
+      padding:6px 11px;font-size:13px;font-weight:600;color:var(--ink-2)}
+    .hud-chip b{color:var(--green);font-size:15px}
+    .hud-chip.goal b{color:var(--terra)}
+    .hud-chip.moves b{font-size:17px}
+    .proto-btn{background:var(--green);color:#fff;border:none;border-radius:7px;padding:7px 13px;
+      font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer}
+    .proto-btn.ghost{background:var(--paper-2);color:var(--ink-2);border:1px solid var(--line)}
+    #proto-reset{margin-left:auto}
+    .board-wrap{position:relative;max-width:400px;margin:0 auto}
+    #proto-board{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;touch-action:manipulation}
+    #fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .pt{position:absolute;width:6px;height:6px;border-radius:50%;opacity:.95;
+      transition:transform .42s cubic-bezier(.2,.7,.3,1),opacity .42s linear}
+    .cell{aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;
+      font-size:clamp(14px,4.2vw,20px);cursor:pointer;user-select:none;color:#fff;line-height:1}
+    .cell:active{transform:scale(.92)}
+    .cell.pu{border:2px solid #1e2419;box-shadow:0 0 0 2px rgba(255,255,255,.7) inset}
+    .cell.pod{background:#f2e7cf;color:#8a6b3a;border:2px solid #8a6b3a;font-size:clamp(15px,4.4vw,22px)}
+    .cell.leaf{background:#cdbf9a;color:#5a4a28}
+    .cell.pot{background:#b98a63;color:#4a2f1c;font-family:var(--sans);font-weight:800;font-size:13px}
+    .cell.pop{animation:pp .16s ease-out forwards}
+    @keyframes pp{to{transform:scale(.15);opacity:0}}
+    .cell.hit{animation:hh .18s ease-out}
+    @keyframes hh{40%{transform:translateY(-4px) scale(1.06)}}
+    .cell.drop{animation:dd .24s cubic-bezier(.3,.85,.4,1) backwards}
+    @keyframes dd{from{transform:translateY(-150%)}}
+    .cell.formed{animation:bl .5s ease-out}
+    @keyframes bl{0%{transform:scale(.6)}55%{transform:scale(1.18)}}
+    .proto-log{font-family:var(--sans);font-size:13.5px;color:var(--ink-2);
+      margin-top:14px;min-height:2.6em;text-align:center;line-height:1.5}
+    .proto-log b{color:var(--green)}
+    .proto-log.win{color:var(--green);font-weight:700}
+    .proto-log.lose{color:var(--terra);font-weight:700}
+    .proto-key{display:flex;flex-wrap:wrap;gap:6px 13px;justify-content:center;
+      margin-top:14px;font-family:var(--sans);font-size:12px;color:var(--ink-3)}
+    .proto-key span{display:flex;align-items:center;gap:5px}
+    .proto-key i{width:17px;height:17px;border-radius:4px;display:inline-flex;
+      align-items:center;justify-content:center;color:#fff;font-style:normal;font-size:11px}
+    .proto-note{font-family:var(--sans);font-size:13.5px;color:var(--ink-3);
+      margin-top:18px;line-height:1.55;border-top:1px solid var(--line);padding-top:14px}
+    @media(prefers-reduced-motion:reduce){
+      .cell.pop,.cell.drop,.cell.formed,.cell.hit{animation:none}
+      .pt{display:none}
+    }
+  </style>
+
+  <div class="proto">
+    <div class="proto-hud">
+      <span class="hud-chip moves">Moves <b id="p-moves">25</b></span>
+      <span class="hud-chip goal">Leaves <b id="p-leaf">5</b></span>
+      <span class="hud-chip goal">Pots <b id="p-pot">3</b></span>
+      <span class="hud-chip goal">Seedpods <b id="p-pod">0</b>/2</span>
+      <span class="hud-chip">Pollen <b id="p-pollen">0</b>/30</span>
+      <button id="proto-sound" class="proto-btn ghost" type="button">Sound: off</button>
+      <button id="proto-reset" class="proto-btn" type="button">Reset</button>
+    </div>
+    <div class="board-wrap"><div id="proto-board"></div><div id="fx"></div></div>
+    <div class="proto-log" id="p-log">Clear 5 leaves and 3 pots and collect 2 Seedpods, in 25 moves.</div>
+    <div class="proto-key">
+      <span><img src="images/pu_antnest.png" class="tbl-icon" alt=""> 5 &rarr; Ant Nest</span>
+      <span><img src="images/pu_puffball.png" class="tbl-icon" alt=""> 7 &rarr; Puffball</span>
+      <span><img src="images/pu_pollencloud.png" class="tbl-icon" alt=""> 9 &rarr; Pollen Cloud</span>
+      <span><img src="images/pu_beehive.png" class="tbl-icon" alt=""> Pollen Meter &rarr; bees</span>
+      <span><img src="images/seedpod.png" class="tbl-icon" alt=""> Seedpod</span>
+    </div>
+  </div>
+
+  <p class="print-only" style="font-family:var(--sans);font-size:14px;color:#4a5443;margin:0">
+    <strong>This prototype is interactive and does not print.</strong>
+    It runs in the browser at <strong>outwinder.com/dream</strong>, at the end of the page.
+  </p>
+
+  <p class="proto-note"><strong>What this does and does not implement.</strong> Logic: the core verb, collapse and refill, all three power-ups with the thresholds and effects from Part IV, the Pollen Meter and its single-obstacle payout, combinations at the level of "two adjacent power-ups both fire", Seedpods placed at the start, dropping as bonuses and being collected at the bottom row, a move budget, three goals, and the first two obstacles. Feel: staggered collapse with the per-column delay and settle budgets from Part V, tiered particles, and the audio density rule. Every sound is generated in the browser, per-event loudness falls as the cluster grows, and a bigger clear reads through pitch and length instead of volume. Turn the sound on; it is the part of Part V that cannot be read.
+    <br><br>It does <em>not</em> implement: the other seven obstacles, boosters, the amplified results listed in the combination table, or any of the meta. It runs the four-colour set, because it is modelled on an early-band level.</p>
+
+  <script>
+  (function(){
+    var R=8,C=8,START_MOVES=25,POD_GOAL=2;
+    var COL={
+      g:{css:'#4a9d5f',img:'images/el_fern.png',name:'Fern',hz:392.00},
+      r:{css:'#d4573a',img:'images/el_poppy.png',name:'Poppy',hz:440.00},
+      y:{css:'#e0a92b',img:'images/el_daisy.png',name:'Daisy',hz:493.88},
+      b:{css:'#3f8bc4',img:'images/el_bluebell.png',name:'Bluebell',hz:587.33},
+      p:{css:'#8a5fb0',img:'images/el_lavender.png',name:'Lavender',hz:659.25}
+    };
+    /* this is an early-band level, so it runs the four-colour set from Part III */
+    var KEYS=['g','r','y','b'];
+    var PU={
+      vine :{css:'#4a9d5f',img:'images/pu_antnest.png',name:'Ant Nest'},
+      thorn:{css:'#d4573a',img:'images/pu_puffball.png',name:'Puffball'},
+      cloud:{css:'#e0a92b',img:'images/pu_pollencloud.png',name:'Pollen Cloud'}
+    };
+    var board=document.getElementById('proto-board'), fx=document.getElementById('fx');
+    var eM=document.getElementById('p-moves'), eL=document.getElementById('p-leaf'),
+        eP=document.getElementById('p-pot'), ePod=document.getElementById('p-pod'),
+        log=document.getElementById('p-log');
+    var g,moves,leafLeft,potLeft,pods,busy,over,dropCols,pollen;
+    var POLLEN_FULL=30;
+
+    /* ---------- audio: generated, nothing loaded ---------- */
+    var actx=null, sound=false;
+    function AC(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ sound=false; } } return actx; }
+    function tone(hz,dur,gain,type,delay,slideTo){
+      if(!sound)return; var a=AC(); if(!a)return;
+      var t0=a.currentTime+(delay||0);
+      var o=a.createOscillator(), gn=a.createGain();
+      o.type=type||'sine'; o.frequency.setValueAtTime(hz,t0);
+      if(slideTo)o.frequency.exponentialRampToValueAtTime(slideTo,t0+dur);
+      gn.gain.setValueAtTime(0.0001,t0);
+      gn.gain.exponentialRampToValueAtTime(Math.max(gain,0.0002),t0+0.012);
+      gn.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+      o.connect(gn); gn.connect(a.destination); o.start(t0); o.stop(t0+dur+0.02);
+    }
+    /* Part V density rule: per-event loudness falls as the count rises */
+    function sfxBlast(colour,n){
+      var base=COL[colour]?COL[colour].hz:440, voices=Math.min(n,8), per=0.075/Math.sqrt(n);
+      for(var i=0;i<voices;i++) tone(base*Math.pow(2,i/12), 0.09+n*0.006, per, 'triangle', i*0.026);
+      if(n>=5) tone(base/2, 0.22+n*0.01, 0.05/Math.sqrt(n), 'sine', 0.02);
+    }
+    function sfxForm(){ [0,4,7].forEach(function(st,i){ tone(392*Math.pow(2,st/12),0.18,0.06,'sine',i*0.05); }); }
+    function sfxPod(){ tone(174.6,0.26,0.08,'sine',0,233.1); }
+    function sfxCollect(){ [0,5,12].forEach(function(st,i){ tone(440*Math.pow(2,st/12),0.22,0.07,'sine',i*0.07); }); }
+    function sfxPower(){ tone(110,0.34,0.09,'sawtooth',0,330); tone(660,0.2,0.04,'triangle',0.03,990); }
+    function sfxHit(){ tone(150,0.08,0.05,'square'); }
+    function sfxEnd(win){
+      if(win)[0,5,9,14].forEach(function(st,i){ tone(392*Math.pow(2,st/12),0.3,0.07,'sine',i*0.1); });
+      else [0,-3,-7].forEach(function(st,i){ tone(330*Math.pow(2,st/12),0.3,0.05,'sine',i*0.12); });
+    }
+
+    /* ---------- particles ---------- */
+    function burstAt(idx,colour,tier){
+      if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+      var cell=board.children[idx]; if(!cell)return;
+      var br=board.getBoundingClientRect(), cr=cell.getBoundingClientRect();
+      var cx=cr.left-br.left+cr.width/2, cy=cr.top-br.top+cr.height/2;
+      var n=tier===3?14:(tier===2?8:5);
+      for(var i=0;i<n;i++){
+        var d=document.createElement('div'); d.className='pt';
+        d.style.background=colour; d.style.left=cx+'px'; d.style.top=cy+'px';
+        if(tier===3){ d.style.width='8px'; d.style.height='8px'; }
+        fx.appendChild(d);
+        (function(el){
+          var ang=Math.random()*6.283, dist=(tier===3?34:20)+Math.random()*26;
+          requestAnimationFrame(function(){
+            el.style.transform='translate('+(Math.cos(ang)*dist)+'px,'+(Math.sin(ang)*dist+16)+'px) scale(.3)';
+            el.style.opacity='0';
+          });
+          setTimeout(function(){ el.remove(); }, tier===3?620:320);
+        })(d);
+      }
+    }
+
+    function rnd(){ return KEYS[(Math.random()*KEYS.length)|0]; }
+    function inb(r,c){ return r>=0&&r<R&&c>=0&&c<C; }
+    function say(h,cls){ log.className='proto-log'+(cls?' '+cls:''); log.innerHTML=h; }
+    function wait(ms){ return new Promise(function(res){ setTimeout(res,ms); }); }
+
+    function init(){
+      g=[];
+      for(var r=0;r<R;r++){ var row=[]; for(var c=0;c<C;c++) row.push({t:'tile',k:rnd()}); g.push(row); }
+      [[2,1],[3,5],[5,2],[6,6],[4,0]].forEach(function(s){ g[s[0]][s[1]]={t:'leaf'}; });
+      [[5,4],[2,3],[6,1]].forEach(function(s,i){ g[s[0]][s[1]]={t:'pot',layers:(i%2)+1}; });
+      [[3,2],[4,6]].forEach(function(s){ g[s[0]][s[1]]={t:'pod'}; });
+      moves=START_MOVES; leafLeft=5; potLeft=3; pods=0; pollen=0;
+      busy=false; over=false; dropCols=null;
+      say('Clear 5 leaves and 3 pots and collect 2 Seedpods, in 25 moves.');
+      render();
+    }
+    function hud(){ eM.textContent=moves; eL.textContent=leafLeft; eP.textContent=potLeft; ePod.textContent=pods;
+      var el=document.getElementById('p-pollen'); if(el)el.textContent=pollen; }
+
+    function render(flash){
+      board.innerHTML='';
+      for(var r=0;r<R;r++)for(var c=0;c<C;c++){
+        var x=g[r][c], d=document.createElement('div');
+        d.className='cell'; d.dataset.r=r; d.dataset.c=c;
+        if(!x){ d.style.background='#e4e0d6'; }
+        else if(x.t==='tile'){
+          var item=COL[x.k];
+          d.style.background=item.css;
+          var im=document.createElement('img'); im.src=item.img; im.className='cell-icon'; im.alt=item.name;
+          d.appendChild(im);
+          if(dropCols&&dropCols.indexOf(c)>=0){ d.classList.add('drop'); d.style.animationDelay=(c*30)+'ms'; }
+        }
+        else if(x.t==='leaf'){ d.classList.add('leaf'); d.textContent='❀'; d.title='Dry Leaf'; }
+        else if(x.t==='pot'){ d.classList.add('pot'); d.textContent=x.layers; d.title='Clay Pot, '+x.layers+' layers'; }
+        else if(x.t==='pod'){
+          d.classList.add('pod'); d.title='Seedpod: bring it to the bottom row';
+          var im=document.createElement('img'); im.src='images/seedpod.png'; im.className='cell-icon'; im.alt='Seedpod';
+          d.appendChild(im);
+        }
+        else {
+          var p=PU[x.k]; d.classList.add('pu'); d.style.background=p.css; d.title=p.name;
+          var im=document.createElement('img'); im.src=p.img; im.className='cell-icon'; im.alt=p.name;
+          d.appendChild(im);
+          if(flash&&flash.indexOf(r+','+c)>=0)d.classList.add('formed');
+        }
+        d.addEventListener('click',onTap);
+        board.appendChild(d);
+      }
+      dropCols=null; hud();
+    }
+
+    function cluster(r,c){
+      var k=g[r][c].k, seen={}, out=[], st=[[r,c]];
+      while(st.length){
+        var q=st.pop(), y=q[0], x=q[1], id=y+','+x;
+        if(seen[id]||!inb(y,x))continue;
+        var cell=g[y][x];
+        if(!cell||cell.t!=='tile'||cell.k!==k)continue;
+        seen[id]=1; out.push([y,x]);
+        st.push([y+1,x],[y-1,x],[y,x+1],[y,x-1]);
+      }
+      return out;
+    }
+
+    function damageNeighbours(cells){
+      var done={}, any=false;
+      cells.forEach(function(h){
+        [[h[0]+1,h[1]],[h[0]-1,h[1]],[h[0],h[1]+1],[h[0],h[1]-1]].forEach(function(n){
+          var y=n[0],x=n[1],id=y+','+x;
+          if(!inb(y,x)||done[id])return;
+          var o=g[y][x]; if(!o)return;
+          if(o.t==='leaf'){ done[id]=1; g[y][x]=null; leafLeft--; any=true; }
+          else if(o.t==='pot'){ done[id]=1; o.layers--; any=true;
+            if(o.layers<=0){ g[y][x]=null; potLeft--; } }
+        });
+      });
+      return any;
+    }
+
+    /* everything that is not a power-up or a pod obeys gravity; pods and power-ups fall too */
+    function settle(){
+      var touched=[];
+      for(var c=0;c<C;c++){
+        var keep=[], changed=false;
+        for(var r=R-1;r>=0;r--) if(g[r][c]) keep.push(g[r][c]);
+        for(var r2=R-1,i=0;r2>=0;r2--,i++){
+          var nv = i<keep.length ? keep[i] : {t:'tile',k:rnd()};
+          if(g[r2][c]!==nv) changed=true;
+          g[r2][c]=nv;
+        }
+        if(changed)touched.push(c);
+      }
+      return touched;
+    }
+
+    /* a Seedpod resting on the bottom row is collected */
+    /* Pollen Meter: fills from cleared tiles, pays out one obstacle layer */
+    function addPollen(n){
+      pollen+=n;
+      if(pollen<POLLEN_FULL)return null;
+      pollen-=POLLEN_FULL;
+      var tgt=null,best=-1;
+      for(var y=0;y<R;y++)for(var x=0;x<C;x++){
+        var o=g[y][x]; if(!o)continue;
+        var w = o.t==='pot' ? 10+o.layers : (o.t==='leaf' ? 5 : 0);
+        if(w>best){ best=w; tgt=[y,x]; }
+      }
+      if(!tgt)return null;
+      var o=g[tgt[0]][tgt[1]];
+      if(o.t==='leaf'){ g[tgt[0]][tgt[1]]=null; leafLeft--; }
+      else if(o.t==='pot'){ o.layers--; if(o.layers<=0){ g[tgt[0]][tgt[1]]=null; potLeft--; } }
+      sfxPod(); burstAt(idxOf(tgt[0],tgt[1]),'#c98a1e',2);
+      return 'The <b>Pollen Meter</b> filled. Bees took one layer off the toughest obstacle.';
+    }
+
+    function collectPods(){
+      var n=0;
+      for(var c=0;c<C;c++){
+        if(g[R-1][c]&&g[R-1][c].t==='pod'){ g[R-1][c]=null; pods++; n++; }
+      }
+      return n;
+    }
+
+    function commonColour(cells){
+      var t={},best=null,bn=-1,k;
+      cells.forEach(function(q){ var x=g[q[0]][q[1]]; if(x&&x.t==='tile')t[x.k]=(t[x.k]||0)+1; });
+      for(k in t) if(t[k]>bn){ bn=t[k]; best=k; }
+      return best;
+    }
+
+    function plan(kind,r,c,colour){
+      var hit=[],convert=[];
+      function add(y,x){ if(inb(y,x)&&g[y][x]&&g[y][x].t==='tile')hit.push([y,x]); }
+      if(kind==='vine'){
+        if(Math.random()<0.5){ for(var x1=0;x1<C;x1++)add(r,x1); }
+        else { for(var y1=0;y1<R;y1++)add(y1,c); }
+      }
+      else if(kind==='thorn'){ for(var a=-2;a<=2;a++)for(var b=-2;b<=2;b++)add(r+a,c+b); }
+      else if(kind==='cloud'){
+        var target=colour||commonColour([[r,c]])||rnd();
+        for(var y2=0;y2<R;y2++)for(var x2=0;x2<C;x2++)
+          if(g[y2][x2]&&g[y2][x2].t==='tile'&&g[y2][x2].k===target)hit.push([y2,x2]);
+      }
+      else if(kind==='hive'){
+        /* Royal Match's Propeller: pick the hardest obstacle on the board, go there */
+        var tgt=null,best=-1;
+        for(var y3=0;y3<R;y3++)for(var x3=0;x3<C;x3++){
+          var o=g[y3][x3]; if(!o)continue;
+          var w = o.t==='pot' ? 10+o.layers : (o.t==='leaf' ? 5 : 0);
+          if(w>best){ best=w; tgt=[y3,x3]; }
+        }
+        if(tgt){
+          hit.push(['TARGET',tgt[0],tgt[1]]);
+          for(var a4=-1;a4<=1;a4++)for(var b5=-1;b5<=1;b5++)add(tgt[0]+a4,tgt[1]+b5);
+        } else {
+          for(var a5=-1;a5<=1;a5++)for(var b6=-1;b6<=1;b6++)add(r+a5,c+b6);
+        }
+      }
+      return {hit:hit,convert:convert};
+    }
+
+    function idxOf(r,c){ return r*C+c; }
+    function markPop(cells){ cells.forEach(function(h){ var el=board.children[idxOf(h[0],h[1])]; if(el)el.classList.add('pop'); }); }
+    function markHit(cells){
+      var done={};
+      cells.forEach(function(h){
+        [[h[0]+1,h[1]],[h[0]-1,h[1]],[h[0],h[1]+1],[h[0],h[1]-1]].forEach(function(n){
+          var id=n[0]+','+n[1];
+          if(!inb(n[0],n[1])||done[id])return;
+          var o=g[n[0]][n[1]]; if(!o||(o.t!=='leaf'&&o.t!=='pot'))return;
+          done[id]=1; var el=board.children[idxOf(n[0],n[1])]; if(el)el.classList.add('hit');
+        });
+      });
+    }
+
+    function checkEnd(){
+      if(leafLeft<=0&&potLeft<=0&&pods>=POD_GOAL){ over=true; sfxEnd(true);
+        say('Level complete, with <b>'+moves+'</b> moves to spare.','win'); return true; }
+      if(moves<=0){ over=true; sfxEnd(false);
+        say('Out of moves. '+leafLeft+' leaves, '+potLeft+' pots and '+Math.max(0,POD_GOAL-pods)+' Seedpods left. Reset to try again.','lose');
+        return true; }
+      return false;
+    }
+
+    function resolve(msg,tier,flash){
+      dropCols=settle();
+      var got=collectPods();
+      if(got)sfxCollect();
+      return wait(tier>=3?260:150).then(function(){
+        render(flash);
+        return wait(tier>=3?300:200);
+      }).then(function(){
+        if(!checkEnd()) say(got? msg+' <b>'+got+'</b> Seedpod'+(got>1?'s':'')+' collected.' : msg);
+        busy=false;
+      });
+    }
+
+    function onTap(e){
+      if(busy||over)return;
+      var r=+e.currentTarget.dataset.r, c=+e.currentTarget.dataset.c, cell=g[r][c];
+      if(!cell)return;
+
+      if(cell.t==='leaf'||cell.t==='pot'||cell.t==='pod'){
+        say(cell.t==='leaf'?'A Dry Leaf clears when you blast next to it.'
+          : cell.t==='pot'?'A Clay Pot loses one layer per blast beside it.'
+          : 'A Seedpod is collected when it reaches the bottom row. Clear below it.');
+        return;
+      }
+      if(cell.t==='pu'){ busy=true; moves--; fireAt(r,c,cell.k); return; }
+
+      var cl=cluster(r,c);
+      if(cl.length<2){ say('Single tiles cannot be blasted. Find two or more adjacent.'); return; }
+      busy=true; moves--;
+      var n=cl.length, colour=cell.k;
+      sfxBlast(colour,n);
+      markPop(cl); markHit(cl);
+      cl.forEach(function(h,i){ if(i<10)burstAt(idxOf(h[0],h[1]),COL[colour].css,n>=5?2:1); });
+
+      wait(160).then(function(){
+        if(damageNeighbours(cl))sfxHit();
+        cl.forEach(function(h){ g[h[0]][h[1]]=null; });
+        var beeMsg=addPollen(n);
+
+        var made=null, flash=[];
+        if(n>=5){
+          if(n>=9) made='cloud';
+          else if(n>=7) made='thorn';
+          else made='vine';
+          g[r][c]={t:'pu',k:made}; flash.push(r+','+c); sfxForm();
+          burstAt(idxOf(r,c),PU[made].css,2);
+        }
+        if(n>=9){
+          var spot=null;
+          for(var x=0;x<C&&!spot;x++) if(g[0][x]===null) spot=[0,x];
+          if(!spot)for(var y=0;y<R&&!spot;y++)for(var x2=0;x2<C&&!spot;x2++) if(g[y][x2]===null) spot=[y,x2];
+          if(spot){ g[spot[0]][spot[1]]={t:'pod'}; sfxPod(); }
+        }
+
+        var msg;
+        if(made) msg='Cleared <b>'+n+'</b> tiles. That makes a <b>'+PU[made].name+'</b>.';
+        else msg='Cleared '+n+' tiles. Five or more makes a power-up.';
+        if(beeMsg) msg=beeMsg;
+        return resolve(msg, n>=5?2:1, flash);
+      });
+    }
+
+    function fireAt(r,c,kind){
+      var partners=[[r+1,c],[r-1,c],[r,c+1],[r,c-1]].filter(function(q){
+        return inb(q[0],q[1])&&g[q[0]][q[1]]&&g[q[0]][q[1]].t==='pu'; });
+      var names=[PU[kind].name], all={hit:[],convert:[]};
+      g[r][c]=null;
+      var e1=plan(kind,r,c,null);
+      all.hit=all.hit.concat(e1.hit); all.convert=all.convert.concat(e1.convert);
+      partners.forEach(function(q){
+        var y=q[0],x=q[1]; if(!g[y][x]||g[y][x].t!=='pu')return;
+        var k2=g[y][x].k; g[y][x]=null;
+        var e2=plan(k2,y,x,null);
+        all.hit=all.hit.concat(e2.hit); all.convert=all.convert.concat(e2.convert);
+        names.push(PU[k2].name);
+      });
+      var combined=names.length>1;
+      sfxPower();
+      markPop(all.hit); markHit(all.hit);
+      all.hit.forEach(function(h,i){ if(i<14)burstAt(idxOf(h[0],h[1]),PU[kind].css,3); });
+
+      wait(200).then(function(){
+        var targets=all.hit.filter(function(h){return h[0]==='TARGET';});
+        all.hit=all.hit.filter(function(h){return h[0]!=='TARGET';});
+        targets.forEach(function(t){
+          var o=g[t[1]][t[2]]; if(!o)return;
+          if(o.t==='leaf'){ g[t[1]][t[2]]=null; leafLeft--; }
+          else if(o.t==='pot'){ g[t[1]][t[2]]=null; potLeft--; }
+        });
+        if(targets.length)sfxHit();
+        if(damageNeighbours(all.hit))sfxHit();
+        var beeMsg2=addPollen(all.hit.length);
+        var conv=all.convert.length?commonColour(all.convert):null;
+        all.convert.forEach(function(q){ if(g[q[0]][q[1]]&&g[q[0]][q[1]].t==='tile'&&conv)g[q[0]][q[1]]={t:'tile',k:conv}; });
+        all.hit.forEach(function(h){ if(g[h[0]][h[1]]&&g[h[0]][h[1]].t==='tile')g[h[0]][h[1]]=null; });
+
+        if(combined){
+          var spot=null;
+          for(var x=0;x<C&&!spot;x++) if(g[0][x]===null) spot=[0,x];
+          if(spot){ g[spot[0]][spot[1]]={t:'pod'}; sfxPod(); }
+        }
+        var label=combined?'<b>'+names.join(' + ')+'</b> combined':'<b>'+names[0]+'</b> fired';
+        var msg2=label+': '+all.hit.length+' cleared'+(combined?', and a Seedpod dropped':'')+'.';
+        if(beeMsg2) msg2=beeMsg2;
+        return resolve(msg2,3,[]);
+      });
+    }
+
+    document.getElementById('proto-reset').addEventListener('click',function(){ init(); });
+    document.getElementById('proto-sound').addEventListener('click',function(){
+      sound=!sound;
+      if(sound){ var a=AC(); if(a&&a.state==='suspended')a.resume(); tone(523.25,0.12,0.06,'sine'); }
+      this.textContent='Sound: '+(sound?'on':'off');
+      this.className='proto-btn '+(sound?'':'ghost');
+    });
+    init();
+  })();
+  </script>
+</section>
+
+<footer class="wrap">
+  <p><strong>Enes Duruk</strong> · <a href="https://outwinder.com">outwinder.com</a> · Game design study, September 2026.</p>
+  <p style="margin-top:8px">Analysis based on my own play of Royal Match, Royal Kingdom and Toon Blast, with progression data cross-referenced against community documentation for both titles. All design in Parts II to VIII is my own.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var nav=document.querySelector('.topnav-inner');
+  if(!nav)return;
+  var links=[].slice.call(nav.querySelectorAll('a[href^="#"]'));
+  var map=links.map(function(a){
+    var el=document.getElementById(a.getAttribute('href').slice(1));
+    return el?{a:a,el:el}:null;
+  }).filter(Boolean);
+  if(!map.length)return;
+
+  var current=null,ticking=false;
+
+  function update(){
+    var navH=nav.getBoundingClientRect().height;
+    var probe=navH+40;                       // just under the sticky bar
+    var found=null;
+    for(var i=0;i<map.length;i++){
+      var r=map[i].el.getBoundingClientRect();
+      if(r.top<=probe && r.bottom>probe){found=map[i];break;}
+      if(r.top>probe){break;}
+      found=map[i];                           // last one that started above the probe
+    }
+    // past the final section, keep the last link lit
+    if(!found && window.innerHeight+window.scrollY>=document.body.scrollHeight-4)
+      found=map[map.length-1];
+    if(found===current)return;
+    if(current)current.a.classList.remove('active');
+    current=found;
+    if(!current)return;
+    current.a.classList.add('active');
+    // keep the active tab visible in the horizontally scrolling bar
+    var ar=current.a.getBoundingClientRect(),nr=nav.getBoundingClientRect();
+    if(ar.left<nr.left+8)      nav.scrollLeft+=ar.left-nr.left-16;
+    else if(ar.right>nr.right-8) nav.scrollLeft+=ar.right-nr.right+16;
+  }
+  var last=0;
+  function onScroll(){
+    var now=Date.now();
+    if(now-last>=60){ last=now; update(); return; }
+    if(ticking)return;
+    ticking=true;
+    setTimeout(function(){ ticking=false; last=Date.now(); update(); },60);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll,{passive:true});
+  update();
+})();
+</script>
+</body>
+</html>

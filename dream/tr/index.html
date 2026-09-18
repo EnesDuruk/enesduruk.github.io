@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Bloomrise · Oyun Tasarım Çalışması · Enes Duruk</title>
+<meta name="description" content="Casual bir dokunarak patlatma bulmaca oyununun tasarım dokümanı." />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --paper:#faf8f4; --paper-2:#f2efe8;
+  --ink:#1e2419; --ink-2:#4a5443; --ink-3:#7c8577;
+  --line:#e0dbd0;
+  --green:#2f6b3f; --green-soft:#eaf1e9;
+  --terra:#b8562f; --terra-soft:#fbeee7;
+  --gold:#a8822c;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:Charter,Georgia,"Iowan Old Style",serif;
+}
+
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.72}
+
+.wrap{max-width:820px;margin:0 auto;padding:0 24px}
+
+.topnav{position:sticky;top:0;z-index:50;background:rgba(250,248,244,.94);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topnav-inner{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;
+  align-items:center;gap:17px;overflow-x:auto;scrollbar-width:none}
+.topnav-inner::-webkit-scrollbar{display:none}
+.topnav a{font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--ink-3);
+  text-decoration:none;white-space:nowrap;padding:3px 0;border-bottom:2px solid transparent}
+.topnav a:hover{color:var(--green);border-bottom-color:var(--green)}
+.topnav a.active{color:var(--green);font-weight:700;border-bottom-color:var(--green)}
+.topnav .nav-home{font-weight:700;color:var(--ink)}
+.topnav .nav-lang{margin-left:auto;font-weight:700;color:var(--terra);border:1px solid var(--line);border-radius:6px;padding:2px 9px}
+.topnav .nav-lang:hover{color:#fff;background:var(--terra);border-color:var(--terra)}
+.topnav .nav-home.active{color:var(--ink);border-bottom-color:transparent}
+
+.masthead{padding:62px 0 38px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--terra);margin-bottom:18px}
+h1{font-family:var(--sans);font-size:clamp(38px,7vw,58px);line-height:1.04;
+  letter-spacing:-.025em;font-weight:800;margin-bottom:14px}
+.subtitle{font-size:clamp(18px,2.6vw,21px);color:var(--ink-2);line-height:1.5;
+  max-width:30em;margin-bottom:26px}
+.byline{font-family:var(--sans);font-size:13.5px;color:var(--ink-3);
+  display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.byline a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47,107,63,.3)}
+
+section{padding:50px 0;border-bottom:1px solid var(--line)}
+.part-label{font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--terra);margin-bottom:10px}
+h2{font-family:var(--sans);font-size:clamp(27px,4.4vw,34px);line-height:1.15;
+  letter-spacing:-.02em;font-weight:800;margin-bottom:20px}
+h3{font-family:var(--sans);font-size:20px;font-weight:700;letter-spacing:-.01em;
+  margin:36px 0 12px;line-height:1.3}
+h4{font-family:var(--sans);font-size:15.5px;font-weight:700;margin:26px 0 8px}
+p{margin-bottom:17px}
+p:last-child{margin-bottom:0}
+ul,ol{margin:0 0 17px 22px}
+li{margin-bottom:7px}
+li:last-child{margin-bottom:0}
+code{font-family:var(--mono);font-size:.86em;background:var(--paper-2);
+  padding:1px 5px;border-radius:3px;border:1px solid var(--line)}
+.lead{font-size:19.5px;line-height:1.62;color:var(--ink-2)}
+
+.callout{background:var(--green-soft);border-left:3px solid var(--green);
+  padding:18px 22px;margin:26px 0;border-radius:0 6px 6px 0}
+.callout.warn{background:var(--terra-soft);border-left-color:var(--terra)}
+.callout.plain{background:var(--paper-2);border-left-color:var(--ink-3)}
+.callout p{margin-bottom:11px;font-size:16px}
+.callout p:last-child{margin-bottom:0}
+.callout-title{font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--green);margin-bottom:8px;display:block}
+.callout.warn .callout-title{color:var(--terra)}
+.callout.plain .callout-title{color:var(--ink-3)}
+
+.tbl-scroll{overflow-x:auto;margin:24px 0;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);
+  font-size:14px;line-height:1.5;min-width:520px}
+th{text-align:left;font-weight:700;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-3);border-bottom:1.5px solid var(--ink-3);padding:0 12px 8px 0;vertical-align:bottom}
+td{padding:10px 12px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.num{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.tbl-icon{width:22px;height:22px;vertical-align:middle;margin-right:6px;object-fit:contain;display:inline-block}
+.cell-icon{width:80%;height:80%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.25))}
+
+.cards{display:grid;gap:14px;margin:24px 0}
+@media(min-width:620px){.cards.two{grid-template-columns:1fr 1fr}}
+.card{border:1px solid var(--line);border-radius:8px;padding:18px 20px;background:#fff}
+.card h5{font-family:var(--sans);font-size:15px;font-weight:700;margin-bottom:4px;
+  display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.tag{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;padding:2px 7px;border-radius:99px;
+  background:var(--green-soft);color:var(--green)}
+.tag.t{background:var(--terra-soft);color:var(--terra)}
+.tag.g{background:#f7f0dd;color:var(--gold)}
+.card p{font-size:15px;line-height:1.6;margin-bottom:9px;color:var(--ink-2)}
+.card p:last-child{margin-bottom:0}
+.card .why{font-size:14px;color:var(--ink-3);border-top:1px solid var(--line);
+  padding-top:9px;margin-top:11px}
+
+figure{margin:28px 0}
+figcaption{font-family:var(--sans);font-size:13px;color:var(--ink-3);margin-top:11px;line-height:1.5}
+
+.todo{background:#fff4d6;border:2px dashed var(--gold);border-radius:8px;
+  padding:16px 20px;margin:24px 0;font-family:var(--sans);font-size:15px;color:#6b5312}
+.todo b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+
+footer{padding:42px 0 70px;font-family:var(--sans);font-size:14px;color:var(--ink-3)}
+footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47,107,63,.3)}
+
+.print-only{display:none}
+
+@media print{
+  .topnav,#proto-reset,.todo{display:none!important}
+  /* the prototype cannot be played on paper: point at it instead of printing a dead grid */
+  #proto-board,.proto-hud,.proto-key,.proto-log{display:none!important}
+  .print-only{display:block}
+  .wf-frame,.wf-grid>div,.cards,.card{break-inside:avoid}
+  body{font-size:10.5pt;line-height:1.5;background:#fff}
+  .wrap{max-width:100%;padding:0}
+  section{padding:16pt 0;border-bottom:none}
+  h2{font-size:17pt;margin-top:10pt}
+  h2,h3,h4{break-after:avoid}
+  table,figure,.callout,.card{break-inside:avoid}
+  .masthead{padding:0 0 16pt}
+  h1{font-size:26pt}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="nav-home" href="https://outwinder.com">← Outwinder</a>
+    <a href="#analysis">I · Analiz</a>
+    <a href="#concept">II · Konsept</a>
+    <a href="#first50">III · İlk 50 Bölüm</a>
+    <a href="#catalogue">IV · Elemanlar</a>
+    <a href="#art">V · Sanat &amp; Ses</a>
+    <a href="#meta">VI · Meta &amp; Ekonomi</a>
+    <a href="#leveldesign">VII · Bölüm Tasarımı</a>
+    <a href="#ui">VIII · Wireframe</a>
+    <a href="#prototype">Prototip</a>
+    <a class="nav-lang" href="../index.html">English</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="eyebrow">Oyun Tasarım Çalışması</div>
+  <h1>Bloomrise</h1>
+  <p class="subtitle">Casual dokunarak patlatma bulmaca oyunu ve onu tasarlamak için incelediğim iki oyunun analizi.</p>
+  <div class="byline">
+    <span><strong>Enes Duruk</strong></span><span>·</span>
+    <span>Eylül 2026</span><span>·</span>
+    <span><a href="https://outwinder.com">outwinder.com</a></span>
+  </div>
+</header>
+
+<section id="intro">
+  <p class="lead">Oyun yapıp yayınlıyorum. Beş tane, hepsi tek başıma ve yaklaşık sekiz ayda; üçü şu an yayında. Bu case'e de kendi projelerime yaklaştığım gibi yaklaştım: önce oyuncunun başparmağıyla ne yapacağına karar ver, sonra ekonomi ve sanat yönü buna razı olana kadar dışa doğru genişlet.</p>
+
+  <p>Doküman iki yarıdan oluşuyor. Kısım I, Royal Match ve Toon Blast'ı istenen yedi boyutta inceliyor. Kısım II'den VIII'e kadar ise <strong>Bloomrise</strong>'ı tasarlıyor. Çekirdeği bilerek klasik; asıl iş içerik setinde, ekonomide, ve tek bir power-up'ın nasıl doğduğuna dair küçük bir değişiklikte.</p>
+
+  <p>Bu sayfanın sonunda çekirdek mekaniğin çalışan bir prototipi var. Mekanikle ilgili verdiğim her sayı bu prototipten çıktı, beni yanılttığını gösterenler dahil.</p>
+
+  <p>Kısım III takvim, Kısım IV ise katalog. İkisi de aynı zemini bilerek iki farklı yönden ele alıyor, çünkü bir level tasarımcısıyla bir sanatçının ihtiyacı farklı dokümanlar.</p>
+</section>
+
+<section id="analysis">
+  <div class="part-label">Kısım I</div>
+  <h2>Analiz</h2>
+
+  <p class="lead">Yedi boyuta geçmeden önce, case'in kendisiyle ilgili bir gözlemim var. Çünkü sonrasındaki her şeyi bu belirledi.</p>
+
+  <p><strong>Dream Games&#39;in dokunarak patlatma oyunu yok.</strong> Royal Match da Royal Kingdom da swap match-3. Royal Kingdom, Royal Match'ten meta katmanı ve boss bölümleriyle ayrılıyor, oyuncunun parmağının yaptığı işle değil. Bu case'te adı geçen tek blast oyunu Toon Blast, o da Peak'e ait.</p>
+
+  <p>Yani bu iş "zaten match-3 yapan bir şirkete dördüncü bir match-3 tasarlamak" değil. Daha çok şuna benziyor: Dream'in hiç çıkarmadığı bir mekaniği alıp Dream'in tanındığı standarda getirmek. Riski nereye harcayacağıma bu çerçeve karar verdi. Bloomrise'ın teması sıcak, karakter odaklı ve bilinçli olarak tanıdık. Çekirdeği de öyle. Ödünç almayıp kendi eklediğim tek şey, power-up merdiveninin içinde değil yanında duran yavaş bir gösterge.</p>
+
+  <h3>Bu oyunlarda geldiğim nokta</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Oyun</th><th>İlerleme</th><th>Oynanan süre</th><th>Kullanım amacı</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Royal Match</strong></td><td class="num">Level 130</td><td class="num">8sa 30dk</td><td>Meta yapı, ilerleme temposu ve tekliflerin nerede çıktığı için ana referans.</td></tr>
+      <tr><td><strong>Toon Blast</strong></td><td class="num">Level 30</td><td class="num">50dk</td><td>Çekirdek eylem için ana referans: küme seçimi, power-up eşikleri.</td></tr>
+      <tr><td><strong>Royal Kingdom</strong></td><td class="num">Level 30</td><td class="num">50dk</td><td>Royal Match'ten nerede ayrıldığını görmek için oynandı.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Google Play geçmişimdeki geri kalan oyunlar</h4>
+
+  <p>Seçilmiş bir liste yerine gerçek listeyi vermeyi tercih ederim. Mağazanın kaydettiği sürelerle birlikte aşağıda görüntüleyebilirsiniz. </p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Oyun</th><th>Süre</th><th>Oyun</th><th>Süre</th></tr></thead>
+    <tbody>
+      <tr><td>Royal Match</td><td class="num">8sa 30dk</td><td>Ballz</td><td class="num">20dk</td></tr>
+      <tr><td>Cube Escape: Paradox</td><td class="num">2sa</td><td>Helix Jump</td><td class="num">13dk</td></tr>
+      <tr><td>Stack</td><td class="num">1sa 24dk</td><td>Bricks</td><td class="num">10dk</td></tr>
+      <tr><td>Arrows</td><td class="num">1sa 6dk</td><td>Everblast</td><td class="num">10dk</td></tr>
+      <tr><td>Royal Kingdom</td><td class="num">50dk</td><td>Stack Blocks</td><td class="num">8dk</td></tr>
+      <tr><td>Toon Blast</td><td class="num">50dk</td><td>Traffic Hero</td><td class="num">7dk</td></tr>
+      <tr><td>Nonogram</td><td class="num">25dk</td><td>Bricky Boy</td><td class="num">6dk</td></tr>
+      <tr><td>Color Switch</td><td class="num">25dk</td><td>Two Dots</td><td class="num">5dk</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Bu liste bir oyuncunun listesi değil, bir geliştiricinin listesi. Oturumların çoğu kısa çünkü oyunu belirli bir mekaniğin nasıl kurulduğunu anlamak için kurdum, anlayana kadar oynadım ve bıraktım. Royal Match tek istisna; burada kitlesinin oynadığı gibi oynadığım tek oyun o.</p>
+
+  <p>Bu listenin gösterdiği şey, incelediğim şeyle çıkardığım şey arasındaki çizgi. <strong>Stack</strong>, <em>Stackline</em>'ın bilerek klonu olduğu oyun; kaynağını burada vermeden önce bunu dokümanda zaten yazmıştım. <strong>Ballz, Bricks, Everblast, Stack Blocks</strong> ve <strong>Bricky Boy</strong>, <em>Brick Multiplier</em>'ı yapmadan önce içinden geçtiğim brick-breaker'lar. <strong>Cube Escape: Paradox</strong> Rusty Lake'in oyunu; <em>October</em>'ı mobil platforma da çıkarmak istediğim için, point-and-click yapısının telefonda nasıl durduğunu okumaya oraya gittim. Kurulum geçmişimde tesadüfen orada olan hiçbir şey yok.</p>
+
+  <p>Dürüst olmak gerekirse bu, mobil free-to-play'in içinde yaşayan birinin profili değil, sahip olmadığım bir piyasa bilgisini de iddia etmeyeceğim. Bu türe dair bilgim daha çok bir yapımcı bilgisi. Mekanikleri sökme ve yeniden kurmadan gelen bir bilgi. Ve ticari tarafta tasarım tarafına göre daha zayıf. İlk ay kapatacağım açık bu, ve Kısım VI'nın ekonomi varsayımlarını açıkça yazmasının nedeni de bu.</p>
+
+  <h3>1 · Oyun Mekanikleri</h3>
+
+  <p>İki oyun da farklı türde kararlar istiyor.</p>
+
+  <p><strong>Royal Match sizden bir şekil bulmanızı ister.</strong> İki komşu karoyu yer değiştirirsiniz, hamlenin değeri ortaya çıkardığınız geometride yatar. Düz sırada dört tane bir Rocket yapar. Kare şeklinde dört tane bir Propeller yapar. L veya T şeklinde beş tane bir TNT yapar. Düz sırada beş tane bir Light Ball yapar. Tahta geçerli hamlelerle dolu ve çoğu hiçbir işe yaramaz, dolayısıyla beceri işe yarayan birkaç taneyi tarayabilmekte.</p>
+
+  <p><strong>Toon Blast sizden bir boyut bulmanızı ister.</strong> Aynı renkteki herhangi iki komşu küp geçerlidir. Soru hiçbir zaman bir hamlenin izinli olup olmadığı değil, sadece kümenin yeterince büyük olup olmadığıdır. Beş küp bir Rocket verir, yedi veya sekiz bir Bomb, dokuz bir Disco Ball.</p>
+
+  <p>Bunun sonucu, bir blast oyuncusunun ne kadar yaklaştığını her zaman bilmesi. Küme orada duruyor ve sayılabilir. Bir swap oyuncusu ise bir power-up'ı genelde planlamaz, keşfeder. Yani blast, tarama zorluğunu planlama şeffaflığıyla takas eder, baskı algıdan sabra kayar. Bir kümeyi erken almak her zaman gözle görülür biçimde israftır ve oyuncu bunu her turda hisseder.</p>
+
+  <p>Bloomrise'ın üzerine kurulduğu gözlem bu. Madem bir blast oyuncusunun gerilimi zaten sabırda yaşıyor, tasarım eklemek için ilginç yer, sabrettiğiniz ödülün ta kendisi.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Royal Match</th><th>Oluşturan</th><th>Toon Blast</th><th>Oluşturan</th></tr></thead>
+    <tbody>
+      <tr><td>Rocket</td><td class="num">4 düz sırada</td><td>Rocket</td><td class="num">5 küp</td></tr>
+      <tr><td>Propeller</td><td class="num">4 kare şeklinde</td><td>Bomb</td><td class="num">7–8 küp</td></tr>
+      <tr><td>TNT</td><td class="num">5 L veya T şeklinde</td><td>Disco Ball</td><td class="num">9 küp</td></tr>
+      <tr><td>Light Ball</td><td class="num">5 düz sırada</td><td>–</td><td>–</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Royal Match, Toon Blast'ın üç power-up'ına karşılık dört tane taşıyor ve o fazladan olana ihtiyacı var. Yaratım şekil odaklı olduğunda, her farklı şeklin farklı bir karşılığı olmalı, yoksa geometri ilginç olmaktan çıkar. Toon Blast ise tek bir küme boyutu ekseni üzerinde çalışıyor. Bu kafada tutması daha temiz bir şey ama power-up dağarcığını üçle sınırlıyor.</p>
+
+  <p>İki oyun da derinliğinin çoğunu power-up'ların nasıl birleştiğinden alıyor, ve ikisi de merdivenin en tepesine aynı türden bir şey koyuyor. Royal Match'te Light Ball, başka bir power-up'a kaydırıldığında, eşleşme elemanlarını o power-up'a dönüştürür. Toon Blast'te Disco Ball tek başına bir rengin tüm küplerini temizler, bir başka power-up'la birleştiğinde ise tahtaya rocket veya bomb saçar. İkisi de sadece daha büyük bir patlama değil. Birleştiklerinde her biri power-up sisteminin kendisi üzerinde etki ediyor. İkisini birleştirmenin her şeyi temizlemesinin ve diğer power-up'ların üstlerine oturmasına gerek kalmamasının nedeni de bu.</p>
+
+  <h3>2 · Bölüm Tasarımı</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Bölüm</th><th>Öğe</th><th>Ne öğretiyor</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Balloons</td><td>Komşuluk, küp olmayan şeyleri de temizler</td></tr>
+      <tr><td class="num">4</td><td>Crates</td><td>Bazı şeyler birden fazla vuruş ister</td></tr>
+      <tr><td class="num">11</td><td>Bubbles</td><td>Bir engel, oynanabilir bir karonun üstünde durabilir</td></tr>
+      <tr><td class="num">21</td><td>Magic Hats</td><td>Bazı şeyler kırılmak yerine boşalır</td></tr>
+      <tr><td class="num">31</td><td>Colored Balloons</td><td>Renk sadece bir eşleşme anahtarı değil, bir kısıt haline gelir</td></tr>
+      <tr><td class="num">41</td><td>Ducks</td><td>Yerçekimi hedefleri: bir şeyi aşağı indir</td></tr>
+      <tr><td class="num">51</td><td>Light Bulbs</td><td>Hem iki vuruşluk hem hedef öğesi olan hedefler</td></tr>
+      <tr><td class="num">61</td><td>Can Toss</td><td>Dokuz vuruş, yani power-up'lar artık isteğe bağlı değil</td></tr>
+      <tr><td class="num">81</td><td>Soda Bottle</td><td>Renge özel vuruşlar, dört veya beş kat</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Bölüm 30'a kadar oynadım, yani ilk dört satır bana ait, geri kalanı topluluk dokümantasyonundan derlenmiş ve kaynaklar arasında tutarlı. İlk 81 bölüm içinde dokuz öğe, sonra bir sonraki dalgaya kadar uzun bir ara. Öğretim, kaybın en yüksek ve kitlenin en büyük olduğu yerde gerçekleşiyor, arkasındaki devasa bölüm sayısı ise oyuncunun zaten bildiğini yeniden bir araya getirerek taşınıyor. Sanat ve tasarım bütçesini harcamanın verimli bir yolu bu, ve şekli doğrudan kopyaladım: Bloomrise'ın ilk ellisinde dokuz öğe, sonra kompozisyon.</p>
+
+  <p>Royal Match aynı sorunu alanlara bölerek çözüyor. Her biri kendi restorasyon görevleri olan temalı bir oda; tamamlanan her bölüm bir yıldız veriyor, yıldızlar bu görevlere harcanıyor, bir odayı bitirmek bir sonrakini açıyor. Kampanya bu yüzden her zaman bitirilebilir hissettirecek kadar küçük bölümlere kesiliyor. Bir şeyi tamamlamaya her zaman birkaç bölümden fazla uzakta değilsiniz, bu da ana ekrandaki tek bir özellikten daha iyi bir retention aracı.</p>
+
+  <h3>3 · Bölüm Zorluğu</h3>
+
+  <p>Bir swap oyununda zorluk çoğunlukla şekilleri engellemekle ilgilidir. Bir blast oyununda ise bitişikliği engellemekle ilgilidir, ve bu hangi düğmelerin önemli olduğunu değiştirir.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Düğme</th><th>Blast oyunundaki etkisi</th><th>Kullanmanın bedeli</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Renk sayısı</strong></td><td>En güçlü ve en sessiz kol. Dört renkten beşe geçmek ortalama küme boyutunu çökertir ve power-up'ları çok daha nadir hale getirir.</td><td>Neredeyse yok. Oyuncuya görünmez.</td></tr>
+      <tr><td><strong>Hamle bütçesi</strong></td><td>Bölümün öğrettiği şeyi değiştirmeden boşluğu kaldırır.</td><td>Yok, ve lansmandan sonra yeniden ayarlanabilir.</td></tr>
+      <tr><td><strong>Tahta parçalanması</strong></td><td>Sabit engeller sütunları böler, böylece kümeler kırılma noktasının karşısında oluşamaz.</td><td>Yüksek. Parçalanmış tahtalar en az okunaklı olanlardır.</td></tr>
+      <tr><td><strong>Engel vuruş sayısı</strong></td><td>Toon Blast'ın Can Toss'u dokuz vuruş ister, bu da power-up'ları zorunlu kılar.</td><td>Orta. Aşırı kullanılırsa bulmacayı angaryaya çevirir.</td></tr>
+      <tr><td><strong>Hedef miktarı</strong></td><td>Bölümün tamamında verimlilik tabanını yükseltir.</td><td>Düşük, ama bölümün şeklini düzleştirir.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Royal Match, Toon Blast'ta olmayan bir araç daha ekliyor, ve bu iki oyundaki en akıllıca zorluk kararı: bölümleri <em>Hard</em> ve <em>Super Hard</em> olarak etiketliyor ve bunlar için fazladan Royal Pass anahtarı veriyor. Bir sıçrama normalde oyuncu için saf bir bedeldir. Buna ilerleme para birimi bağlamak sıçramayı bir fırsata çeviriyor, ve takıma zorluğu oyuncunun adaletsizlik olarak okumayacağı, okunaklı bir yerden yükseltme imkânı veriyor.</p>
+
+  <p>İki oyun da denemeleri canlarla sınırlıyor: en fazla beş, bir zamanlayıcıyla yenileniyor, para birimiyle veya bir takımdan isteyerek doldurulabiliyor. Başarısızlıkta bir can kaybediliyor. Bu sistemin zorlukla ilgisi göründüğünden daha az: gerçek işlevi kötü bir oturumu yarın geri gelmek için bir sebebe çevirmek.</p>
+
+  <p>İki oyunda da başarısızlık oranlarını, tamamlama oranlarını veya kayıp noktalarını ölçmedim. Yukarıdakilerin hepsi sistemlerin izin verdiğinden okundu, telemetriden değil. Kısım VII, Bloomrise için zorluk hedefleri önerdiğinde, bunlar başlangıç hipotezleri olarak belirtiliyor.</p>
+
+  <h3>4 · Grafikler</h3>
+
+  <p>İki oyun da aynı sorunu çözüyor: bir karo, dışarıda tutulan bir telefonda, başparmak boyutunda, saniyenin dörtte birinde tanınabilir olmalı.</p>
+
+  <p>Royal Match bunu render kalitesiyle çözüyor. Karolar aydınlatılmış, kenarları yumuşatılmış ve malzemesi belirgin, restorasyon sahneleri ise illüstrasyona yakın. Bu detay seviyesi ticari olarak karşılığını buluyor, çünkü meta katmanı güzel bir şeyi restore etme fantezisini satıyor ve restorasyonun gerçekten güzel görünmesi gerekiyor, yoksa döngünün sonunda bir karşılık kalmıyor. Bu bedel, çok sayıda temalı odada asset başına maliyet olarak ortaya çıkıyor.</p>
+
+  <p>Toon Blast bunu düzlükle çözüyor. Tek renkli küpler, üzerinde bir parlama, kalın dış çizgiyle çizilmiş karakterler, neredeyse hiç malzeme detayı yok. Ellinci bir engel eklemek, Royal Match'in üslubunda aynı eklemenin maliyetinin bir kesri kadar tutuyor, ve düz bir küp daha hızlı okunuyor. Dokunuşların hızlı ve sık olduğu bir oyunda bu daha çok önem taşıyor.</p>
+
+  <p>İkisi de rengi sadece bir anlam taşıdığı yerde harcıyor. Tahta arka planları soluk tutuluyor ki karolar öne çıksın, yüksek doygunluktaki renkler ise ilerleme, ödül ve tekliflere saklanıyor. Bir Royal Match ana ekranının bu kadar çok şeyi gürültüye dönüşmeden taşıyabilmesinin sebebi bu disiplin.</p>
+
+  <p>İkisinin de yapmadığı kadar zorlayacağım bir şey var: şekil fazlalığı. İkisi de eşleşme elemanlarını ayırmak için renk tonuna dayanıyor. Erkeklerin yaklaşık %8'inde bir dereceye kadar renk körlüğü var, bu da bir renk eşleştirme oyununda bir oynanabilirlik sorunu. Bloomrise'ın beş öğesi renkten önce siluetle ayırt ediliyor, ve test şu: oyun gri tonlamada da oynanabilir olmalı.</p>
+
+  <h3>5 · Animasyon</h3>
+
+  <p>Toon Blast'te tek bir dokunuş on beş küpü yok edebilir ve dört sütunu çökertebilir. Tahta çok fazla hareket ediyor ve durduğu an okunaklı olmak zorunda, yani buradaki animasyon süs değil. Oyuncu tahtayı bu sayede takip ediyor.</p>
+
+  <p>Çökme kademeli. Küpler sütun başına küçük bir gecikmeyle düşüyor ve yerine oturma gerekenden belirgin biçimde daha uzun sürüyor. Bu fazladan süre, büyük bir temizliğin bir olay gibi hissettirmesini sağlıyor, daha pratik olarak da göze takip edecek bir sıra veriyor, böylece yeni tahta bir düzen içinde geliyor.</p>
+
+  <p>Power-up yaratımına beklenti eklenmiş: küp bir Rocket'a dönüşmeden önce kısa bir bekleme anı var, böylece oyuncu bir şey kazandığını fark ediyor. İki oyun da karakterlerinde bekleme animasyonları çalıştırıyor, bu da oyuncunun bakmayı bıraktığı bir ekrana dikkati geri çekmenin ucuz ve etkili bir yolu.</p>
+
+  <p>Bu sorunun okunabilirlik yarısıyla <em>Stackline</em>'da karşılaştım, çıkardığım tek dokunuşlu bir istifleme oyunu. Hızlandığında kule gözün takip edebildiğinden daha hızlı yükseliyordu. İlk başta kamerayı yukarı kestirdim, bu teknik olarak doğruydu ama bozuk hissettiriyordu. Kesmeyi, yavaşça geri inen bir takip hareketiyle değiştirmek yaklaşık dört kare maliyetine mal oldu ve oyunu okunaklı yaptı. Blast'taki karşılığı, bir Disco Ball'dan sonraki, tahtanın çoğunun aynı anda değiştiği an. Eğer hiçbir şey oyuncuya bu değişimi takip edecek bir yol vermezse, bir sonraki dokunuşu bir tahmin olur.</p>
+
+  <h3>6 · Partiküller &amp; Özel Efektler</h3>
+
+  <p>Blast oyunları, swap oyunlarının çoğunlukla kaçındığı bir sorunla karşı karşıya: olay yoğunluğu. Bir swap üç ila beş karo yok eder. İyi bir dokunuş on beş taneyi yok eder, zincirlenmiş bir power-up ise tahtanın çoğunu yok eder.</p>
+
+  <p>Toon Blast bunu katmanlandırarak çözüyor. Küçük bir temizlik birkaç kısa ömürlü partikülle mütevazı bir patlama alır. Bir power-up patlaması ise ekran ölçeğinde bir iş alır: ışık, döküntü, kamera sarsıntısı, izler. Bütçe, akılda kalması gereken anlara gidiyor ve rutin olması gerekenlerden esirgeniyor. Akılda kalanların farklı hissettirmesini sağlayan da bu.</p>
+
+  <p>Royal Match olay başına daha fazla harcıyor ve partikülleri malzemeye özgü yapıyor. Cam kırılıp parçalanıyor, tahta yarılıyor, buz çatlıyor. Partikül size engelin ne malzemeden yapıldığını söylüyor, bu da cila kılığına girmiş bir okunabilirlik. Toon Blast'ın döküntüsü daha jenerik ve daha neşeli, bu da onun daha düz sanatına uyuyor.</p>
+
+  <p>İzler hafife alınan kısım. Bir Rocket'ın izi hızlı görünmek için orada değil, oyuncunun olay bittikten sonra hangi sıranın temizlendiğini görebilmesi için orada. Propeller'ın uçuş yolu için de aynısı geçerli. İki oyunda da hızda hayatta kalan efektler, bilgi taşıyanlar.</p>
+
+  <p>Bu hatayı ses tarafında ben de yaptım. <em>Stackline</em>'da düşen her parçaya kendi sesini verdim, çünkü sessiz döküntü ölü hissettiriyordu, ve ilk sürüm kullanılamaz haldeydi. Hızlandığında bir gürültü duvarına dönüştü. Çözüm sesleri kaldırmak değildi, onları biçimlendirmekti: olay başına daha kısık, perdede hafifçe çeşitlenen, tam sesle üst üste binmek yerine örtüşen sesler. Bir blast oyununda aynı sorun bir büyüklük mertebesi daha büyük, ve buradaki özel başarısızlık biçimi sıkılma değil. Oyuncunun oyunu sessize alması, bu da geri bildirim döngüsünün çoğunu kalıcı olarak ortadan kaldırıyor.</p>
+
+  <h3>7 · Kullanıcı Arayüzü</h3>
+
+  <p>Royal Match'in ana ekranı ikisinin daha yoğun olanı. Restorasyon görünümünü, oyna düğmesini, görev sayacını, canları, coin'leri, bir takım girişini ve kenarlarda dönen bir dizi etkinlik ikonu ile süreli teklifi taşıyor. Toon Blast'inki ise daha sakin; baskın öğe bölüm yolu ve aynı anda daha az canlı yüzey var.</p>
+
+  <p>İkisinin de doğru yaptığı şey: birincil eylem konusunda hiçbir zaman soru işareti olmaması. Ekranda başka her ne varsa, en büyük ve en parlak öğe bir sonraki bölümü oynamak, ve hiçbir şey ağırlıkta onunla yarışmıyor. Retention'ın birinin uygulamayı açıp birkaç saniye içinde bir bölümün içinde olmasına bağlı olduğu bir oyunda, bir ana ekranın işlevinin çoğu bu.</p>
+
+  <p>Oyun içi ekranlar, ana ekranlardan daha çok birbirine benziyor. Hedefler sol üstte oturuyor, hamle sayacı sağ üstte veya ortada oturuyor ve ekrandaki en büyük sayı o, booster'lar başparmak erişimindeki alt kısımda sıralanıyor, tahta ise aradaki her şeyi kaplıyor. Royal Match hamle sayacını bir taç içine alıyor, bu süs gibi görünse de ekrandaki en çok kontrol edilen tek sayıyı anında bulunabilir kılıyor. İki oyun da başparmağın durduğu alt köşelere etkileşimli hiçbir şey koymuyor, çünkü orada kazara dokunmalar bir hamleye mal olur.</p>
+
+  <p>İki oyunun da en dikkatli davrandığı ekran, başarısızlıktan sonraki ekran. Tahta hâlâ arkada görünür durumda geliyor, ne kadar yaklaştığınızı tam olarak gösteriyor, ve bir bedel karşılığında ekstra hamle sunuyor. Bu, casual bir puzzle oyunundaki ticari olarak en önemli tek ekran, ve iki saniyenin altında okunacak şekilde tasarlanmış.</p>
+
+  <p>Royal Match'e itiraz edeceğim yer: eş zamanlı canlı etkinlik yüzeyi sayısı. Bölüm 130 civarında ana ekran düzenli olarak birbiriyle yarışan birkaç zamanlayıcı ve ilerleme çubuğu taşıyor. Bedel görsel karmaşadan çok, her oturumun başında neyin acil olduğunu yeniden çözme işi. Bloomrise, eş zamanlı etkinlik yüzeylerini ikiyle sınırlıyor, ve Kısım VIII bu sınırı tutmak için nelerden vazgeçtiğimi anlatıyor.</p>
+
+  <h3>Royal Kingdom</h3>
+
+  <p>Royal Kingdom bir swap match-3, ve elli dakikalık oynanışında an be an oynanış Royal Match'ten ayırt edilmesi zor. Farklı gördüğüm şey meta katmanı: oda oda yakın çekimler yerine daha geniş, mahalle ölçekli bir restorasyon görünümü. Tahtanın kendisinin farklı davrandığı tek yer boss bölümleri. Bir hedefi temizlemek yerine karşıdaki yapıya saldırıyorsun, ve kırılımı nerede yaptığın saldırının nereye gideceğini belirliyor; böylece konum, Royal Match'in oyuncuya hiç sormadığı bir karar haline geliyor. Çevresindeki animasyonlu kurtarma sahneleri fark değil; onlar Royal Match'te de Toon Blast'te de var.</p>
+
+  <p>Bu ikiliyi bir portföy kararı olarak okuyorum. Aynı eylem, farklı meta, oyuncunun telefonundaki ikinci slotu hedefliyor. Bu aynı zamanda bir blast oyununun açık pozisyon olduğuna dair en net argüman, çünkü mevcut motorun cevaplayamadığı tek soru bu.</p>
+
+  <h3>Neler çıkardım, ve burada bunun değeri ne</h3>
+
+  <p><strong>Outwinder</strong> adıyla geliştiriyorum. Beş oyun, üçü yayında: Google Play'de <em>Brick Multiplier</em> ve <em>Stackline</em>, Steam'de <em>Still Open: Taskbar Cafe Idle</em>. İki tanesi daha tamamlanmış durumda, Steam sayfaları yayında ve içerikleri herkese açık, yayın bekliyor: birinci şahıs bir psikolojik korku oyunu olan <em>Not Yet</em>, ve mobil sürümünü çıkarmayı düşündüğüm minimalist point-and-click anlatı oyunu <em>October</em>. Hepsinde mekanikleri ben tasarladım, bölümleri ben kurdum, mağaza sayfalarını ben yazdım ve güncellemeleri ben çıkardım, tek başıma.</p>
+
+  <p>İkisi burayla ilgili. <em>Brick Multiplier</em>, baştan sona benim kurduğum bir retention katmanına sahip casual bir mobil puzzle: günlük görevler, seri ödülleri, liderlik tabloları. <em>Stackline</em> ise bilinçli olarak iyi bilinen bir tasarımın klonu olarak kurduğum tek dokunuşlu bir zamanlama oyunu. Böylece tasarımın kendisi değişken olmadan his, ses ve kamera üzerinde çalışabildim.</p>
+
+  <p>İndirme sayıları yok denecek kadar az ve elimde retention veya dönüşüm verisi yok. Bu deneyimin gerçek değeri bundan daha dar ve daha somut: bir günlük görev ve seri sisteminin tanımlanmasının, kurulmasının ve güncellemeler boyunca tutarlı tutulmasının neye mal olduğunu biliyorum. Böyle bir sistemin ne işe yaradığını bilmek, işin kolay olan yarısı. Bu oyunları çıkarırken öğrendiğim asıl şey şu oldu: işin ürünü bitirmek olduğunu sanmışım. Bitmiş ve makul ölçüde cilalanmış iki oyunun neredeyse kimseye ulaşmaması, çabamı nereye koyduğum konusunda tartışmasız bir geri bildirimdi. İçerik ve mağaza hattını artık geliştirmeden sonra değil, onunla birlikte yürütmemin sebebi bu.</p>
+</section>
+
+<section id="concept">
+  <div class="part-label">Kısım II</div>
+  <h2>Konsept</h2>
+
+  <p class="lead"><strong>Bloomrise</strong>, terk edilmiş cam seralarla dolu bir vadide geçen, dokunarak patlatma türünde bir casual bulmaca oyunu. Yan yana duran iki veya daha fazla çiçeğe dokunuyorsun, patlıyorlar, üstteki karolar boşalan yere düşüyor. Bitirdiğin her bölüm sana bir Sprout kazandırıyor, ve Sprout'lar vadinin bir köşesini daha çiçeğe boğuyor.</p>
+
+  <p>Kadro küçük. Mira, harabeye dönmüş bir mülkü devralan bir botanikçi. Burrow ise kazı işini yapan, çoğu konuda kendinden emin şekilde yanılan bir köstebek. Oyuncu önce Glasshouse'u, sonra Orchard'ı, sonra Terraces'ı onarıyor ve vadi boyunca yukarı ilerliyor. Tema sıcak, karakter odaklı ve bilinçli olarak tanıdık. Çekirdek mekanik de öyle.</p>
+
+  <h3>Çekirdek mekanik, süslemeden</h3>
+
+  <p>Küme boyutunun belirlediği üç power-up, istisnasız tek bir eksende.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Küme</th><th>Power-up</th><th>Etki</th><th>Royal Match karşılığı</th></tr></thead>
+    <tbody>
+      <tr><td class="num">5–6 karo</td><td><strong>Ant Nest</strong></td><td>Karıncalar delikten çıkıp oluştuğu satırı ya da sütunu süpürüyor.</td><td>Rocket</td></tr>
+      <tr><td class="num">7–8 karo</td><td><strong>Puffball</strong></td><td>5×5 spor patlaması. Menzildeki her engelden bir kat söküyor.</td><td>TNT</td></tr>
+      <tr><td class="num">9+ karo</td><td><strong>Pollen Cloud</strong></td><td>Tahtadaki kendi renginden tüm karoları temizliyor.</td><td>Light Ball</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Bu yapı doğrudan Toon Blast'ın yapısı. Eşikleri zevkime göre değil, ölçerek seçtim. Dört renkli 8×8 tahtalar ürettim, henüz hiç hamle yapılmamış halde, ve her birinde aynı renkten bitişik karo gruplarını saydım. Aşağıdaki yüzdeler, o tahtaların ne kadarında o boyutta <em>en az bir</em> grup bulunduğunu gösteriyor: tahtaların %91'inde beş veya daha büyük bir grup hazır duruyor, %50'sinde yedi ve üzeri, %20'sinde dokuz ve üzeri bir grup var. Bu bir olasılık hesabı değil, bir simülasyon: tahtaları üretip saydım, çünkü kapalı formdaki çözüm zor, saymak ise on satır. Betik: <a href="../sim/cluster_sim.py">sim/cluster_sim.py</a>.</p>
+
+  <p>Eşikleri seçen şey bu. Dokuz karo en üst kademede, çünkü her beş tahtadan yaklaşık birinde doğrudan görülebiliyor: nadir, ama ulaşılmaz değil. Aynı sayılar bir kademeyi üç karoya koymanın neden işe yaramayacağını da söylüyor: üç ve üzeri bir grup test edilen her tahtada var, ve oyuncunun neredeyse her hamlede aldığı bir power-up ödül sayılmaz. Kademeler arasındaki iki karoluk boşluk ise ölçüm değil, bir tasarım kararı: altı karoluk bir kümeyle yedi karoluğunu gözle ayırmak zor, ve fark tek karo olsaydı oyuncu bir dokunuşun ne yapacağını hesaplayamazdı.</p>
+
+  <p>Dream'in işi yeni mekanik icat etmek değil. Royal Kingdom, çekirdeğinde yine Royal Match, ve bu bir eksiklik değil, şirketin yönteminin kendisi: kanıtlanmış bir mekaniği alıp kimsenin yetişemeyeceği kadar ileri götürmek. Onlara egzotik bir çekirdek mekanik öneren bir case, sorulmamış bir soruya cevap vermiş olur.</p>
+
+  <h3>Pollen Meter</h3>
+
+  <p>Yukarıdaki her şey, Toon Blast'ın yapısının üstüne farklı bir sanat yönü giydirilmiş hâli. Bundan sonraki kısım ise ödünç almadığım, kendi eklediğim tek şey, ve bunu bitmiş bir cevap olarak değil bir öneri olarak sunuyorum. Power-up merdiveninin içinde değil, yanında duruyor.</p>
+
+  <div class="callout">
+    <span class="callout-title">Pollen Meter</span>
+    <p>Temizlediğin her karo, tahtanın yanındaki göstergeye pollen ekliyor. Gösterge dolduğunda <strong>arılar kovandan çıkıp tam olarak bir engele zarar veriyor.</strong> Bir kat, bir vuruş, tahtadaki en dayanıklı engel. Sonra gösterge boşalıyor ve yeniden başlıyor.</p>
+    <p>Ayar için başlangıç noktası: <strong>dolum başına 30 karo</strong>; ortalama hamle başına dört beş karo düşününce bu yaklaşık yedi hamlede bir salım demek, yani normal bir bölümde iki üç kez. Bu sayı bir tahmin. Doğrusu gerçek oyuncuları izlemekten çıkar, benden değil.</p>
+  </div>
+
+  <p>Bu sistem var çünkü bir blast tahtası tasarımcıya tam olarak bir yaratım ekseni veriyor: küme boyutu. Bu eksen de en üstteki basamak görünmez olmadan önce yaklaşık üç basamağı kaldırabiliyor. Oyuncuya vermek istediğim başka her şeyin, bir dokunuşun boyutundan başka bir yerden gelmesi gerekiyordu.</p>
+
+  <p>Kattığı şey ikinci bir saat. Power-up merdiveni tek bir hamlenin kalitesini ödüllendiriyor; gösterge ise bütün bir bölümün hacmini ödüllendiriyor. Kötü giden bir bölümde bile oyuncu bir şeyin dolduğunu görüyor, ve verdiği şey küçük, bedava ve oyuncunun en çok takıldığı soruna yönelik.</p>
+
+  <p>Bilinçli olarak oyundaki en zayıf yardım bu: bir engel, bir katman, o kadar. Sebebi şu. Geniş alan temizleyen bir gösterge, continue teklifinin rakibi olurdu. Böyle bir durumda kaybetmek üzere olan oyuncu için en iyi hamle oyalanmak olurdu: bölümün istediği riski almak yerine, göstergeyi doldurmak için küçük ve güvenli temizlikler yapmak. Ödemeyi tek engelle sınırlamak bunu engelliyor, çünkü göstergeyi doldurmak hamle harcıyor ve aldığın karşılık, harcadığın hamleden daha az değerli.</p>
+
+  <p>Söyleyemeyeceğim şey, bunun eğlenceli olup olmadığı. Yukarıdaki gerekçeyi savunurum, ama bu fikre duyduğum güven dökümandaki her şeyden düşük; çünkü buradaki diğer bütün kararlar ya ölçüldü ya da kendini zaten kanıtlamış bir oyundan alındı, bu ise ikisi de değil. İki soru bunu hızlıca çözerdi: oyuncular göstergeye gerçekten bakıyor mu, ve kaybederken oynayış biçimlerini değiştiriyor mu. Fark etmiyorlarsa cevap ödemeyi büyütmek değil, mekaniği kesmektir; çünkü ödemeyi büyüten versiyon, continue teklifiyle rekabet eden versiyondur.</p>
+
+  <h3>İsim hakkında</h3>
+
+  <p>Bloomrise, bilinçli olarak bir <em>Royal</em> oyunu değil.</p>
+
+  <p>Royal Match ve Royal Kingdom ikisi de swap match-3, ve oyuncu için bu kelime artık o türü işaret ediyor. Blast farklı bir fiil, daha hızlı bir oturum, farklı bir alışkanlık. Aynı markanın altına koymak, o markanın biriktirdiği tanınırlığı harcar ve oyuncuya ismin artık oyunu tahmin ettirmediğini öğretir. Daha da somut bir çakışma var: Royal Match'te zaten Garden, Zen Garden ve Chess Garden adlı bölgeler var, yani bir <em>Royal Garden</em> yeni bir oyun değil, onun odalarından biri gibi okunurdu.</p>
+
+  <p>Portföyde ikinci bir aile olması, üçüncü bir Royal'dan daha sağlıklı. Bunu inşa etmeye değip değmeyeceği bir tasarım kararı değil, bir iş kararı, ve bu karar elimde olmayan sayılara sahip insanlara ait.</p>
+
+  <h3>Bu tasarım buraya nasıl geldi</h3>
+
+  <p>Yukarıda anlattığım çekirdek mekanik, dördüncü versiyon. Yerini aldığı üç versiyon, hayatta kalandan daha öğretici, o yüzden sırayla anlatıyorum.</p>
+
+  <h4>1. Seed &amp; Bloom, ve onu öldüren aritmetik</h4>
+
+  <p>İlk versiyon power-up'ları küme boyutuna göre yaratmıyordu. Beş veya daha fazla karo patlattığında tahtaya bir <strong>Seed</strong> düşüyordu. Seed düştüğü yerde kalıyor, diğer karolarla birlikte aşağı inmiyordu. Onu, çevresindeki sekiz hücrenin herhangi birinde patlatma yaparak besliyordun, ve üç beslemeden sonra bir power-up'a dönüşüyordu. Hangisini alacağını beslediğin renkler belirliyordu; üç beslemenin üçü de farklı renkten geldiyse en güçlüsünü alıyordun, <strong>Bloomstar</strong>.</p>
+
+  <p>Fikri sevmiştim, çünkü ödülü bir taahhüde çeviriyordu. Seed'i korumak zorundaydın, ve engellerin de artık sadece engelleyecekleri değil, saldıracakları bir şey vardı.</p>
+
+  <p>Sonra dağılımı hesapladım. Beş renkli bir tahtada üç besleme, renkler aşağı yukarı bağımsız kabul edilirse:</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Tahta</th><th>Hesaplama</th><th>Üç beslemenin de farklı olma ihtimali</th></tr></thead>
+    <tbody>
+      <tr><td>5 renk</td><td class="num">1 × 4/5 × 3/5</td><td class="num">%48</td></tr>
+      <tr><td>4 renk</td><td class="num">1 × 3/4 × 2/4</td><td class="num">%37,5</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>İlk besleme herhangi bir renk olabilir. İkincisinin ondan farklı olma ihtimali 5'te 4, üçüncüsünün ikisinden de farklı olma ihtimali 5'te 3. Yani oyundaki en nadir ve en güçlü power-up, Seed'lerin neredeyse yarısında çıkıyordu; dikkat etmemenin varsayılan sonucu olarak. Kendi notumda yanına "kazara elde etmesi zor" diye yazmıştım. Koşulu değiştirdim: üç beslemenin en az ikisi beş-artı bir patlamadan gelmeliydi. Kurdum ve ölçtüm: rastgele oynayışta %7,8, kasten hedefleyen oyunda %18,3.</p>
+
+  <p><strong>Kural artık doğruydu ve yine de kestim.</strong> İki sebep, ikisi de aritmetikle ilgili değil.</p>
+
+  <p>Birincisi: bütün oyun bu tek yaratma kuralına asılıydı ve kuralın eğlenceli olup olmadığını bilmiyordum, çünkü hiçbir insan oynamamıştı. Ölçebildiğim şey dağılımdı. Ölçemediğim şey histi, ve oyunu taşıyan kısım da oydu.</p>
+
+  <p>İkincisi: her tahtaya vergi biniyordu. Mekaniği yaşatmak için şöyle bir level tasarım kuralı yazmıştım: her bölümde, bir Seed'in üç hamle boyunca hayatta kalıp beslenebileceği bir bölge olmalı. Bu, tek bir mekaniği ayakta tutmak için level ekibinin yapacağı <em>her</em> tahtada ödeyeceği kalıcı bir kısıt. Fikrin işe yarayan kısmı yine de kaldı: Seed, toplanabilir bir hedef öğesi olan <strong>Seedpod</strong>'a dönüştü.</p>
+
+  <h4>2. Dört power-up, ve tersine işleyen merdiven</h4>
+
+  <p>Yerine geleni Royal Match'e birebir eşledim: Rocket için Ant Nest, TNT için Puffball, Light Ball için Pollen Cloud, Propeller için Bee Hive. Ama Royal Match'in dördü olmasının sebebi, swap'ın iki yaratım eksenine sahip olması: sayı <em>ve</em> şekil: düz sırada dört, karede dört, L şeklinde beş, sırada beş. Bir blast tahtasındaysa sadece sayı var, Toon Blast'ın üçe sahip olmasının sebebi de bu.</p>
+
+  <p>Yani dördüncüsünün ikinci bir eksene ihtiyacı vardı, ben de konumu kullandım: üst sıraya değen beş-artı bir temizlik, Ant Nest yerine bir Bee Hive yapıyordu. Bu hemen bozuldu. Üst sırada dokuz karolik bir temizlik, oyuncuya Pollen Cloud yerine bir Bee Hive verirdi. Yani daha iyi bir hamle daha kötü ödeme yapardı. Konumun seçimini sadece yedi-sekiz kademesiyle sınırlayarak yamadım.</p>
+
+  <h4>3. Kuralın yanlış olduğunu gösteren yama</h4>
+
+  <p>Yama işe yaradı ve kural artık doğruydu, ve tam da o zaman kuralın hiç var olmaması gerektiği anlaşıldı. "Yedi karo bir Puffball yapar, üst sıraya değmediği sürece; değerse bir Bee Hive yapar, ama dokuz her zaman bir Pollen Cloud yapar" oyuncuya öğretilmesi gereken ve yine de yanlış öğrenileceği bir kural. İçinde şartı olan bir yaratım kuralı, tahtanın kendi başına öğretemeyeceği bir kuraldır.</p>
+
+  <p>Bariz alternatif, üç ya da dört karoluk dördüncü bir boyut kademesiydi. Yazıya dökmeden önce ölçtüm:</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Küme</th><th>Tahta başına, 4 renk</th><th>En az bir tane olan tahtalar</th></tr></thead>
+    <tbody>
+      <tr><td class="num">3+</td><td class="num">6,48</td><td class="num">%100</td></tr>
+      <tr><td class="num">5+</td><td class="num">1,85</td><td class="num">%91</td></tr>
+      <tr><td class="num">7+</td><td class="num">0,60</td><td class="num">%50</td></tr>
+      <tr><td class="num">9+</td><td class="num">0,21</td><td class="num">%20</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Her tahtada altı buçuk tane üç karolik küme var, ve test edilen her tahtada bir üç-artı küme mevcut. Oraya bir kademe koymak, oyuncuya neredeyse her hamlede bir power-up verirdi; bu da onu ödül olmaktan çıkarır ve çekirdeğin sahip olduğu tek gerilimi ortadan kaldırır: daha büyük bir küme için bekleme kararı.</p>
+
+  <h4>4. Arıların neden bir booster da olmadığı</h4>
+
+  <p>Bir sonraki fikir, Bee Hive'ı satın alınabilir bir booster'a indirgemekti. Bu, farklı bir sebepten yanlış: booster listesinde zaten coin karşılığında bir karo ya da bir engel katmanı kaldıran <strong>Shears</strong> var. Shears, bu oyunun <strong>Royal Hammer</strong>'ı: Royal Match'te hamle harcamadan bir karoyu veya herhangi bir öğenin bir katmanını kaldıran bölüm içi booster. Bilerek aynı araç, çünkü o slot işliyor. Satın alınabilen ikinci bir "bir şeyi kaldır", aynı ürünün ikinci kez tekrarı, ve oyuncu baskı altında iki benzer kurtarma düğmesini birbirinden ayıramaz.</p>
+
+  <p>Arılarla ilgili asıl iyi olan şey hiçbir zaman satın alma değildi. Kendiliğinden gelmeleriydi, en çok takıldığın şeye gitmeleriydi, ve onları sen hedeflememiş olmandı. Bu bir gösterge işidir, bir düğme değil. O yüzden bir göstergeye dönüştü, tek bir engelle sınırlandı ki ödeme yapmanın bir alternatifi değil, oyundaki en küçük yardım olarak kalsın.</p>
+
+  <p>Bu belge hakkında söyleyebileceğim en faydalı şey şu: içindeki çekirdek, denediğim en özgün fikir değil. Öncesinde üç versiyon vardı ve üçünü de kestim: birini eğlenceli olup olmadığını bilemediğim için, birini kuralın içine şart girdiği için, birini zaten işleyen bir booster'ı tekrar ettiği için. Hayatta kalan şey bilinçli olarak sıradan. Üçünün herhangi birini sizinle birlikte parçalarına ayırabilir, nerede ve neden durduğumu tek tek anlatabilirim.</p>
+</section>
+
+<section id="first50">
+  <div class="part-label">Kısım III</div>
+  <h2>İlk 50 Bölüm</h2>
+
+  <p class="lead">Toon Blast, ilk 81 bölümünde dokuz eleman öğretiyor ve sonrasında kompozisyona yaslanıyor. Ben bu şekli elliye sıkıştırdım, hiçbir bölümün oyuncudan aynı anda iki şey öğrenmesini istemeyeceği şekilde düzenledim.</p>
+
+  <p>İlk elli boyunca standart tahta <strong>8×8</strong>. Düzensiz tahta şekilleri 32. bölümde başlıyor.</p>
+
+  <h3>Renk sayısı, ölçüldü</h3>
+
+  <p>Kısım I, renk sayısını türdeki en sessiz güçlü zorluk kolu olarak adlandırmıştı. İşte satır başına yüz bin rastgele tahta üzerinden gerçekte ne yaptığı.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Renkler</th><th>5+ kümesi olan tahtalar<br><em>(bir Ant Nest)</em></th><th>7+ olan<br><em>(bir Puffball)</em></th><th>9+ olan<br><em>(bir Pollen Cloud)</em></th></tr></thead>
+    <tbody>
+      <tr><td><strong>4</strong> <em>(bölüm 1–25)</em></td><td class="num">%91,1</td><td class="num">%49,5</td><td class="num">%19,8</td></tr>
+      <tr><td><strong>5</strong> <em>(bölüm 26+)</em></td><td class="num">%70,7</td><td class="num">%23,0</td><td class="num">%6,0</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Satır başına yüz bin rastgele tahta, oyuncunun birkaç hamlede kurduğu kümeleri değil, ilk bakışta var olan kümeleri sayıyor; yani bunlar taban değerler, gerçek oran değil. Önemli olan şekil. Beşinci rengin eklenmesi Ant Nest arzını kabaca yarıya indiriyor, Puffball'da bunu bir kez daha yarılıyor, ve Pollen Cloud'u beş tahtada birden on beş tahtada bire düşürüyor.</p>
+
+  <p>Bu tablodan iki karar çıkıyor. Beşinci renk yalnızca bir kez, 26. bölümde gelir, ve ondan sonraki üç bölüm içinde başka hiçbir zor eleman tanıtılmaz, çünkü bu zaten kozmetik gibi görünen bir zorluk değişikliği. Ve renk sayısı, bir tema ayarının içine gömülü değil, hamle bütçesinin yanında her bölümün spec sayfasında yer almalı, çünkü power-up merdiveninin tepesini herhangi bir engelden daha çok o oynatıyor.</p>
+
+  <div class="callout">
+    <span class="callout-title">Bu tablonun bana kaybettirdiği</span>
+    <p>Seedpod'ları başlangıçta dokuz-artı bir temizlemenin düşürdüğü bir şey olarak yazmıştım. Tablo, beş renkte dokuz-artı bir kümenin on beş tahtada birinde bulunduğunu söylüyor; yani buna dayalı bir toplama hedefi, oyuncunun için plan yapamayacağı bir hedef olurdu. Bunu prototipi oynayıp hiç bir tane bile toplayamayarak fark ettim.</p>
+    <p><strong>Seedpod'lar artık bölüm tasarımcısı tarafından tahtaya yerleştiriliyor</strong>, Toon Blast'ın ördeklerini yerleştirdiği gibi. Her power-up kombinasyonu bir tane fazladan düşürüyor, ama bu arz değil fazlalık: kombinasyon oyuncunun bilerek kurduğu bir şey, yani hâlâ bir zar atışı değil. Ders genelleniyor: bir hedef türünün, tasarımcının kontrol ettiği bir arza ihtiyacı vardır, yoksa o bir hedef değil, bir dilektir.</p>
+  </div>
+
+  <h3>Beş perde</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Bölümler</th><th>Perde</th><th>Ne öğreniliyor</th><th>Hedeflenen his</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1–7</td><td><strong>Fiil</strong></td><td>Bitişik karolara dokun. Büyük kümeler daha çok kazandırır.</td><td>Zahmetsiz. Burada başarısızlık bir kusurdur.</td></tr>
+      <tr><td class="num">8–19</td><td><strong>Engel</strong></td><td>Tahtada duran şeyler var, ve bazıları power-up gerektiriyor.</td><td>İlk gerçek kararlar. 14–16'da ilk kasıtlı kayıp.</td></tr>
+      <tr><td class="num">20–31</td><td><strong>Baskı</strong></td><td>Tahtada bir şey senin koleksiyon nesneni avlıyor. Beşinci renk geliyor.</td><td>20–22'de ilk duvar. Takımlar 20'de açılıyor.</td></tr>
+      <tr><td class="num">32–45</td><td><strong>Kompozisyon</strong></td><td>Power-up'lar birleşiyor, tahtalar parçalanıyor, planlama birkaç hamleye yayılıyor.</td><td>Bölümler artık refleksle çözülemiyor.</td></tr>
+      <tr><td class="num">46–50</td><td><strong>Fasıl kapanışı</strong></td><td>Her şey aynı anda, kendine özgü şekli olan bir tahtada.</td><td>50. bölüm ilk Süper Zor'dur.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Tanıtım takvimi</h3>
+
+  <p>Her yeni eleman iki bölüm alır. Önce çözümün ihtiyacından kabaca yarı daha fazla hamlesi olan ve rakip hedefi olmayan bir sandbox, sonra iki ila dört bölüm sonra dar bir bütçeyle bir test. Aynı anda başka bir şey de tanıtan bir bölümde hiçbir şey tanıtılmaz.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Bölüm</th><th>Tanıtılan</th><th>Tür</th><th>Amaç</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>Dry Leaf</strong></td><td>Engel</td><td>Komşuluk, karo olmayan şeyleri de etkiler. Tek vuruş, tehdit yok.</td></tr>
+      <tr><td class="num">2</td><td><strong>Ant Nest</strong></td><td>Power-up</td><td>Beş karo. Daha büyük bir küme için beklemenin ilk ödülü.</td></tr>
+      <tr><td class="num">4</td><td><strong>Clay Pot</strong></td><td>Engel</td><td>Vuruş sayısı var. Bir ila üç katman.</td></tr>
+      <tr><td class="num">7</td><td><strong>Puffball</strong></td><td>Power-up</td><td>Yedi karo. Merdivenin basamakları olduğunu öğretir.</td></tr>
+      <tr><td class="num">8</td><td><strong>Frost Glass</strong></td><td>Engel</td><td>Oynanabilir bir karonun üzerinde duran bir engel.</td></tr>
+      <tr><td class="num">11</td><td><strong>Pollen Cloud</strong></td><td>Power-up</td><td>Dokuz karo. Boyut merdiveninin tepesi, ve hak edilmiş hissettirecek kadar nadir.</td></tr>
+      <tr><td class="num">14</td><td><strong>Root Knot</strong></td><td>Engel</td><td>Komşuluğa bağlı; herhangi bir power-up onu kaldırır. İlk kasıtlı kayıp, 14–16'da.</td></tr>
+      <tr><td class="num">16</td><td><strong>Seedpod</strong></td><td>Koleksiyon nesnesi</td><td>Başlangıçta tahtada iki tane var. Onları en alt sıraya getir. Üçüncü hedef türü.</td></tr>
+      <tr><td class="num">17</td><td><strong>Shears</strong></td><td>Booster</td><td>Herhangi bir karoyu ya da bir engel katmanını kaldır.</td></tr>
+      <tr><td class="num">20</td><td><strong>Weevil</strong></td><td>Engel</td><td>Üç kareden başlayan, yedikçe uzayan ve vurdukça kısalan bir kurtçuk. Greenhouse'lar aynı bölümde açılır.</td></tr>
+      <tr><td class="num">23</td><td><strong>Pollen Meter</strong></td><td>Sistem</td><td>Temizledikçe doluyor; dolunca arılar bir engel katmanına hasar veriyor. Weevil'den sonra giriyor, böylece ilk yardım ettiği şey oyuncunun zaten korktuğu bir tehdit oluyor.</td></tr>
+      <tr><td class="num">26</td><td><strong>Lavender</strong></td><td>Eşleşme elemanı</td><td>Beşinci renk, kendi bölümünde tek başına. Power-up arzı burada kabaca yarıya iner.</td></tr>
+      <tr><td class="num">30</td><td><strong>Kombinasyonlar</strong></td><td>Çekirdek</td><td>İki power-up'ın bitişik olacağı şekilde kurulmuş bir tahta. Hiçbir şey açıklanmaz.</td></tr>
+      <tr><td class="num">32</td><td><strong>Stone Planter</strong></td><td>Engel</td><td>Tahtanın şeklini değiştiren ilk eleman. Düzensiz tahtalar burada başlar.</td></tr>
+      <tr><td class="num">38</td><td><strong>Creeping Ivy</strong></td><td>Engel</td><td>Hamle sayacı olmayan bir saat.</td></tr>
+      <tr><td class="num">41</td><td><strong>Thistle</strong></td><td>Engel</td><td>Kendi arzını üreten bir hedef.</td></tr>
+      <tr><td class="num">46</td><td><em>İlk Zor bölüm</em></td><td>Zorluk</td><td>Etiketlenmiş, çift Season anahtarı.</td></tr>
+      <tr><td class="num">48</td><td><strong>Sun Lamp</strong></td><td>Engel</td><td>Sana yardım eden tek eleman, ve gelen en son eleman.</td></tr>
+      <tr><td class="num">50</td><td><em>İlk Süper Zor</em></td><td>Zorluk</td><td>Fasıl kapanışı, düzensiz tahta, üçlü anahtar.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Hedef türleri, sırayla</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Nereden</th><th>Hedef</th><th>Neden orada</th></tr></thead>
+    <tbody>
+      <tr><td class="num">L1</td><td>Bir renkten <em>n</em> karo temizle</td><td>Hedef, fiilin kendisi. Bölümde ikinci bir fikir yok.</td></tr>
+      <tr><td class="num">L4</td><td>Tüm engelleri temizle</td><td>Dikkat karolardan, üzerlerinde duran şeye kayar.</td></tr>
+      <tr><td class="num">L16</td><td>Seedpod'ları en alt sıraya getir</td><td>Nerede patlattığının, neyi patlattığından daha çok önem taşıdığı ilk an.</td></tr>
+      <tr><td class="num">L41</td><td>Serbest bırakılan öğeleri topla</td><td>Kendi arzını üreten bir hedef; bu yüzden kaynağın temposu ayarlanmalı.</td></tr>
+      <tr><td class="num">L44</td><td>Aynı anda iki tür</td><td>Ancak her biri tek başına öğrenildikten sonra.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Booster'lar</h3>
+
+  <p>Booster'lar ikiye ayrılır: başlangıç kartında sakince seçilen bölüm-öncesi booster'lar, ve baskı altında harcanan bölüm-içi booster'lar. Bunlar farklı kararlar, ve oyun onları aynı sistemmiş gibi sunmamalı. Hiçbir booster'a hamle harcanmaz.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Booster</th><th>Ne zaman</th><th>Açılıyor</th><th>Etki</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Shears</strong></td><td>Bölüm-içi</td><td class="num">L17</td><td>Herhangi bir karoyu, ya da herhangi bir engelin bir katmanını hamle harcamadan kaldır. Royal Match'in Royal Hammer'ı.</td></tr>
+      <tr><td><strong>Watering Can</strong></td><td>Bölüm-öncesi</td><td class="num">L23</td><td>Tahtada baştan bir Ant Nest ile başla.</td></tr>
+      <tr><td><strong>Colour Call</strong></td><td>Bölüm-içi</td><td class="num">L28</td><td>3×3 içindeki bir renkteki tüm karoları başka bir renge çevir. İhtiyaç duyduğun yerde bir küme kurar.</td></tr>
+      <tr><td><strong>Burrow's Dig</strong></td><td>Bölüm-içi</td><td class="num">L34</td><td>Seçilen bir sırayı tünelle, içindeki her şeyden bir katman söker.</td></tr>
+      <tr><td><strong>Trowel</strong></td><td>Bölüm-öncesi</td><td class="num">L34</td><td>İlk hamleden önce rastgele üç engel katmanı söker.</td></tr>
+      <tr><td><strong>Extra Moves</strong></td><td>Başarısızlıkta</td><td class="num">L6</td><td>Continue teklifi. Denemeler arttıkça fiyatlanır ve yükselir. Bkz. Kısım VI.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Her açılışın yeri</h4>
+
+  <p>Her bölüm-içi booster, en az bir kez kaybedilmek üzere tasarlanmış bir bölümün hemen ardından açılır, çünkü oyuncu kurtarılmaya ihtiyacı olduğunu bilmeden önce sunulan bir kurtarma aracı bir satış numarası gibi okunur.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Kasıtlı kayıp</th><th>Sebep</th><th>Sonra açılan booster</th></tr></thead>
+    <tbody>
+      <tr><td class="num">L14–16</td><td>Root Knot, power-up gerekiyor</td><td class="num">Shears, L17</td></tr>
+      <tr><td class="num">L20–22</td><td>Weevil, Seedpod'lar tehdit altında</td><td class="num">Watering Can, L23</td></tr>
+      <tr><td class="num">L27</td><td>Beşinci renk, yeni arzdaki ilk bölüm</td><td class="num">Colour Call, L28</td></tr>
+      <tr><td class="num">L33</td><td>Stone Planter, tahta parçalanması</td><td class="num">Burrow's Dig &amp; Trowel, L34</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Doldurma, ve neden bir karıştırma booster'ı yok</h4>
+
+  <p>Bir blast tahtası, ancak dikey veya yatay olarak bitişik hiçbir iki karo aynı rengi paylaşmadığında ölüdür. Yirmi bin rastgele 8×8 beş renkli çekilişte bir tane bile üretemedim. Stone Planter'lar sütunları böldüğü için doldurma segment bazında tanımlanır: bir sütunun her segmenti kendi üstünden dolar, sabit bir engelin altında kalan segment de dahil.</p>
+
+  <p>Yine de bir ölü-tahta politikası var, çünkü "fiilen asla" ile "asla" aynı şey değil. Bu gerçekleşirse tahta sessizce kendini yeniden karıştırır, engeller hücrelerini ve durumlarını korur, ve oyuncuya hiçbir şey söylenmez. Oyuncuya türün sahip olmadığı bir sorun için booster satmak işe yaramazdan da kötü olurdu; bu, blast oyunları hakkında dışarıdan akıl yürüttüğümü gösterirdi.</p>
+</section>
+
+<section id="catalogue">
+  <div class="part-label">Kısım IV</div>
+  <h2>Öğe Kataloğu</h2>
+
+  <p class="lead">Kısım III her öğenin ne zaman ve neden geldiğini anlattı. Burada ise her birinin ne olduğu var. Aşağıdaki tablo oyunun tamamını tek ekrana sığdırıyor; ondan sonraki her şey bir satırın arkasındaki ayrıntı.</p>
+
+  <h3>Her şey, tek bakışta</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Kategori</th><th>İsim</th><th>Renk / Bölüm</th><th>Ne olduğu</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="5"><strong>Eşleşme<br>elemanları</strong></td><td><img src="../images/el_fern.png" class="tbl-icon" alt=""><strong>Fern</strong></td><td>Yeşil</td><td>Tüy gibi yaprak, ince yaprakçıklarla dolu. Varsayılan olan bu.</td></tr>
+      <tr><td><img src="../images/el_poppy.png" class="tbl-icon" alt=""><strong>Poppy</strong></td><td>Kırmızı</td><td>Dört geniş yaprak, sığ bir kâse şekli.</td></tr>
+      <tr><td><img src="../images/el_daisy.png" class="tbl-icon" alt=""><strong>Daisy</strong></td><td>Sarı</td><td>Işınsal disk, ince yapraklarla dolu.</td></tr>
+      <tr><td><img src="../images/el_bluebell.png" class="tbl-icon" alt=""><strong>Bluebell</strong></td><td>Mavi</td><td>Tek bir sapta sarkan çan.</td></tr>
+      <tr><td><img src="../images/el_lavender.png" class="tbl-icon" alt=""><strong>Lavender</strong></td><td>Mor, L26'dan itibaren</td><td>Küçük tomurcuklardan oluşan dikey bir başak.</td></tr>
+
+      <tr><td rowspan="4"><strong>Power-up'lar</strong></td><td><img src="../images/pu_antnest.png" class="tbl-icon" alt=""><strong>Ant Nest</strong></td><td class="num">5 karo · L2</td><td>Oluştuğu satırı veya sütunu süpürür.</td></tr>
+      <tr><td><img src="../images/pu_puffball.png" class="tbl-icon" alt=""><strong>Puffball</strong></td><td class="num">7–8 karo · L7</td><td>5×5 patlama, bir engel katmanını soyar.</td></tr>
+      <tr><td><img src="../images/pu_pollencloud.png" class="tbl-icon" alt=""><strong>Pollen Cloud</strong></td><td class="num">9+ karo · L11</td><td>Kendi renginden olan her karoyu temizler.</td></tr>
+      <tr><td><img src="../images/pu_beehive.png" class="tbl-icon" alt=""><strong>Pollen Meter</strong></td><td class="num">gösterge · L23</td><td>Temizlenen karolardan dolar; dolduğunda arılar en dayanıklı engelin bir katmanına zarar verir.</td></tr>
+
+      <tr><td><strong>Toplanabilir</strong></td><td><img src="../images/seedpod.png" class="tbl-icon" alt=""><strong>Seedpod</strong></td><td class="num">L16</td><td>Bölüm tasarımcısı tarafından yerleştirilir; power-up kombinasyonları fazladan düşürür. Onu en alt satıra getir.</td></tr>
+
+      <tr><td rowspan="9"><strong>Engeller</strong></td><td><strong>Dry Leaf</strong></td><td class="num">L1</td><td>Bitişikteki bir patlamayla tek vuruşta gider.</td></tr>
+      <tr><td><strong>Clay Pot</strong></td><td class="num">L4</td><td>Bir ila üç katman, bitişik her patlamada bir katman gider.</td></tr>
+      <tr><td><strong>Frost Glass</strong></td><td class="num">L8</td><td>Oynanabilir bir karonun üzerinde durur; altındaki karoyu temizle.</td></tr>
+      <tr><td><strong>Root Knot</strong></td><td class="num">L14</td><td>Bitişikliğe karşı bağışık. Herhangi bir power-up onu kaldırır.</td></tr>
+      <tr><td><strong>Weevil</strong></td><td class="num">L20</td><td>Üç kareden başlar, altıda durur. Senin hamlenin sonunda hareket eder, başının girdiği karoyu yer, ve her üç karoda bir parça uzar. Her vuruş kuyruğundan bir parça alır.</td></tr>
+      <tr><td><strong>Stone Planter</strong></td><td class="num">L32</td><td>2×2, yer çekimini yok sayar, beş vuruş. Sütunları böler.</td></tr>
+      <tr><td><strong>Creeping Ivy</strong></td><td class="num">L38</td><td>Bir karoyu kaplar; vurulmadığı sürece her üç hamlede bir yayılır.</td></tr>
+      <tr><td><strong>Thistle</strong></td><td class="num">L41</td><td>Her vuruşta bir tohum tüyü bırakır; hepsini topla.</td></tr>
+      <tr><td><strong>Sun Lamp</strong></td><td class="num">L48</td><td>Her hamlede açılıp kapanır. Yanarken temizlenen karolar Pollen Meter'a iki kat sayılır.</td></tr>
+
+      <tr><td rowspan="6"><strong>Booster'lar</strong></td><td><strong>Shears</strong></td><td class="num">bölüm içi · L17</td><td>Bir karoyu veya bir engel katmanını kaldırır.</td></tr>
+      <tr><td><strong>Watering Can</strong></td><td class="num">bölüm öncesi · L23</td><td>Tahtada bir Ant Nest ile başla.</td></tr>
+      <tr><td><strong>Colour Call</strong></td><td class="num">bölüm içi · L28</td><td>3×3 içinde bir rengi yeniden renklendir.</td></tr>
+      <tr><td><strong>Burrow's Dig</strong></td><td class="num">bölüm içi · L34</td><td>Seçilen bir satır boyunca bir katman soy.</td></tr>
+      <tr><td><strong>Trowel</strong></td><td class="num">bölüm öncesi · L34</td><td>Başlangıçta rastgele üç engel katmanını soy.</td></tr>
+      <tr><td><strong>Extra Moves</strong></td><td class="num">başarısızlıkta · L6</td><td>Continue teklifi. Beş hamle, ücretli.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Eşleşme elemanları</h3>
+
+  <p>Beş renk var. Kendime koyduğum kısıtlama şu: her karo, renk çıkarıldığında da tanınabilmeli; yani önce siluet, sonra renk tonu geliyor. Renk eşleştirmeye dayanan bir oyun, erkeklerin yaklaşık %8'ini etkileyen renk körlüğü olan oyuncular için oynanamıyorsa, bu kendi kendine koyulmuş bir izleyici tavanıdır, ve şekiller baştan doğru tasarlanırsa bunun bedeli sıfırdır.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Öğe</th><th>Renk</th><th>Siluet</th><th>Çağrıştırdığı</th></tr></thead>
+    <tbody>
+      <tr><td><img src="../images/el_fern.png" class="tbl-icon" alt=""><strong>Fern</strong></td><td>Yeşil</td><td>Tüy gibi yaprak, ince yaprakçıklarla dolu</td><td>Büyüme, varsayılan olan</td></tr>
+      <tr><td><img src="../images/el_poppy.png" class="tbl-icon" alt=""><strong>Poppy</strong></td><td>Kırmızı</td><td>Dört geniş yaprak, sığ bir kâse</td><td>Sıcaklık, güç</td></tr>
+      <tr><td><img src="../images/el_daisy.png" class="tbl-icon" alt=""><strong>Daisy</strong></td><td>Sarı</td><td>Işınsal disk, ince yapraklarla dolu</td><td>Yayılma</td></tr>
+      <tr><td><img src="../images/el_bluebell.png" class="tbl-icon" alt=""><strong>Bluebell</strong></td><td>Mavi</td><td>Tek bir sapta sarkan çan</td><td>Akış, aşağı doğru</td></tr>
+      <tr><td><img src="../images/el_lavender.png" class="tbl-icon" alt=""><strong>Lavender</strong></td><td>Mor</td><td>Küçük tomurcuklardan oluşan dikey başak</td><td>Nadirlik</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Test basit ve ilk sanat geçişinde uygulamaya değer: beşini de 44 piksende gri tonlamayla çiz ve birine adlarını sordur. Söyleyemiyorlarsa siluetler işini yapmıyor demektir, sonradan yapılacak hiçbir renk ayarı bunu düzeltmez.</p>
+
+  <h3>Power-up'lar</h3>
+
+  <p>Üçü küme boyutundan geliyor, biri konumdan. Standart 8×8 tahtada, beş renkle her birinin gerçekte ne yaptığı aşağıda; çünkü belirsiz tanımlar üzerine kurulu bir merdiveni kimse ayarlayamaz.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Power-up</th><th>Nasıl oluşuyor</th><th>Temizlediği</th><th>Dönüştüğü</th><th>Görevi</th></tr></thead>
+    <tbody>
+      <tr><td><img src="../images/pu_antnest.png" class="tbl-icon" alt=""><strong>Ant Nest</strong></td><td class="num">5 karo</td><td class="num">8</td><td>–</td><td>Tahtanın karşısına ulaşmak</td></tr>
+      <tr><td><img src="../images/pu_puffball.png" class="tbl-icon" alt=""><strong>Puffball</strong></td><td class="num">7–8 karo</td><td class="num">≈25</td><td>–</td><td>Güç ve engel kaldırma</td></tr>
+      <tr><td><img src="../images/pu_pollencloud.png" class="tbl-icon" alt=""><strong>Pollen Cloud</strong></td><td class="num">9+ karo</td><td class="num">≈13</td><td>–</td><td>Renge göre tüm tahtaya etki etmek</td></tr>
+
+    </tbody>
+  </table>
+  </div>
+
+  <p>Bir eksenin taşıyabileceği üç basamak var. Oyuncunun elde ettiği geri kalan her şey Pollen Meter'dan, booster'lardan ya da bölüm yerleşiminden geliyor; bunları merdivenin dışında tutmak, merdivenin okunaklı kalmasını sağlıyor: küme boyutu girer, power-up çıkar, başka koşul yok.</p>
+
+  <p>Pollen Cloud en üstte, çünkü geometriye değil renge göre tahtaya etki ediyor. Royal Match'in Light Ball'u ve Toon Blast'in Disco Ball'u da aynı prensip üzerine kurulu. Üstüne başka bir şey gerekmemesinin sebebi de bu: bir power-up merdiveninin tepesinde, diğer basamaklara etki eden bir şey olmalı.</p>
+
+  <h4>Kombinasyonlar</h4>
+
+  <p>Bitişik hücrelerdeki iki power-up, hangisine dokunulursa dokunulsun birleşir.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Kombinasyon</th><th>Sonuç</th></tr></thead>
+    <tbody>
+      <tr><td><img src="../images/pu_antnest.png" class="tbl-icon" alt=""><img src="../images/pu_antnest.png" class="tbl-icon" alt=""> Ant Nest + Ant Nest</td><td>Tüm satırı <em>ve</em> tüm sütunu temizler.</td></tr>
+      <tr><td><img src="../images/pu_antnest.png" class="tbl-icon" alt=""><img src="../images/pu_puffball.png" class="tbl-icon" alt=""> Ant Nest + Puffball</td><td>Satır temizlenir ve her iki ucunda 5×5'lik bir patlama olur.</td></tr>
+      <tr><td><img src="../images/pu_puffball.png" class="tbl-icon" alt=""><img src="../images/pu_puffball.png" class="tbl-icon" alt=""> Puffball + Puffball</td><td>7×7, iki engel katmanını soyar.</td></tr>
+      <tr><td><img src="../images/pu_pollencloud.png" class="tbl-icon" alt=""><img src="../images/pu_antnest.png" class="tbl-icon" alt=""> Pollen Cloud + Ant Nest</td><td>Seçilen renkteki her karo bir Ant Nest'e dönüşür, sonra hepsi patlar.</td></tr>
+      <tr><td><img src="../images/pu_pollencloud.png" class="tbl-icon" alt=""><img src="../images/pu_puffball.png" class="tbl-icon" alt=""> Pollen Cloud + Puffball</td><td>Seçilen renkteki her karo bir Puffball'a dönüşür, sonra hepsi patlar.</td></tr>
+      <tr><td><img src="../images/pu_pollencloud.png" class="tbl-icon" alt=""><img src="../images/pu_pollencloud.png" class="tbl-icon" alt=""> Pollen Cloud + Pollen Cloud</td><td>Tahtayı temizler ve her engelden bir katman soyar.</td></tr>
+
+
+
+
+    </tbody>
+  </table>
+  </div>
+
+  <p>Her kombinasyon bir Seedpod düşürür. Bunları öğrenmenin sessiz sebebi de bu: kombinasyon, oyuncunun kontrol ettiği tek Seedpod kaynağı, ve tasarımcınınkinin yanında var olmasına izin verdiğim tek kaynak olmasının sebebi bu.</p>
+
+  <h3>Seedpod</h3>
+
+  <div class="cards">
+    <div class="card">
+      <h5><img src="../images/seedpod.png" class="tbl-icon" alt="">Seedpod <span class="tag">Toplanabilir · L16</span></h5>
+      <p><strong>Tahtaya yerleştirilir</strong>, bölüm tasarımcısı tarafından; yani hedefin dayandığı arz rastgele değil, tasarlanmıştır. Her power-up kombinasyonu fazladan bir tane düşürür. Bu arz değil fazlalık: kombinasyon bilinçli bir hamledir, yani hedef hiçbir zaman şanslı bir tahtaya bağlı kalmaz.</p>
+      <p><strong>Davranışı</strong> normal bir sakin gibidir: yer çekimiyle düşer, eşleştirilemez ve patlamalarla ya da power-up'larla yok edilemez.</p>
+      <p><strong>Toplanması</strong>, en alt satıra indirilmesiyle olur; o noktada tahtayı terk eder.</p>
+      <p><strong>Kaybedilmesi</strong> yalnızca bir Weevil'a olur.</p>
+      <p class="why">Tahtayı meta'ya bağlayan tek nesne bu. Oyuncunun yaptığı diğer her şey bölüm sonunda bir Sprout'a dönüşür; Seedpod ise oyuncunun fiziksel olarak tahtadan aşağı taşıdığı ve sonra bahçeye dikildiğini gördüğü bir şey. Bu, restorasyon fantezisine başka bir para biriminden daha fazla katkı sağlıyor.</p>
+    </div>
+  </div>
+
+  <h3>Engeller</h3>
+
+  <p>İlk elli bölümde dokuz tane var: aşağıda sekizi, bir de kendi başlığını hak eden Weevil, çünkü hareket eden tek engel o.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Bölüm</th><th>Engel</th><th>Davranış</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>Dry Leaf</strong></td><td>Bitişikteki bir patlamayla tek vuruşta gider. Asla engel değil, sadece hedef.</td></tr>
+      <tr><td class="num">4</td><td><strong>Clay Pot</strong></td><td>Bir ila üç katman, bitişik her patlamada bir tanesi kalkar.</td></tr>
+      <tr><td class="num">8</td><td><strong>Frost Glass</strong></td><td>Oynanabilir bir karonun üzerinde durur. Kaldırmak için altındaki karoyu temizle; karo, üzeri kapalıyken de eşleştirilebilir kalır.</td></tr>
+      <tr><td class="num">14</td><td><strong>Root Knot</strong></td><td>Bitişik patlamalara karşı bağışık. <em>Herhangi bir</em> power-up'tan tek vuruşla kalkar. Bilinçli bir tercih bu, çünkü ilk zorlu engel belirli bir rengin gelmesine bağlı olmamalı.</td></tr>
+      <tr><td class="num">32</td><td><strong>Stone Planter</strong></td><td>2×2, yer çekimini yok sayar, beş vuruş. Sütunları böler; yani tahtanın içeriğini değil topolojisini değiştirir. Az kullanılır: parçalanma, zorluğun en az okunaklı türüdür.</td></tr>
+      <tr><td class="num">38</td><td><strong>Creeping Ivy</strong></td><td>Bir karoyu kaplar ve oynanamaz hâle getirir. Vurulmadığı sürece her üç hamlede bir komşu bir karoya yayılır. Hamle sayacı olmayan bir saat.</td></tr>
+      <tr><td class="num">41</td><td><strong>Thistle</strong></td><td>Her vuruşta bir tohum tüyü bırakır; bunlar sürüklenir ve toplanmaları gerekir; thistle boşaldığında kırılır. Kendi arzını üreten bir hedef; bulmacanın kendisi de bu kaynağın temposunu ayarlamak.</td></tr>
+      <tr><td class="num">48</td><td><strong>Sun Lamp</strong></td><td>Her hamlede açılıp kapanır. Yanarken temizlenen her karo Pollen Meter'a iki kat sayılır, yani bulmaca en büyük temizliğini yanık hamleye denk getirmek. Yardımcı olan tek öğe, ve gelenlerin sonuncusu.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h5>Weevil <span class="tag t">L20 · hareket eden tek engel</span></h5>
+      <p><strong>Nedir:</strong> tahtadaki tek canlı olan bir kurtçuk, <strong>başlangıçta üç kare uzunluğunda</strong>. Bölüm tasarımcısı onu tahtanın bir kenarı boyunca yerleştiriyor, tıpkı Seedpod'lar gibi, ve bir daha belirmiyor. <strong>Senin hamlenin sonunda hareket ediyor, asla öncesinde değil</strong>; yani baktığın tahta her zaman üzerinde işlem yapacağın tahta oluyor. Başı en yakın Seedpod'a doğru bir sonraki hücreye giriyor ve oradaki karoyu yiyor, kuyruğu son hücresini bırakıyor, ve o hücre diğerleri gibi yukarıdan doluyor. Yerçekimiyle düşmüyor, hareket ettirilemeyen engellerin içinden geçemiyor ve onları yemiyor.</p>
+      <p><strong>Beslendikçe uzuyor, dövüştükçe kısalıyor.</strong> Yediği her üç karo bir parça ekliyor. Her vuruş kuyruğundan bir parça alıyor, ve kısalırken hareket etmeye devam ediyor. Son parçasını alınca ölüyor. Böylece oyuncunun önünde gizli bir sayı yerine canlı bir sayı duruyor: uzayan bir Weevil, elinden kaçan bir bölüm demek; kısalan bir Weevil ise can barına bakmadan görebildiği bir ilerleme.</p>
+      <p><strong>Altı karede duruyor.</strong> Bu sınır fikrin değil benim, ve koyma sebebim şu: sınırsız büyüme tahtayı bozuyor. Üç hamlede bir parça hızıyla, hiç dokunulmamış bir Weevil normal bir bölümün sonunda koca bir sırayı kaplıyor, ve geri dönüşü olmayan bir bulmaca bulmaca değildir. Altı, duvar sayılacak kadar geniş ve etrafından oynanacak kadar dar. 40. bölüme kadar bölüm başına birden fazla olmuyor.</p>
+      <p><strong>Weevil bulunan bir bölümde tahtada her zaman hedefin gerektirdiğinden bir fazla Seedpod bulunur.</strong> Bir tanesini kaybetmek oyuncuya gerçek bir bedel ödetmeli, ama bölümü sessizce bitirilemez hale getirmemeli; çünkü oyuncunun fark edemediği bitirilemez bir tahta, bir bulmacanın ona yapabileceği en kötü şey.</p>
+      <p class="why">Oyundaki diğer bütün engeller statiktir: orada durur, sen de onunla uğraşırsın. Weevil hareket ediyor, ve bir blast oyununda bu genel değil çok belirli bir baskı anlamına geliyor. Kısım I'de zorluğun bitişikliği bozmak olduğunu söylüyorum, ve üç kareli bir Weevil tam da gezen bir duvar: her hamlede tahtayı başka bir yerden kesiyor, yani oyuncunun iki hamle önce okuduğu tahta artık önündeki tahta değil. Tek karede olsaydı bir rahatsızlık olurdu. Üç karede ise oyuncunun etrafından plan yapmak zorunda olduğu bir şekil, ve asıl mesele de bu. Ayrıca tahtadan doğrudan okunabilen bir geri sayım ve zaten kazandığı bir şeyi korumakla bölümü bitirmek arasında gerçek bir seçim sunuyor. Bir toplama hedefinin muhasebeden ibaret olmayıp gerilim taşımasının tek sebebi de bu.</p>
+      <p class="why"><strong>Burada neyi riske atıyorum.</strong> Bu, incelediğim iki oyunda çalıştığını görebildiğim şeyin ötesine uzandığım tek eleman. Ne Royal Match'te ne Toon Blast'te hareket eden bir engele denk geldim; ne oynadığım bölümlerde, ne de topluluğun internetteki kaynaklarında yaptığım aramalarda. Bu, öyle bir şey yok demek değil. Ve durum iki yöne birden kesiyor. Oyuncunun hamleleri arasında değişen bir tahta, bir bulmaca oyuncusunun en az beklediği şey; Weevil'ı ilginç yapan da bu, onu batırabilecek olan da bu. Çünkü tahtanın yerinde duracağına güvenemeyen bir oyuncu plan yapmayı bırakıp tepki vermeye başlar. Aleyhine daha sessiz bir argüman daha var. Peak'in Toon Blast'te böyle bir şey çıkarmak için yılları ve binlerce bölümü oldu, ve ben böyle bir şeye denk gelmedim. Ya yeterince ilerlemediğim için karşılaşmadım, ya da denendi ve tutmadı. İkincisi gerçek bir ihtimal, ve bunu düşünmemiş gibi yapmaktansa söylemeyi tercih ederim. İlk oynanabilir sürümden gelecek tek bir sayı meseleyi çözer: oyuncu Weevil'ı görür görmez ne sıklıkta öldürüyor. Eğer bu her seferine yakınsa, o bir karar değil, iki hamlelik bir vergidir ve kalkmalıdır. Tuttum, çünkü hiçbir tehdit altında olmayan bir toplama hedefi muhasebedir, ve çünkü böyle bir fikir hiç denenmemektense erkenden yanılmaya değer.</p>
+    </div>
+  </div>
+</section>
+
+<section id="art">
+  <div class="part-label">Kısım V</div>
+  <h2>Sanat, Animasyon ve Ses</h2>
+
+  <p class="lead">Kısım I'de, bir patlatma oyununda efektlerin süs olmadığını, oyuncunun bir hamlede on beş hücresi birden değişen bir tahtaya dair zihnindeki modeli bu sayede koruduğunu söylemiştim. Aşağıdaki spesifikasyon bu fikrin devamıdır.</p>
+
+  <h3>Sanat yönü</h3>
+
+  <p>Üretim gerekçeleriyle düz (flat) bir yaklaşım; Royal Match'ten çok Toon Blast'e yakın. Bloomrise'ın ilk elli bölümünde yaklaşık dokuz engel ailesine ihtiyaç var, ondan sonrası için de çok daha fazlasına; düz bir dil, ellinci engelin maliyetini beşinciye yakın tutuyor. Detay bütçesi bunun yerine bahçe restorasyon sahnelerine gidiyor: meta'nın görsel olarak karşılığını ödemesi gereken yer orası.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Katman</th><th>Uygulama</th><th>Neden</th></tr></thead>
+    <tbody>
+      <tr><td>Tahta arka planı</td><td>Doygunluğu düşük, düşük kontrast, %15 opaklığın üzerinde detay yok</td><td>Karolar bunun üzerinde öne çıkmalı. Buradaki her dekoratif öğe, okunması gereken tek şeyle yarışır.</td></tr>
+      <tr><td>Eşleşme karoları</td><td>Düz dolgu, tek highlight, güçlü siluet farkı</td><td>Çeyrek saniyede tanınmalı. Gri tonlamada bile oynanabilir.</td></tr>
+      <tr><td>Power-up'lar ve Seedpod'lar</td><td>Tahtadaki en sıcak renkli öğeler, fiziksel olarak daha büyük, hafif bekleme hareketi</td><td>Oyuncunun yöneldiği nesneler bunlar. Dokunulmadan da göz alıcı olmaları gerekir.</td></tr>
+      <tr><td>Engeller</td><td>Soluk, karolardan daha soğuk tonda, malzemesi net belli</td><td>Eşleştirilecek şeyler değil, yolun üstündeki dekor gibi okunmalılar.</td></tr>
+      <tr><td>Doygun renk</td><td>Yalnızca ilerleme, ödül ve tekliflere ayrılır</td><td>Her şey bağırırsa, hiçbiri sinyal vermez.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Animasyon zamanlaması</h3>
+
+  <p>Bütçeler, dokunuştan tahtanın tamamen yerine oturup yeniden dokunulabilir hale gelmesine kadar geçen süreyi kapsar. Bu sayıların üzerindeki her şey oyunu yavaş hissettirir, altındaki her şey okunaksız kılar.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Olay</th><th>Bütçe</th><th>Notlar</th></tr></thead>
+    <tbody>
+      <tr><td>Patlatma, 2–4 karo</td><td class="num">≤ 350 ms</td><td>Önce patlama, sonra çökme. Bekleme yok.</td></tr>
+      <tr><td>Patlatma, 5+ karo</td><td class="num">≤ 600 ms</td><td>Power-up oluşmadan önce 120 ms'lik bir bekleme içerir; böylece oyuncu ne kazandığını görür.</td></tr>
+      <tr><td>Seedpod düşüşü</td><td class="num">≤ 450 ms</td><td>Çökmeyle paralel çalışır, asla sonrasında değil.</td></tr>
+      <tr><td>Seedpod toplanması</td><td class="num">≤ 700 ms</td><td>Beklenti hissi verilen tek rutin olay. Oyuncunun tahta boyunca taşıdığı tek şey bu.</td></tr>
+      <tr><td>Tek power-up</td><td class="num">≤ 900 ms</td><td>İz, temizlikten sonra 200 ms boyunca görünür kalmalı.</td></tr>
+      <tr><td>Kombinasyon</td><td class="num">≤ 1400 ms</td><td>Kamera kısa bir yerine oturma ve geri dönüş hareketi yapar, asla kesme değil.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Çökme sütun bazında kademelidir, eş zamanlı değildir. Sütunlar soldan sağa, aralarında yaklaşık 30 ms olacak şekilde yerine oturur; bu, tek bir hareket gibi okunacak kadar kısa, göze bir sıra hissi verecek kadar da uzundur.</p>
+
+  <h3>Partiküller</h3>
+
+  <p>Katmanlı; böylece büyük bir temizlik küçük olandan türü itibarıyla ayırt edilebiliyor. Kaçınılması gereken durum, on beş tam patlamanın aynı anda gerçekleşmesidir. Bu görsel bir çamura dönüşür ve tahtayı, onu temizlemenin kutlaması altına gömer.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Katman</th><th>Tetikleyici</th><th>Bütçe</th><th>Ekran efektleri</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1 · Patlama</strong></td><td>Herhangi bir sıradan patlatma</td><td class="num">Karo başına 4–6 partikül, 250 ms ömür</td><td>Yok</td></tr>
+      <tr><td><strong>2 · Oluşum</strong></td><td>Power-up oluşturulduğunda</td><td class="num">Toprak püfü, 8 partikül, bir halka</td><td>Yok. Hücrede kısa, sıcak bir parıltı.</td></tr>
+      <tr><td><strong>3 · Toplama</strong></td><td>Seedpod alt sıraya ulaştığında</td><td class="num">Yaprak patlaması, 20 partikül, 600 ms</td><td>Hücrede hafif parlama, sarsıntı yok</td></tr>
+      <tr><td><strong>4 · Detonasyon</strong></td><td>Power-up ateşlendiğinde</td><td class="num">40+ partikül, izler, döküntü</td><td>Hafif, 2 px sarsıntı, 80 ms zaman genişlemesi</td></tr>
+      <tr><td><strong>5 · Kombinasyon</strong></td><td>İki power-up</td><td class="num">Tam bütçe, katmanlı</td><td>Hafif, 5 px sarsıntı, kamera yerine oturma ve geri dönüş</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Kesin sınır: kaç olay tetiklenmiş olursa olsun, aynı anda 250'den fazla canlı partikül olamaz. Bu sınırın üzerinde önce 1. ve 2. katmanlar düşürülür, çünkü bir zincir sırasında kimsenin izlemediği şey küçük patlamalardır.</p>
+
+  <p>Hızda hayatta kalan her partikülün bir bilgi taşıması gerekir. Rocket tarzı izler, oyuncunun hangi hattın temizlendiğini sonradan görebilmesi için vardır. Döküntü rengi engelin malzemesiyle eşleşir, böylece oyuncu bir sayaç okumadan neyin kırıldığını öğrenir. Bu ikisinden hiçbirini yapmayan bir efekt oyuna girmez.</p>
+
+  <h3>Ses</h3>
+
+  <p>Bunu <em>Stackline</em>'da yanlış yaptım, Kısım I'de anlattığım gibi: düşen her parçaya tam ses seviyesinde kendi sesini verdim, ve hızlandığında oyun dinlenemez hale geldi. Aşağıdaki kural orada sorunu çözen kural, ve bu oyunun sesini de onun üstüne kurardım.</p>
+
+  <div class="callout">
+    <span class="callout-title">Yoğunluk kuralı</span>
+    <p><strong>Olay sayısı arttıkça olay başına ses düzeyi düşer ve tek bir temizliğin toplam ses düzeyi, kaç karo kırdığından bağımsız olarak sınırlıdır.</strong> Yirmi karoluk bir temizlik, beş karoluk bir temizlikten daha büyük hissettirilir; bunu perde, süre ve bas yoluyla yapar, asla ham ses seviyesiyle değil.</p>
+    <p>Bunu yanlış yapmanın bedeli sesi kapatmış bir oyuncu; tavanın tercih değil kural olmasının sebebi bu.</p>
+  </div>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Katman</th><th>Tasarım</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Karo patlaması</strong></td><td>Tek kısa örnek, küme boyunca perde kademeli olarak yükselir; böylece büyük bir temizlik yükselen bir figür çalar. Üst üste binen sesler yığılmaz, zayıflatılır. En fazla sekiz eşzamanlı ses.</td></tr>
+      <tr><td><strong>Power-up oluşumu</strong></td><td>Alçak, yumuşak, diğer her şeyden ayrışan bir ses. Bir şey kazanıldığının sesidir ve onu üreten temizliğin içinde asla kaybolmamalıdır.</td></tr>
+      <tr><td><strong>Seedpod düşüşü</strong></td><td>Kısa, alçalan bir figür; düştüğü her sırada bir basamak daha alçalarak tekrar eder, böylece oyuncu izlemeden onu duyarak takip edebilir.</td></tr>
+      <tr><td><strong>Seedpod toplanması</strong></td><td>Düşen figürü sonlandırır. Müziği kısmasına izin verilen tek rutin ses olayı budur.</td></tr>
+      <tr><td><strong>Power-up</strong></td><td>Katmanlı: bir atak, power-up'ın eylemine bağlı bir gövde ve görselden sonra da süren bir kuyruk.</td></tr>
+      <tr><td><strong>Müzik</strong></td><td>Sıcak ve düşük enerjili; 4. veya 5. katmandan bir olay sırasında 6 dB kısılır, 400 ms içinde geri gelir.</td></tr>
+      <tr><td><strong>Başarısızlık</strong></td><td>Sessiz. Bir "sting" değil. Bağıran bir kaybetme ekranı, oyuncunun uygulamayı üzerinde kapattığı ekrandır.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Titreşim aynı katmanlamayı izler ve varsayılan olarak 3. katmanın üzerinde kapalıdır, çünkü sürekli titreşim geri bildirimi bataryayı tüketir ve oyuncuların kapattığı ikinci şeydir. Kök salma ve çiçek açma hafif bir dokunuş, patlatmalar orta düzey bir titreşim alır; başka hiçbir şey titremez.</p>
+
+  <h3>Erişilebilirlik, bir özellik olarak ele alınır</h3>
+
+  <p>Siluet öncelikli karolar, oyunun renk olmadan da oynanabilir olması demektir. Bunun üzerine: her karo türüne küçük bir sembol ekleyen bir renk körü modu, sarsıntı ve zaman genişlemesini kaldırırken çökme zamanlamasını olduğu gibi bırakan bir hareket azaltma ayarı ve bahçe görünümündeki arka plan bekleme animasyonunu kapatma seçeneği. Bunların hiçbiri pahalı değil; siluetler baştan doğru tasarlanırsa ilki neredeyse bedavaya gelir.</p>
+</section>
+
+<section id="meta">
+  <div class="part-label">Kısım VI</div>
+  <h2>Meta-Oyun &amp; Ekonomi</h2>
+
+  <p class="lead">Royal Match de Toon Blast da bölümü bitirince yıldız veriyor, ama ikisi bu yıldızla bambaşka şeyler kastediyor. Bloomrise'ın metası bu farktan çıktı.</p>
+
+  <p>Royal Match'te yıldız bir <strong>inşa parası</strong>. Kazanıyorsun, restorasyon işlerine harcıyorsun; bakiyen inip çıkıyor ve meta senin oynadığını tüketiyor. Toon Blast'te aynı yıldız iki iş birden görüyor: hem ödül için boşalttığın sandığı dolduruyor, hem de diğer oyunculara karşı dönen bir turnuva sıralamasında <strong>birikiyor</strong>. Oyunun aciliyet kurduğu taraf, rekabetçi olan.</p>
+
+  <p>Harcamak sahiplenme yaratır. Sıralama aciliyet yaratır. Toon Blast ikisini de tek para birimiyle çeviriyor, Royal Match sadece birincisini. İkisi de olur, ama oyunun hangisinin yük taşıdığını bilmesi gerekir; çünkü metanın <em>ne işe yaradığını</em> o belirler.</p>
+
+  <p>Bloomrise'da yükü harcama taşıyor, sıralama kenarda duruyor. Sebebi çekirdek mekanikte: bir bölüm zaten kendi aciliyetini üretiyor: azalan bir hamle bütçesi, taşınması gereken bir toplama hedefi ve ona doğru yürüyen bir Weevil. Metanın bunun üstüne koyacak bir şeyi yok. Onun getirmesi gereken şey tam tersi: yarın uygulamayı açmak için sakin bir sebep.</p>
+
+  <h3>Çekirdek döngü</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Adım</th><th>Sistem</th><th>Detay</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Bölüm oyna</td><td>Can sadece başarısızlıkta gider; her iki referans oyunda da öyle.</td></tr>
+      <tr><td class="num">2</td><td>Sprout kazan</td><td>Bölüm başına bir tane, sadece ilk geçişte. Hiçbir fiyata satılmaz.</td></tr>
+      <tr><td class="num">3</td><td>Harca</td><td>Her bahçede bir ila üç Sprout'luk altı-dokuz restorasyon işi var. Sırayı oyuncu seçer.</td></tr>
+      <tr><td class="num">4</td><td>Bahçeyi bitir</td><td>Garden Chest, kısa bir sahne, sonraki bahçe açılır.</td></tr>
+      <tr><td class="num">5</td><td>Cultivar aç</td><td>Sonraki bölümlerde bir şeyi değiştiren kalıcı bitki.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Cultivar'lar, ve onları ne zaman iptal ederim</h3>
+
+  <p>Royal Match'te restorasyon kozmetik. Yemek Odası'nı bitirmek bölümün nasıl oynandığını değiştirmiyor. Güvenli bir tasarım, işe de yarıyor; ama meta o zaman oynamanın bir parçası değil, oynamanın ödülü oluyor.</p>
+
+  <p>Bloomrise'da bir bahçeyi bitirmek bir <strong>Cultivar</strong> açıyor. Cultivar, geri yetiştirdiğin bir bitki, ve o andan sonra oyunun bir kuralını kalıcı olarak değiştiriyor. Booster değil, çünkü onu ne harcıyorsun ne satın alıyorsun; power-up da değil, çünkü tahtada hiç yaratılmıyor. Sonrasında oynadığın her bölümde geçerli olan, duran bir madde.</p>
+
+  <p>Glasshouse <strong>Moonflower</strong>'ı veriyor: bölüm başına bir kez son hamleni geri alabiliyorsun. Orchard <strong>Thornwood</strong>'u veriyor: 5&times;5 alanında hiç engel yokken patlayan bir Puffball, boş karoları temizlemek yerine bir Seedpod düşürüyor.</p>
+
+  <p>İkisi de güç eklemiyor. Moonflower bir hatayı geri satın alıyor, Thornwood ziyan olmuş bir power-up'ı hedefte ilerlemeye çeviriyor; ve o hatayı zaten yapmayacak, o Puffball'ı zaten ziyan etmeyecek bir oyuncu için ikisi de tam olarak hiçbir işe yaramıyor. Bütün mesele bu: bölümün nasıl çözüldüğünü değiştiriyorlar, bölüme ne kadar güç getirildiğini değil. Bu özelliğin güvenle sınırlayabildiğim tek hâli bu.</p>
+
+  <p>Böylece dekorasyonla ilgilenmeyen oyuncu için de metanın bir varlık sebebi oluyor, üstelik kurgu bütün kalıyor: sen bir botanikçisin ve canlandırdığın bahçeler sana bir şeyler yetiştiriyor.</p>
+
+  <h4>Bahçe, ikinci bir oyun türü için de yer</h4>
+
+  <p>Bu oyunların hiçbiri oyuncuyu sürekli çekirdek fiilin içinde tutmuyor. Royal Match, reklamlarının üzerine kurulduğu kurtarma bulmacalarını belirli bir bölüm eşiğinden sonra açılan ayrı bir mod olarak oyunun içine koymuş. Oraya kendim ulaşamadım, yayınlanmış kaynaklara dayanıyorum, yani bu detayı ikinci elden bilgi olarak değerlendirin; ama kararın biçimi ödünç alınacak kadar net: ikinci bir bulmaca türü, sınırları çizilmiş, kampanyanın içinde değil yanında duruyor.</p>
+
+  <p>Bloomrise'ın da böyle bir şeyi olmalı, ve yeri bahçe. Düşündüğüm yön şu: hiç eşleştirme içermeyen kısa bir bulmaca, onardığın bahçede geçen, bölüm yolundan değil haritadan girilen, ve kendi para birimine değil kampanyanın zaten kullandığı ekonomiye ödeyen bir mod. Asıl şimdi söylenmeye değer tasarım kararı da bu son kısım: kendi kesesine ödeyen ikinci bir mod kampanyayla rekabet eder, aynı keseye ödeyen ise onu besler. Modun kendisini burada tanımlamıyorum. Bu gerçek bir kapsam ve kendi belgesini hak ediyor; iki paragrafta ikinci bir oyun çizen bir case çalışması, bunun maliyeti konusunda dürüst olmuş olmaz.</p>
+
+  <div class="callout warn">
+    <span class="callout-title">Bedeli ve iptal koşulu</span>
+    <p>Zorluk ayarını meta hızına bağlıyor. Oyuncu gücü bahçe tamamlamayla büyümeye başlayınca, her bölümün bir oyuncu gücü aralığına göre ayarlanması gerekiyor. Kampanyayı koşturan oyuncuyla her bahçeyi tamamlayan oyuncu 120. bölüme farklı çantalarla geliyor.</p>
+    <p>İki önlem birlikte gidiyor. Toplam Cultivar etkisini, en düşük güçlü oyuncuyla en yüksek güçlü oyuncu arasındaki fark kabaca bir hamlelik avantajı aşmayacak şekilde sınırla; ve Cultivar'ları toplamsal değil duruma bağlı yap ki bölüme ne kadar güç getirildiğini değil, bölümün nasıl çözüldüğünü değiştirsinler. Üçüncü bir seçenek, kampanya ilerlemesini bahçe tamamlamaya bağlamak, farkı tamamen kapatıyor; onu yedekte tutuyorum çünkü oyuncunun zamanına en az saygılı olan o.</p>
+    <p><strong>İptal koşulu:</strong> sabit bir bölümde en üst ve en alt Cultivar çeyreği arasındaki başarısızlık oranı farkı on puanı geçerse, özellik kozmetiğe döner.</p>
+  </div>
+
+  <h3>Destek sistemleri</h3>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Sistem</th><th>Açılış</th><th>Tasarım</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Canlar</strong></td><td>–</td><td>En fazla beş, 25 dakikada bir, sadece başarısızlıkta gider. Coin'le veya bir Greenhouse'tan isteyerek dolar. Season aktifken tavan sekize çıkar.</td></tr>
+      <tr><td><strong>Greenhouse'lar</strong></td><td class="num">L20</td><td>Takımlar; Weevil'la aynı bölümde açılıyor ki sosyal açılış ilk gerçek zorluk basamağına denk gelsin. Üyeler 20. bölümden itibaren can, 23'ten itibaren <strong>Sunbeam</strong> gönderiyor. Gerçekten işe yarıyorlar, yani sohbetin bir konusu oluyor.</td></tr>
+      <tr><td><strong>Season'lar</strong></td><td class="num">L35</td><td>Otuz basamaklı aylık yol. Bölümlerden anahtar, Hard'tan iki katı, Super Hard'tan üç katı. Ücretsiz ve premium şerit.</td></tr>
+      <tr><td><strong>Valley Bloom</strong></td><td class="num">L45</td><td>Tek rekabet yüzeyi. 50 kişilik gruplarda 48 saatlik Sprout yarışı. Bilerek kenarda.</td></tr>
+      <tr><td><strong>Burrow's Delivery</strong></td><td class="num">L8</td><td>Yarınkini önden gösteren günlük hediye. Var olan en ucuz retention mekanizması ve ilk kuracağım şey.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Ekonomi</h3>
+
+  <p>Tek soft currency: <strong>Coin</strong>. Doğrudan parayla alınıyor, oynarken yavaş kazanılıyor. Sert para birimi yok, ikinci bir premium katman yok.</p>
+
+  <p>Tek para biriminin gerekçesi şu: eklediğin her dönüşüm katmanı sana biraz bulanıklık kazandırırken güvenden götürüyor; ve ödeme yapan oyuncunun çoğu zaman ne yaptığının gayet farkında bir yetişkin olduğu bir türde bu kötü bir takas. Royal Match devasa ölçekte tek para birimiyle dönüyor; bu da basit yapının masada çok bir şey bırakmadığına dair makul bir kanıt.</p>
+
+  <p>Aşağıdakilerin hepsi gerekçesi yazılı bir başlangıç noktası, doğrulanmış sayı değil. Elimde telemetri yok ve bu dokümanda ilk yanlış çıkmasını beklediğim kısım fiyatlar.</p>
+
+  <h4>Kaynak ve gider</h4>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Coin girişi</th><th>Kabaca</th><th>Coin çıkışı</th><th>Kabaca</th></tr></thead>
+    <tbody>
+      <tr><td>Bölümün ilk geçilişi</td><td class="num">20</td><td>Continue, bölümdeki ilk</td><td class="num">600</td></tr>
+      <tr><td>Günlük hediye</td><td class="num">50–150</td><td>Continue, ikinci</td><td class="num">900</td></tr>
+      <tr><td>Garden Chest</td><td class="num">400</td><td>Continue, üçüncü ve sonrası</td><td class="num">1.400</td></tr>
+      <tr><td>Season yolu, ücretsiz şerit</td><td class="num">~1.200 / ay</td><td>Can doldurma</td><td class="num">900</td></tr>
+      <tr><td>Greenhouse sandığı</td><td class="num">200 / hafta</td><td>Bölüm öncesi booster</td><td class="num">300–500</td></tr>
+      <tr><td>Valley Bloom, ilk 10</td><td class="num">250–1.000</td><td>Bölüm içi booster</td><td class="num">150–400</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Günde sekiz yeni bölüm geçen aktif bir oyuncu için sol sütunu toplayalım: ilk geçişlerden 160, günlük hediyeden yaklaşık 100, ücretsiz Season şeridinden güne yayılmış kabaca 40 ve haftalık Greenhouse sandığından yaklaşık 29. Yuvarlarsak <strong>günde 330 coin</strong>, 600 coin'lik bir continue'ya karşı.</p>
+
+  <p>İstediğim şekil bu: ücretsiz oyuncu kendini kabaca iki günde bir kurtarabiliyor, yani duvar gerçek ama hiçbir zaman mutlak değil. Şuna dikkat: ilk geçiş geliri beceriyle değil içerikle sınırlı. Bu önemli, çünkü iyi bir oyuncunun ekonomiyi çiftlik gibi işleyip açması mümkün olmuyor. Ücretsiz gelir iki günde bir continue'nun epey üstüne kayarsa teklif ağırlığını kaybeder; epey altına inerse başarısızlık ekranı satın alma yerine uygulama silme üretmeye başlar.</p>
+
+  <h4>Continue teklifi</h4>
+
+  <p>Casual bulmaca oyununda ticari olarak en önemli tek ekran burası; ve tasarımın ne yaptığı konusunda dürüst olmak zorunda olduğu tek yer.</p>
+
+  <p>Başarısızlıkta tahta panelin arkasında görünür kalıyor, kalan hedef yüzde olarak değil sayı olarak gösteriliyor ve teklif coin karşılığı beş ekstra hamle.</p>
+
+  <p>Fiyat <em>aynı bölümdeki denemeler</em> boyunca yükseliyor (600, sonra 900, sonra 1.400), ve oyuncu bölümden çıkınca sıfırlanıyor. Yani ikinci kademeye ancak beş hamle satın alıp yine yaklaşmış ve yine kaybetmiş bir oyuncu ulaşıyor. Yükselen fiyat çaresiz oyuncuyu sıkıştırma değil; tek bir bölüme dört bin coin yatırmak üzere olan oyuncu için fren.</p>
+
+  <p><strong>Vazgeçmeyeceğim iki kural.</strong> Oyuncu bitirmeye kabaca bir hamleden uzaksa continue teklif edilmez; çünkü oyuncunun umutsuz olduğunu gördüğü bir teklif, oyunun şansını deniyor gibi okunur. Ve reddetme butonu normal bir buton: kabul edenle aynı boyutta, aynı okunaklıkta. Bu tür, dört puntoluk gri <em>hayır teşekkürler</em> linkleriyle dolu; getirdikleri yuvarlama hatası kadar, götürdükleri ise tam olarak bu oyunun sıcak tonuyla kurmaya çalıştığı iyi niyet.</p>
+
+  <h4>Teklifler ve ne zaman çıktıkları</h4>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Teklif</th><th>İlk gösterim</th><th>Gerekçe</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Continue</strong></td><td class="num">L6, ilk başarısızlıkta</td><td>Bir şey satılmadan önce oyuncunun onu istemiş olması lazım.</td></tr>
+      <tr><td><strong>Starter pack</strong></td><td class="num">İlk iki kayıplı bölümden sonra, genelde L20–22</td><td>Kurulumda değil. Oyuncu duvarı hissetmeden sunulan paket gürültüdür ve teklifleri kapatmayı öğretir.</td></tr>
+      <tr><td><strong>Seed Jar</strong> (kumbara)</td><td class="num">L25</td><td>Bölümler geçildikçe coin'le doluyor, tek bir satın almayla açılıyor. İşe yaramasının sebebi içindekilerin kazanılmış olması; türdeki en az gocunulan teklif bu.</td></tr>
+      <tr><td><strong>Season premium şerit</strong></td><td class="num">L35</td><td>Ancak ücretsiz şerit birkaç gündür gözle görülür ilerledikten sonra.</td></tr>
+      <tr><td><strong>Coin paketleri</strong></td><td class="num">Her zaman, Mağazada</td><td>Oyunu asla bölmez. Ulaşılır, ama dayatılmaz.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Reklam</h4>
+
+  <p>Çıkışta sadece rewarded video. Çıkışta interstitial yok.</p>
+
+  <p><strong>Burada dikkatli olmak istediğim bir nokta var.</strong> Dream'in reklamsız duruşu biliniyor, ve <a href="https://felixbraberg.substack.com/p/dream-games-brings-interstitial-ads" target="_blank" rel="noopener">yayınlanmış kaynaklar</a> bunun değiştiğini aktarıyor: Mayıs 2026'da Royal Match'e interstitial ve rewarded reklam eklenmiş, aynı model daha önce Royal Kingdom'da çalışıyormuş. Kendi oynayışımda tek bir reklama bile denk gelmedim, ve aynı kaynaklar bunu tamamlanmış bir açılımdan çok erken bir test olarak tarif ediyor; yani dürüst okumam, içinde olmadığım sınırlı bir deneme olduğu yönünde. Burada yaşadığım bir şeye değil, yayınlanmış kaynaklara dayanıyorum, ve bu konuda düzeltilmeyi isterim.</p>
+
+  <p>Ortaya çıkardığı soru her halükarda cevaplanmaya değer, ve benim cevabım şu: yeni çıkan bir oyunla olgun bir oyun aynı varlık değil. Royal Match bunu deniyorsa, yıllardır oyuncusunun güvenini kazanmış bir oyunun üzerinde deniyor, ve burada harcanan şey de tam olarak o güven. İnsan ancak daha önce inşa ettiği şeyi harcayabilir. Yeni bir oyunun henüz inşa ettiği bir şey yok. Ayrıca interstitial, sonradan çekilebilen ama geri itilemeyen bir kol: onun yüzünden giden oyuncular, fikrini değiştirip değiştirmediğini kontrol etmeye geri gelmiyor. Yani mesele ilkeden çok sıra: önce rewarded, interstitial ise ancak sayılar sonradan takasın değdiğini söylerse.</p>
+
+  <p>Bunun küçük bir versiyonunu ben de denedim. Google Play'deki oyunlarımda reklam var, ama onlar için yazdığım kural şuydu: yeni bir oyuncu ilk gününde hiç reklam görmez. Gerekçe her ölçekte aynı: ilk oturum, birinin geri gelip gelmeyeceğini öğrendiğin oturumdur, ve birkaç kuruşluk reklam gelirine harcanabilecek en kötü oturum odur.</p>
+
+  <p>Başkası söylemeden benim söylemem gereken bir şey var. Tasarımın bütün önermesi, şu an power-up isteyen oyuncunun onu alamaması üzerine kurulu; <strong>Sunbeam ise tam olarak bunu satıyor</strong>: oyunun üzerine kurulduğu üç hamlelik sabra biçilmiş bir coin fiyatı. Bu, ya üründeki en keskin monetizasyon yüzeyidir ya da her şeyi sessizce eriten şey; tamamen fiyata ve sıklığa bağlı. İlk çıkıştan çıkarıp sonradan sıkı bir sınırla ekleyeceğim tek öğe bu.</p>
+
+  <p>Üç yerleşim: canlar boşken dört saatte bir, bir ücretsiz can; Garden Chest'i ikiye katlama; günde bir ücretsiz bölüm öncesi booster. Üçü de isteğe bağlı, üçü de oyuncunun zaten bir şey istediği anda geliyor ve hiçbiri bölümü bölmüyor.</p>
+
+  <p>Gerekçe, hangi sayının büyük olduğuyla ilgili. Böyle bir casual bulmaca oyununda gelirin neredeyse tamamı reklamdan değil, oyuncunun satın aldığı şeylerden geliyor. Zorunlu interstitial, küçük bir reklam gelirini oturum sayısına mal olarak kazandırıyor; oysa satın alma geliri de o oturumların üzerine kurulu. Yani büyük sayıdan alıp küçük sayıyı besliyor. Rewarded video tersine işliyor: hiç ödeme yapmamış bir oyuncuya döngüde kalmanın bir yolunu veriyor, ve döngüde kalan oyuncu sonradan ödemeye karar verebilir.</p>
+
+  <h4>Çıkıştan önce neyi ölçerim</h4>
+
+  <p>Önce iki bariz olan: oyuncuların ne kadarlık kısmı hayatında bir kez olsun ödeme yapıyor, ve ödeme yapan bir oyuncu ne kadar harcıyor. Onların ötesinde, ekonominin sağlıklı olup olmadığını asıl söyleyen dört tane var. Continue teklifinin kaç kez gösterilip kaç kez kabul edildiği, oyuncunun bitirmeye ne kadar yakın olduğuna göre ayrılmış olarak. Oyuncuların her onuncu bölümde elinde ne kadar coin tuttuğu. Bir oyuncunun haftada kazandığı coin ile harcadığı coin arasındaki oran. Ve başarısızlıkların ne kadarında oyuncunun hiç coin'i olmadığı, yani istese bile teklifi kabul edemeyeceği durumda olduğu. Sonuncusu genelde bir ekonominin oyuncuyu dönüştürmek yerine aç bıraktığının ilk işareti.</p>
+
+  <h4>Neyi dışarıda bıraktım</h4>
+
+  <p>Royal Match geniş ve çeşitli bir canlı etkinlik takvimi çeviriyor. Bloomrise iki eşzamanlı etkinlik yüzeyiyle ve ana ekran spesifikasyonuna yazılmış bir sınırla çıkıyor.</p>
+
+  <p>Bu bir sıra iddiası. Etkinlik takvimi, ölçümden doğan bir live-ops yeteneğidir; henüz çıkmamış bir oyuna on beş etkinlik yazmak, altındaki makine hiç yokken olgun bir ürünün yüzeyini tarif etmek olurdu. Bloomrise ikiyle çıkar, ikisini düzgün ölçer, üçüncüyü hak eder.</p>
+</section>
+
+<section id="leveldesign">
+  <div class="part-label">Kısım VII</div>
+  <h2>Bölüm Tasarımı Stratejisi</h2>
+
+  <p class="lead">Bir patlatma tahtası hiçbir zaman iki kez aynı olmuyor. Karolar yukarıdan rastgele doluyor; yani bölümü kuran kişi dahil kimse, ilk hamleden sonra tahtanın neye benzeyeceğini bilemiyor. Tek başına bu gerçek, bölümlerin nasıl ayarlanması gerektiğini belirler ve çoğu insanın ilk aklına gelen yöntemi devre dışı bırakır.</p>
+
+  <h3>"Çöz ve pay bırak" neden burada işe yaramıyor</h3>
+
+  <p>Deterministik bulmaca tasarımından gelen içgüdü, bölümü en verimli şekilde çözmek, hamleleri saymak ve bütçeyi bunun bir katına ayarlamaktır. Bir patlatma oyununda böyle bir sayı yoktur. Aynı tahta, aynı şekilde oynansa bile her seferinde farklı bir hamle sayısı üretir, çünkü boşluğa ne düştüğü bir sonraki hamlede neyin mevcut olacağını belirler.</p>
+
+  <p>Bunun yerine var olan şey bir dağılımdır ve bütçe, bu dağılım içinde bir persentil seçimidir.</p>
+
+  <h4>Tasarım hattı</h4>
+
+  <ol>
+    <li><strong>Öğretim görevini belirle.</strong> Bölüm başına bir tane: bir öğeyi tanıt, bir öğeyi test et, iki bilinen öğeyi birleştir ya da bilinen bir kombinasyona baskı uygula. Bunlardan biri olmayan bir bölüm doldurmadır.</li>
+    <li><strong>Tahtayı kur.</strong> Şekil, engeller, renk sayısı, hedef, Seedpod ve Weevil konumları.</li>
+    <li><strong>Solver'ı çalıştır.</strong> Sabit bir sezgisel politikaya sahip otomatik bir oyuncu, bölüm başına iki bin deneme. Bu bir sayı değil, hedefe-kadar-hamle dağılımı üretir.</li>
+    <li><strong>Bütçeyi bir persentile ayarla,</strong> bandın hedef başarısızlık oranından seçilen ve bot-insan farkıyla düzeltilmiş bir persentile.</li>
+    <li><strong>Hazırlıksız playtest yap.</strong> Bir insan, bölümün konusu olmayan bir nedenle başarısız olursa, bölüm yanlıştır.</li>
+    <li><strong>Yayınla ve ölç.</strong> Bölüm başına ve deneme sayısına göre başarısızlık oranı ve bırakma oranı.</li>
+  </ol>
+
+  <h4>Bot-insan farkı</h4>
+
+  <p>Sezgisel bir bot, güçlü bir oyuncudan kötü, zayıf bir oyuncudan iyidir; yani dağılımı oyuncunun dağılımı değildir. Bu fark, yayınlanan ilk birkaç yüz bölümün canlı verisine karşı bir kez ölçülür ve sonra tekrar tekrar kullanılır: botun medyan hamle sayısı, aynı bölümde gözlemlenen oyuncu medyanıyla karşılaştırılır ve bu oran ileriye taşınır.</p>
+
+  <p>Canlı veri gelene kadar bu fark bir tahmindir; yani ilk elli bölümün lansmandan sonra yeniden ayarlanması gerekecek. Bunu şimdiden not etmekte fayda var.</p>
+
+  <h4>Banda göre bütçe persentilleri</h4>
+
+  <p><strong>Persentil burada şu demek.</strong> Solver aynı bölümü binlerce kez oynuyor, ve tahta her seferinde rastgele dolduğu için her deneme farklı sayıda hamle harcıyor. Ortaya tek bir cevap değil, bir dağılım çıkıyor. Bütçeyi 80. persentile koymak, o denemelerin onda sekizinin bu bütçenin içinde bittiği anlamına geliyor. Yüksek persentil cömert, düşük persentil sıkı demek. Aşağıdaki sayılar ölçüm değil, elle seçilmiş başlangıç noktaları: ben buradan başlardım, ve ilk canlı oyuncu grubu hepsini yerinden oynatırdı.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Bölümler</th><th>Bütçe</th><th>Etki</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1–10</td><td class="num">99. persentil</td><td>Neredeyse her deneme kazanır. Buradaki başarısızlık zorluk değil, onboarding kusurudur.</td></tr>
+      <tr><td class="num">11–25</td><td class="num">85.</td><td>Birkaç boşa giden hamle önem kazanmaya başlar.</td></tr>
+      <tr><td class="num">26–40</td><td class="num">75.</td><td>Oyuncunun aşağı yukarı verimli oynaması gerekir.</td></tr>
+      <tr><td class="num">41–50</td><td class="num">65.</td><td>Neredeyse verimli oyun gerekir. Zorluk, eklenen engellerden değil, kaldırılan paydan gelir.</td></tr>
+      <tr><td>Hard</td><td class="num">50.</td><td>Medyan deneme başarısız olur. Etiketin anlamı budur.</td></tr>
+      <tr><td>Super Hard</td><td class="num">30.</td><td>Bir power-up zinciri veya booster olmadan çoğu deneme başarısız olur. Ne olduğu konusunda dürüst.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Zorluk nereden gelmeli</h3>
+
+  <p>Akla ilk gelen kol engellerdir, ve yanlış olan da odur. Her engel belirli bir şeyi öğretiyor; yani bir bölümü zorlaştırmak için engel eklemek, aynı zamanda o bölümün ne için var olduğunu değiştiriyor, ve bu da Kısım III'teki öğretme sırasını bozuyor. Üstelik tahtayı kalabalıklaştırıyor. Kalabalık bir tahta, çözülmesi zorlaşmadan okunması zorlaşan bir tahtadır; ve hamleyi göremediği için kaybeden bir oyuncu bunu oyunun haksızlığı olarak okur.</p>
+
+  <p>Doğru kollar hamle bütçesi ve renk sayısı, çünkü ikisi de ne bölümün öğrettiği şeye ne de tahtanın görünüşüne dokunuyor. İkisi de bir yapılandırma dosyasındaki tek bir sayı; yani lansmandan sonra kimseden yeni bir çizim istemeden ayarlanabiliyorlar. İkisinin güçlüsü ve sessizi renk sayısı: dört renkten beşe çıkınca kümeler küçülüyor, power-up'lar seyreliyor, bölüm ciddi şekilde zorlaşıyor, ve oyuncu neyin değiştiğini hiç görmüyor.</p>
+
+  <h3>Zorluk ritmi</h3>
+
+  <p>Düz bir yükseliş yorucudur. Oyuncunun, kendisine bir şeye mal olan bir bölümün hemen ardından temiz bir şekilde kazanabileceği bir bölüme ihtiyacı vardır. İlk elli boyunca tekrar eden birim:</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Konum</th><th>Rol</th><th>Zorluk</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1–2</td><td>Toparlanma. Temiz galibiyet, ritim yeniden kurulur.</td><td>Düşük</td></tr>
+      <tr><td class="num">3–4</td><td>Öğretim. Yeni öğe, hoşgörülü çerçeve.</td><td>Düşük–orta</td></tr>
+      <tr><td class="num">5–6</td><td>Uygulama. Yeni öğe gerçek bir bütçeyle.</td><td>Orta</td></tr>
+      <tr><td class="num">7</td><td>Sıçrama. Aynı anda iki sistem.</td><td>Yüksek</td></tr>
+      <tr><td class="num">8–10</td><td>Pekiştirme. Çeşitli tahtalar, yeni bir şey yok.</td><td>Orta, azalan</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Her on beş ila yirmi bölümde bir sıçrama, etiketli bir <strong>Hard</strong>'a dönüşür; her ellide bir de <strong>Super Hard</strong>'a. Royal Match'i izleyerek, ikisi de ekstra Season anahtarı verir; böylece o duvar, oyuncunun başına gelen bir şey değil, ulaşmak istediği bir şey olur.</p>
+
+  <h3>Power-up arzı için tahta tasarlamak</h3>
+
+  <p>Bir tahta düzeninin sessizce bozabileceği tek şey, oyuncunun bir power-up'a giden yoludur, ve bu hiç bozuk görünmeden bozulur.</p>
+
+  <div class="callout warn">
+    <span class="callout-title">Açık alan kuralı</span>
+    <p><strong>Her bölüm, dokuz veya daha fazla hücreden oluşan en az bir bitişik açık bölge içermelidir.</strong> Bunun altında, beş-artı kümeler güvenilir şekilde oluşmaz olur ve oyuncu bir power-up'a artık iyi oynayarak değil, yalnızca doldurmanın cömert olmasını bekleyerek ulaşabilir.</p>
+    <p>Hiçbir şey inşa edilemeyecek kadar parçalanmış bir tahta, ödül döngüsünü kapatır. Oyuncu bölümün neden kötü hissettirdiğini söyleyemez; sadece oynamayı bırakır. Bu, oyunda otomatik olarak kontrol edilmesi en ucuz, bir kayıp grafiğinden keşfedilmesi en pahalı şeydir.</p>
+  </div>
+
+  <p>Bunun ötesinde, her bölüm bilinçli olarak seçilen ve spesifikasyon sayfasına yazılan ikinci bir eksende sınıflandırılır:</p>
+
+  <ul>
+    <li><strong>Açık.</strong> Az engel, dört renk, geniş bitişik alanlar. Power-up'lar sık gelir ve bulmaca, hangisini hedefleyip nerede harcayacağınla ilgilidir. Bunlar ilk yirmi beş bölüme hakim olmalı.</li>
+    <li><strong>Sıkışık.</strong> Stone Planter'larla parçalanmış, beş renk, tahtada bir Weevil. Zorluk, bir power-up'a ulaşabilmenin kendisidir. Az kullanılır ve başka bir şey tanıtan bir bölümde asla kullanılmaz.</li>
+    <li><strong>Hızlı.</strong> Bölümün birkaç hamlede çözüldüğü, power-up'ların neredeyse hiç yer almadığı kısa bütçeler. Bir tempo değişimi olarak meşru, ama onda birden fazlasında merdiven oyun olmaktan çıkar.</li>
+  </ul>
+
+  <p>Kombinasyon eğitimi olan Bölüm 35, ilk ellinin tasarlanması en zor tahtasıdır ve programlanma nedeni de budur. Yan yana iki garantili açık sütunu olan, sekiz birim genişliğinde dar bir tahta; engel yerleşimi büyük kümeleri her iki sütuna da yönlendiriyor; bütçe ise oyuncunun bir power-up harcamak zorunda kalmadan önce iki power-up yapacak kadar cömert. Kombinasyonu hiçbir şey açıklamaz. Tahta bunu olası kılar, oyuncu da kendisi keşfeder.</p>
+
+  <h3>Neyi ölçerdim</h3>
+
+  <p>Bu hedefler başlangıç hipotezleri. Referans oyunların hiçbirinden telemetrim yok ve ilk canlı kohort bunları bir hafta içinde düzeltecektir.</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <thead><tr><th>Bant</th><th>Hedef başarısızlık oranı</th><th>Üzerindeyse</th><th>Altındaysa</th></tr></thead>
+    <tbody>
+      <tr><td class="num">L1–10</td><td class="num">&lt; %5</td><td>Persentili yükselt. Bu bir onboarding kaçağı ve oyundaki en yüksek öncelikli düzeltme.</td><td>–</td></tr>
+      <tr><td class="num">L11–25</td><td class="num">%10–20</td><td>Sadece sorunlu bölümü yükselt.</td><td>%8'in altındaysa, bant baskı öğretmiyordur.</td></tr>
+      <tr><td class="num">L26–50</td><td class="num">%20–35</td><td>Önce bırakma oranını kontrol et.</td><td>Persentili düşür.</td></tr>
+      <tr><td>Hard</td><td class="num">%45–60</td><td>–</td><td>Zor değildir ve ekstra anahtarlar bedavaya dağıtılıyor demektir.</td></tr>
+      <tr><td>Super Hard</td><td class="num">%65–75</td><td>%85'in üzerindeyse, tahta ne kadar iyi olursa olsun kaldır.</td><td>–</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Başarısızlık oranı tek başına bir teşhis değildir. Önemli olan, aynı bölümdeki başarısızlık oranının bırakma oranıyla birlikte değerlendirilmesidir. Oyuncuların hemen yeniden denediği %50 başarısızlık oranına sahip bir bölüm, tırmanmak istedikleri bir duvardır. Oyuncuların üçte birinin bir daha dönmediği %30 başarısızlık oranına sahip bir bölümse bir kayıp noktasıdır ve çok daha fazla zarar verir.</p>
+
+  <h3>Bu tasarımın çözmediği iki şey</h3>
+
+  <p><strong>Power-up arzı bir bölümün içinde zamanla azalır.</strong> Taze bir tahta kümece zengindir, oynanmış biri değildir; yani merdivene en kolay bölümün ilk üçte birinde, en zor ise son üçte birinde ulaşılır; tam da hedeflerinde geride olan bir oyuncunun bir kurtarmaya ihtiyaç duyduğu andır bu. Yukarıdaki persentil hattı bir dağılımın medyanını ayarlıyor; bu ise o dağılımın şekliyle ilgili bir sorun, ortasıyla değil. Henüz inandığım bir çözümüm yok. Adaylar, bölüm sonuna doğru bir eşik indirimi ya da sona yakın büyük aynı-renk grupları enjekte eden bir engel; ikisi de tartışmaya değer olmadan önce bir solver gerektiriyor.</p>
+
+  <p><strong>İkinci bir chapter'ı taşıyabilecek tek sistem Pollen Meter, ve bir tane yeterli değil.</strong> Oyuncuya power-up merdiveninin dışından bir şey veren tek şey o. Geri kalan her şey türün standart dağarcığının özenli uygulaması. Elli bölüm bu temelde rahat, beş yüz değil; ikinci ve üçüncü chapter'lar aynı türden en az bir sistem daha gerektirir: tek bir dokunuşun büyüklüğüne değil, oyuncunun <em>ne zaman</em> temizlediğine ya da <em>ne kadar</em> temizlediğine göre ödeyen bir şey. Onu tasarlamak bu dokümanda yok ve denemeden önce canlı bir başarısızlık eğrisi görmek isterdim.</p>
+
+  <p>Diğerlerinden daha çok önem taşıyan ve toplanması ucuz olan bir metrik var: <strong>bölüm başına, türe göre ayrılmış oluşturulan power-up sayısı.</strong> Bir bandın Ant Nest sayısı sağlıklıyken Puffball sayısı sıfıra yakınsa, o banttaki tahtalar büyük bir şey inşa edilemeyecek kadar parçalanmış demektir ve zorluk bütçeden değil düzenden geliyordur. Hamle bütçesini gevşetmek bunu düzeltmez; tahtaların yeniden inşa edilmesi gerekir. Aynı sinyalin Pollen Cloud ucunda görülmesi, merdivenin tavanının ulaşılamaz olduğunu ve en üst basamağın dekoratif kaldığını gösterir.</p>
+</section>
+
+<section id="ui">
+  <div class="part-label">Kısım VIII</div>
+  <h2>UI Wireframe'leri</h2>
+
+  <p class="lead">Dört ekran. Hepsi telefon oranlarında çizildi; çünkü sadece inceleme monitöründe çalışan bir düzen, düzen sayılmaz.</p>
+
+  <p>Bilerek gri kutular. Görseller mevcut ve Kısım IV ile V'te gösteriliyor, ama onları buraya koymak bunları wireframe olmaktan çıkarıp mockup yapardı, ve okuyan kişi asıl hangi kararı verdiğimi artık göremezdi. Aşağıdaki tahta da dolgu değil: oyuncunun alabileceği beşli bir kümeyi, alt sıraya iki sıra kalmış bir Seedpod'u, ve onu yemeye giden bir Weevil'ı gösteriyor.</p>
+
+  <style>
+    .wf-grid{display:grid;gap:34px;margin:30px 0}
+    @media(min-width:760px){.wf-grid{grid-template-columns:1fr 1fr;gap:28px}}
+    .wf-frame{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 14px}
+    .wf-frame svg{display:block;width:100%;height:auto;max-width:320px;margin:0 auto}
+    .wf-title{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.06em;
+      text-transform:uppercase;color:var(--ink-3);margin-bottom:12px;text-align:center}
+    .wf-notes{margin:16px 0 0 0}
+    .wf-notes li{font-family:var(--sans);font-size:14.5px;line-height:1.55;margin-bottom:9px;
+      list-style:none;padding-left:26px;position:relative;color:var(--ink-2)}
+    .wf-notes li b{position:absolute;left:0;top:1px;width:19px;height:19px;border-radius:50%;
+      background:var(--green);color:#fff;font-size:11px;font-weight:700;
+      display:flex;align-items:center;justify-content:center}
+    .f{fill:none}
+    .sol{stroke:#1e2419;stroke-width:1.6}
+    .dsh{stroke:#8d9687;stroke-width:1.2;stroke-dasharray:4 3}
+    .fl{fill:#ecefe9}
+    .lbl{font:500 9.5px system-ui,sans-serif;fill:#5c6656}
+    .lbl-s{font:500 8px system-ui,sans-serif;fill:#828c7c}
+    .lbl-b{font:700 12px system-ui,sans-serif;fill:#1e2419}
+    .nm{font:700 9px system-ui,sans-serif;fill:#fff}
+  </style>
+
+  <div class="wf-grid">
+
+    <div>
+    <div class="wf-frame">
+      <div class="wf-title">Ana Ekran</div>
+      <svg viewBox="0 0 320 624" role="img" aria-label="Home screen wireframe">
+        <rect x="1" y="1" width="318" height="622" rx="26" fill="#f7f5f0" class="sol"/>
+        <rect x="14" y="16" width="92" height="30" rx="15" class="fl dsh"/>
+        <text x="24" y="35" class="lbl">♥♥♥♥♥ 24:10</text>
+        <rect x="114" y="16" width="76" height="30" rx="15" class="fl dsh"/>
+        <text x="126" y="35" class="lbl">◎ 1.240</text>
+        <circle cx="290" cy="31" r="15" class="fl dsh"/><text x="285" y="35" class="lbl">⚙</text>
+
+        <rect x="14" y="58" width="292" height="264" rx="10" class="fl dsh"/>
+        <text x="26" y="78" class="lbl-s">BAHÇE · GLASSHOUSE</text>
+        <rect x="40" y="96" width="106" height="82" rx="6" class="f dsh"/>
+        <rect x="160" y="96" width="120" height="120" rx="6" class="f dsh"/>
+        <rect x="40" y="192" width="106" height="72" rx="6" class="f dsh"/>
+        <text x="60" y="142" class="lbl-s">onarıldı</text>
+        <text x="196" y="160" class="lbl-s">sürüyor</text>
+        <text x="66" y="232" class="lbl-s">kilitli</text>
+        <rect x="160" y="230" width="120" height="34" rx="17" fill="#2f6b3f"/>
+        <text x="184" y="252" class="nm">ONAR · 2 ✿</text>
+        <circle cx="291" cy="73" r="9" fill="#2f6b3f"/><text x="288" y="77" class="nm">1</text>
+
+        <rect x="14" y="334" width="140" height="62" rx="9" class="fl dsh"/>
+        <text x="26" y="354" class="lbl-s">SEASON · 12/30</text>
+        <rect x="26" y="362" width="116" height="7" rx="3.5" fill="#d8d3c7"/>
+        <rect x="26" y="362" width="46" height="7" rx="3.5" fill="#b8562f"/>
+        <text x="26" y="388" class="lbl-s">6g kaldı</text>
+        <rect x="166" y="334" width="140" height="62" rx="9" class="fl dsh"/>
+        <text x="178" y="354" class="lbl-s">VALLEY BLOOM</text>
+        <text x="178" y="371" class="lbl-s">7 / 50 sıra</text>
+        <text x="178" y="388" class="lbl-s">31:04 kaldı</text>
+        <circle cx="160" cy="326" r="9" fill="#2f6b3f"/><text x="157" y="330" class="nm">2</text>
+
+        <rect x="14" y="410" width="292" height="36" rx="8" class="fl dsh"/>
+        <text x="26" y="433" class="lbl">✿ 14 Sprouts · Glasshouse 4 / 7 görev</text>
+
+        <rect x="60" y="466" width="200" height="66" rx="33" fill="#2f6b3f"/>
+        <text x="126" y="497" style="font:700 15px system-ui,sans-serif" fill="#fff">PLAY</text>
+        <text x="118" y="515" style="font:600 10.5px system-ui,sans-serif" fill="#cfe2d1">LEVEL 51</text>
+        <circle cx="271" cy="474" r="9" fill="#2f6b3f"/><text x="268" y="478" class="nm">3</text>
+
+        <line x1="14" y1="556" x2="306" y2="556" class="dsh"/>
+        <g class="lbl-s">
+          <rect x="30" y="568" width="60" height="34" rx="7" class="f dsh"/><text x="38" y="589">GREENHOUSE</text>
+          <rect x="130" y="568" width="60" height="34" rx="7" class="f dsh"/><text x="152" y="589">GÖREVLER</text>
+          <rect x="230" y="568" width="60" height="34" rx="7" class="f dsh"/><text x="251" y="589">SHOP</text>
+        </g>
+        <circle cx="16" cy="585" r="9" fill="#2f6b3f"/><text x="13" y="589" class="nm">4</text>
+      </svg>
+    </div>
+    <ul class="wf-notes">
+      <li><b>1</b><strong>Bahçe, bir sekme değil, ekranın kendisi.</strong> Oyuncunun uğruna çalıştığı şey en büyük alanı kaplıyor ve hiçbir şeye dokunmadan görünür durumda. Restorasyonu bir menünün arkasına gizlemek onu angaryaya çevirir.</li>
+      <li><b>2</b><strong>İki etkinlik alanı, spesifikasyonla sınırlı.</strong> Biri kaldırılmadan üçüncüsü eklenmiyor. Bu, Kısım I'de Royal Match'in ana ekranına yönelttiğim eleştirinin somut cevabı.</li>
+      <li><b>3</b><strong>PLAY yerinden oynamaz.</strong> En büyük öğe, en yüksek kontrast, başparmakla ulaşılabilir, hiçbir etkinlik tarafından yerinden edilmez. Geri dönen bir oyuncu, hiçbir şey okumadan üç saniyeden kısa sürede bir bölümün içinde olmalı.</li>
+      <li><b>4</b><strong>Üç hedef.</strong> Geri kalan her şeye bahçeden ulaşılabiliyor. Beş öğeli bir alt bar, iki tanesi ölü olan bir alt bardır.</li>
+    </ul>
+    </div>
+
+    <div>
+    <div class="wf-frame">
+      <div class="wf-title">Oyun İçi Ekran</div>
+      <svg viewBox="0 0 320 624" role="img" aria-label="Gameplay screen wireframe">
+        <rect x="1" y="1" width="318" height="622" rx="26" fill="#f7f5f0" class="sol"/>
+
+        <circle cx="26" cy="36" r="15" class="fl dsh"/><text x="22" y="41" class="lbl">&#8249;</text>
+        <circle cx="64" cy="36" r="17" fill="#e8ecdf" stroke="#8d9687" stroke-width="1.3"/>
+        <circle cx="58.5" cy="33" r="2.2" fill="#3a4436"/><circle cx="69.5" cy="33" r="2.2" fill="#3a4436"/>
+        <path d="M 57 41 Q 64 46 71 41" fill="none" stroke="#3a4436" stroke-width="1.3"/>
+        <circle cx="82" cy="20" r="9" fill="#2f6b3f"/><text x="79" y="24" class="nm">1</text>
+
+        <rect x="90" y="16" width="134" height="40" rx="9" class="fl dsh"/>
+        <text x="98" y="30" class="lbl-s">HEDEFLER</text>
+        <rect x="98" y="36" width="24" height="14" rx="3" class="f dsh"/><text x="126" y="48" class="lbl">12</text>
+        <rect x="150" y="36" width="24" height="14" rx="3" class="f dsh"/><text x="178" y="48" class="lbl">3</text>
+        <rect x="232" y="16" width="76" height="40" rx="9" class="fl dsh"/>
+        <text x="244" y="30" class="lbl-s">HAMLE</text>
+        <text x="252" y="50" style="font:700 18px system-ui,sans-serif" fill="#1e2419">18</text>
+        <circle cx="228" cy="14" r="9" fill="#2f6b3f"/><text x="225" y="18" class="nm">2</text>
+
+        <rect x="10" y="68" width="300" height="300" rx="10" class="f dsh"/>
+        <g class="f" stroke="#c3cabc" stroke-width="1">
+          <rect x="18" y="76" width="284" height="284" rx="6"/>
+          <line x1="53.5" y1="76" x2="53.5" y2="360"/><line x1="89.0" y1="76" x2="89.0" y2="360"/><line x1="124.5" y1="76" x2="124.5" y2="360"/><line x1="160.0" y1="76" x2="160.0" y2="360"/><line x1="195.5" y1="76" x2="195.5" y2="360"/><line x1="231.0" y1="76" x2="231.0" y2="360"/><line x1="266.5" y1="76" x2="266.5" y2="360"/>
+          <line x1="18" y1="111.5" x2="302" y2="111.5"/><line x1="18" y1="147.0" x2="302" y2="147.0"/><line x1="18" y1="182.5" x2="302" y2="182.5"/><line x1="18" y1="218.0" x2="302" y2="218.0"/><line x1="18" y1="253.5" x2="302" y2="253.5"/><line x1="18" y1="289.0" x2="302" y2="289.0"/><line x1="18" y1="324.5" x2="302" y2="324.5"/>
+        </g>
+        <g class="wf-tiles">
+          <circle cx="35.75" cy="93.75" r="7" fill="#c2cbbb"/>
+          <circle cx="71.25" cy="93.75" r="7" fill="#d3cbba"/>
+          <circle cx="106.75" cy="93.75" r="7" fill="#b6bfc7"/>
+          <circle cx="142.25" cy="93.75" r="7" fill="#c2cbbb"/>
+          <circle cx="177.75" cy="93.75" r="7" fill="#d3cbba"/>
+          <circle cx="213.25" cy="93.75" r="7" fill="#b6bfc7"/>
+          <circle cx="248.75" cy="93.75" r="7" fill="#d3cbba"/>
+          <circle cx="284.25" cy="93.75" r="7" fill="#c2cbbb"/>
+          <circle cx="35.75" cy="129.25" r="7" fill="#b6bfc7"/>
+          <circle cx="71.25" cy="129.25" r="7" fill="#c2cbbb"/>
+          <circle cx="106.75" cy="129.25" r="7" fill="#d3cbba"/>
+          <circle cx="142.25" cy="129.25" r="7" fill="#b6bfc7"/>
+          <circle cx="177.75" cy="129.25" r="7" fill="#c2cbbb"/>
+          <circle cx="213.25" cy="129.25" r="7" fill="#d3cbba"/>
+          <circle cx="248.75" cy="129.25" r="7" fill="#c2cbbb"/>
+          <circle cx="284.25" cy="129.25" r="7" fill="#b6bfc7"/>
+          <circle cx="35.75" cy="164.75" r="7" fill="#d3cbba"/>
+          <circle cx="71.25" cy="164.75" r="7" fill="#b6bfc7"/>
+          <circle cx="106.75" cy="164.75" r="7" fill="#c2cbbb"/>
+          <circle cx="213.25" cy="164.75" r="7" fill="#c2cbbb"/>
+          <circle cx="248.75" cy="164.75" r="7" fill="#b6bfc7"/>
+          <circle cx="284.25" cy="164.75" r="7" fill="#d3cbba"/>
+          <circle cx="35.75" cy="200.25" r="7" fill="#c2cbbb"/>
+          <circle cx="71.25" cy="200.25" r="7" fill="#d3cbba"/>
+          <circle cx="106.75" cy="200.25" r="7" fill="#b6bfc7"/>
+          <circle cx="142.25" cy="200.25" r="7" fill="#d3cbba"/>
+          <circle cx="177.75" cy="200.25" r="7" fill="#b6bfc7"/>
+          
+          
+          <circle cx="35.75" cy="235.75" r="7" fill="#b6bfc7"/>
+          <circle cx="71.25" cy="235.75" r="7" fill="#c2cbbb"/>
+          <circle cx="106.75" cy="235.75" r="7" fill="#d3cbba"/>
+          <circle cx="142.25" cy="235.75" r="7" fill="#c2cbbb"/>
+          <circle cx="177.75" cy="235.75" r="7" fill="#d3cbba"/>
+          <circle cx="213.25" cy="235.75" r="7" fill="#b6bfc7"/>
+          <circle cx="248.75" cy="235.75" r="7" fill="#d3cbba"/>
+          <circle cx="284.25" cy="235.75" r="7" fill="#c2cbbb"/>
+          <circle cx="35.75" cy="271.25" r="7" fill="#d3cbba"/>
+          <circle cx="71.25" cy="271.25" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="106.75" cy="271.25" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="142.25" cy="271.25" r="7" fill="#b6bfc7"/>
+          <circle cx="177.75" cy="271.25" r="7" fill="#c2cbbb"/>
+          <circle cx="213.25" cy="271.25" r="7" fill="#d3cbba"/>
+          <circle cx="35.75" cy="306.75" r="7" fill="#c2cbbb"/>
+          <circle cx="71.25" cy="306.75" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="106.75" cy="306.75" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="142.25" cy="306.75" r="7" fill="#d3cbba"/>
+          <circle cx="177.75" cy="306.75" r="7" fill="#b6bfc7"/>
+          <circle cx="213.25" cy="306.75" r="7" fill="#c2cbbb"/>
+          <circle cx="248.75" cy="306.75" r="7" fill="#b6bfc7"/>
+          <circle cx="284.25" cy="306.75" r="7" fill="#d3cbba"/>
+          <circle cx="35.75" cy="342.25" r="7" fill="#b6bfc7"/>
+          <circle cx="71.25" cy="342.25" r="8" fill="#93ad7e" stroke="#5f7d4e" stroke-width="1.2"/>
+          <circle cx="106.75" cy="342.25" r="7" fill="#c2cbbb"/>
+          <circle cx="142.25" cy="342.25" r="7" fill="#b6bfc7"/>
+          <circle cx="177.75" cy="342.25" r="7" fill="#d3cbba"/>
+          <circle cx="213.25" cy="342.25" r="7" fill="#c2cbbb"/>
+          <circle cx="248.75" cy="342.25" r="7" fill="#d3cbba"/>
+          <circle cx="284.25" cy="342.25" r="7" fill="#b6bfc7"/>
+        </g>
+        <path d="M 54 254 H 124 V 324 H 89 V 359 H 54 Z" fill="none" stroke="#5f7d4e"
+              stroke-width="1.4" stroke-dasharray="4 3"/>
+        <text x="56" y="248" style="font:700 9px system-ui,sans-serif" fill="#5f7d4e">5 KARO &#183; ANT NEST</text>
+
+        <rect x="128" y="151" width="28" height="28" rx="5" fill="#f5e4da" stroke="#b8562f" stroke-width="1.5"/>
+        <text x="137" y="171" style="font:700 12px system-ui,sans-serif" fill="#b8562f">&#10041;</text>
+        <rect x="164" y="151" width="28" height="28" rx="6" fill="#f2e7cf" stroke="#8a6b3a" stroke-width="1.5"/>
+        <text x="172" y="171" style="font:700 13px system-ui,sans-serif" fill="#8a6b3a">&#10086;</text>
+        <circle cx="200" cy="150" r="9" fill="#2f6b3f"/><text x="197" y="154" class="nm">3</text>
+
+        <rect x="200" y="188" width="97" height="25" rx="12.5" fill="#e6ded0" stroke="#6b5636" stroke-width="1.5"/>
+        <line x1="232" y1="190" x2="232" y2="211" stroke="#6b5636" stroke-width="1" opacity="0.55"/>
+        <line x1="264" y1="190" x2="264" y2="211" stroke="#6b5636" stroke-width="1" opacity="0.55"/>
+        <circle cx="210" cy="196.5" r="1.7" fill="#6b5636"/><circle cx="210" cy="204.5" r="1.7" fill="#6b5636"/>
+        <path d="M 198 195 C 192 186 190 180 189 175" fill="none" stroke="#6b5636" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <path d="M 185 179 L 188.5 172 L 193 178" fill="none" stroke="#6b5636" stroke-width="1.2"/>
+        <text x="222" y="230" style="font:700 8.5px system-ui,sans-serif" fill="#6b5636">WEEVIL &#183; 3/6</text>
+
+        <circle cx="248.75" cy="271.25" r="7" fill="#d3cbba"/><circle cx="284.25" cy="271.25" r="7" fill="#b6bfc7"/>
+
+        <rect x="10" y="382" width="146" height="44" rx="9" class="fl dsh"/>
+        <text x="20" y="400" class="lbl-s">SEEDPODS</text>
+        <text x="20" y="415" class="lbl-s">&#10086; tahtada 1 &#183; 2/3</text>
+        <rect x="164" y="382" width="146" height="44" rx="9" class="fl dsh"/>
+        <text x="174" y="400" class="lbl-s">POLLEN METER</text>
+        <rect x="174" y="407" width="126" height="8" rx="4" fill="#d8d3c7"/>
+        <rect x="174" y="407" width="79" height="8" rx="4" fill="#c98a1e"/>
+        <circle cx="306" cy="378" r="9" fill="#2f6b3f"/><text x="303" y="382" class="nm">4</text>
+
+        <line x1="10" y1="460" x2="310" y2="460" class="dsh"/>
+        <g class="lbl-s" text-anchor="middle">
+          <rect x="12" y="480" width="68" height="78" rx="10" class="fl dsh"/>
+          <text x="46" y="514">&#9986;</text><text x="46" y="538">SHEARS</text>
+          <rect x="88" y="480" width="68" height="78" rx="10" class="fl dsh"/>
+          <text x="122" y="514">&#9681;</text><text x="122" y="538">COLOUR</text>
+          <rect x="164" y="480" width="68" height="78" rx="10" class="fl dsh"/>
+          <text x="198" y="514">&#9935;</text><text x="198" y="538">DIG</text>
+          <rect x="240" y="480" width="68" height="78" rx="10" class="fl dsh"/>
+          <text x="274" y="514">&#9728;</text><text x="274" y="538">SUNBEAM</text>
+        </g>
+        <circle cx="14" cy="478" r="9" fill="#2f6b3f"/><text x="11" y="482" class="nm">5</text>
+        <text x="160" y="590" class="lbl-s" text-anchor="middle">hiçbir booster hamle harcamaz</text>
+      </svg>
+    </div>
+    <ul class="wf-notes">
+  <li><b>1</b><strong>Mira, sol üstte, boşta duruyor.</strong> Genel bir avatar değil, oyunun kendi iki karakterinden biri. Royal Match kralıyla, Toon Blast da kadrosuyla aynısını yapıyor: oynanış ekranındaki yüz, hikayedeki yüzle aynı; böylece oyuncu oynarken oyunun dünyasına bağlı kalıyor. Göz kırpıyor, tahtayı izliyor, ve bir power-up ateşlendiğinde tepki veriyor. Bu ekranda geri bildirim olmayan tek animasyon o, ve temannın vaat ettiği sıcaklığı koyabileceğin en ucuz yer burası. Bölüm numarası da kendine bir satır ayırmak yerine onun yanında duruyor.</li>
+  <li><b>2</b><strong>Hedefler solda, hamleler sağda, tek satırda, tahtanın üstünde.</strong> Her dokunuş arasında kontrol edilen bu iki sayı asla oyuncunun kendi elinin altında kalmıyor. Hamle sayısı, tahtadan sonra ekrandaki en büyük sayı.</li>
+  <li><b>3</b><strong>Tahtadaki en "sıcak" şeyler power-up'lar ve Seedpod'lar.</strong> Bir karodan daha büyükler, karonun asla sahip olmadığı hafif bir parıltı taşıyorlar ve çok hafifçe kıpırdanıyorlar. Oyuncunun yöneldiği her şey, etiket okumadan bulunabilmeli.</li>
+  <li><b>4</b><strong>İki yavaş sayaç tek bir şeridi paylaşıyor.</strong> Solda Seedpod'lar: oyuncunun denetleyemediği bir toplama hedefi, güvenmeyi bıraktığı bir hedeftir; şerit, tahtanın konumla söylediğini kelimeyle söylüyor. Sağda ise Pollen Meter var, bu ekranda kendi kendine hareket eden tek şey. Sayı değil bar olarak gösteriliyor, çünkü oyuncunun tam değere değil, sadece dolmaya yaklaşıp yaklaşmadığına ihtiyacı var.</li>
+  <li><b>5</b><strong>Dört booster yuvası; sabit, başparmakla ulaşılabilir, hiçbiri hamle harcamıyor.</strong> Dinlenen bir başparmağın değeceği alt köşelerde etkileşimli hiçbir şey yok.</li>
+</ul>
+    </div>
+
+    <div>
+    <div class="wf-frame">
+      <div class="wf-title">Bölüm Başlangıç Kartı</div>
+      <svg viewBox="0 0 320 400" role="img" aria-label="Level start card wireframe">
+        <rect x="1" y="1" width="318" height="398" rx="20" fill="#e8e5dd" class="sol"/>
+        <text x="20" y="26" class="lbl-s">ARKADA ANA EKRAN, KARARTILMIŞ</text>
+        <rect x="24" y="44" width="272" height="310" rx="14" fill="#faf8f4" stroke="#1e2419" stroke-width="1.6"/>
+        <text x="120" y="76" class="lbl-b">LEVEL 51</text>
+        <rect x="46" y="94" width="228" height="56" rx="8" class="fl dsh"/>
+        <text x="58" y="112" class="lbl-s">HEDEFLER</text>
+        <rect x="58" y="120" width="26" height="20" rx="4" class="f dsh"/><text x="90" y="135" class="lbl">12</text>
+        <rect x="140" y="120" width="26" height="20" rx="4" class="f dsh"/><text x="172" y="135" class="lbl">3</text>
+        <text x="216" y="135" class="lbl">24 hamle</text>
+        <text x="58" y="176" class="lbl-s">BOOST İLE BAŞLA</text>
+        <g class="lbl-s" text-anchor="middle">
+          <rect x="58" y="188" width="64" height="62" rx="10" class="fl dsh"/>
+          <text x="90" y="214">✿</text><text x="90" y="232">WATERING</text><text x="90" y="244">◎ 400</text>
+          <rect x="128" y="188" width="64" height="62" rx="10" class="fl dsh"/>
+          <text x="160" y="214">⛏</text><text x="160" y="232">TROWEL</text><text x="160" y="244">◎ 300</text>
+          <rect x="198" y="188" width="64" height="62" rx="10" class="fl dsh"/>
+          <text x="230" y="214">?</text><text x="230" y="232">KİLİTLİ</text>
+        </g>
+        <circle cx="52" cy="180" r="9" fill="#2f6b3f"/><text x="49" y="184" class="nm">1</text>
+        <rect x="58" y="274" width="204" height="48" rx="24" fill="#2f6b3f"/>
+        <text x="142" y="303" style="font:700 14px system-ui,sans-serif" fill="#fff">BAŞLA</text>
+        <text x="108" y="342" class="lbl-s">◎ 1.240 kullanılabilir</text>
+      </svg>
+    </div>
+    <ul class="wf-notes">
+      <li><b>1</b><strong>Bölüm öncesi booster'lar sadece burada, başka hiçbir yerde yok.</strong> Bu, tam bilgiyle verilen sakin bir karar: hedefler ve hamle sayısı aynı kartta, böylece oyuncu yardıma ihtiyacı olup olmadığını, ihtiyaç duymadan önce değerlendirebiliyor. Aynı şeyi bölüm ortasında, baskı altında satmak, farklı ve daha kötü bir ürün olurdu.</li>
+    </ul>
+    </div>
+
+    <div>
+    <div class="wf-frame">
+      <div class="wf-title">Başarısızlık ve Continue</div>
+      <svg viewBox="0 0 320 400" role="img" aria-label="Failure and continue screen wireframe">
+        <rect x="1" y="1" width="318" height="398" rx="20" fill="#e8e5dd" class="sol"/>
+        <text x="20" y="26" class="lbl-s">TAHTA HÂLÂ GÖRÜNÜYOR, SOLUK</text>
+        <rect x="24" y="44" width="272" height="310" rx="14" fill="#faf8f4" stroke="#1e2419" stroke-width="1.6"/>
+        <text x="106" y="76" class="lbl-b">HAMLE KALMADI</text>
+        <rect x="46" y="94" width="228" height="58" rx="8" class="fl dsh"/>
+        <text x="58" y="112" class="lbl-s">KALAN</text>
+        <rect x="58" y="120" width="26" height="20" rx="4" class="f dsh"/>
+        <text x="92" y="135" style="font:700 13px system-ui,sans-serif" fill="#b8562f">2</text>
+        <text x="120" y="135" class="lbl">Seedpod kaldı</text>
+        <circle cx="286" cy="104" r="9" fill="#2f6b3f"/><text x="283" y="108" class="nm">1</text>
+
+        <rect x="46" y="172" width="228" height="56" rx="28" fill="#b8562f"/>
+        <text x="96" y="196" style="font:700 13px system-ui,sans-serif" fill="#fff">+5 HAMLE</text>
+        <text x="122" y="214" style="font:600 11px system-ui,sans-serif" fill="#f5d9cc">◎ 600</text>
+        <circle cx="286" cy="172" r="9" fill="#2f6b3f"/><text x="283" y="176" class="nm">2</text>
+
+        <rect x="46" y="244" width="228" height="48" rx="24" fill="#faf8f4" stroke="#4a5443" stroke-width="1.6"/>
+        <text x="122" y="273" style="font:600 13px system-ui,sans-serif" fill="#1e2419">VAZGEÇ</text>
+        <circle cx="286" cy="244" r="9" fill="#2f6b3f"/><text x="283" y="248" class="nm">3</text>
+        <text x="72" y="322" class="lbl-s">Sonraki deneme ◎ 900. Bir can kullanılacak.</text>
+      </svg>
+    </div>
+    <ul class="wf-notes">
+      <li><b>1</b><strong>Ne kadar yakın olunduğunu tam sayı olarak göster.</strong> "İki Seedpod kaldı" bir bilgidir. %92'lik bir yüzde çubuğu ise bir satış tekniğidir, ve oyuncular farkı bilir.</li>
+      <li><b>2</b><strong>Teklif, fiyatlandırılmış ve giderek artıyor.</strong> Aynı bölüm içinde önce 600, sonra 900, sonra 1.400. Bölümden çıkınca sıfırlanıyor. Oyuncu bitirmeye kabaca bir hamleden daha uzaktaysa hiç gösterilmiyor, çünkü gerçekçi biçimde başarılı olamayacak bir teklif bir kere dönüşüm sağlar ve güveni kalıcı olarak tüketir.</li>
+      <li><b>3</b><strong>Reddetmek de gerçek bir buton.</strong> Kabul etmekle aynı boyutta, aynı okunabilirlikte, aynı ulaşılabilirlikte. Tür, dört puntoluk gri <em>hayır teşekkürler</em> linkleriyle dolu; bunlar yuvarlama hatası kadar kazanç getirir ve tam olarak bu oyunun tonunun üzerine kurulduğu iyi niyeti harcar.</li>
+    </ul>
+    </div>
+
+  </div>
+
+  <p>Bundan en az emin olduğum kısım o şerit. Telefonda 40 piksel dikey alana mal oluyor, ki bu 8×8'lik bir tahtada neredeyse bir satıra denk geliyor. Pollen Meter'ın bir yerde yaşaması gerekiyor, ama Seedpod tarafı gereksiz olabilir: ilk oynanabilir sürüm oyuncuların Seedpod'larını sadece tahtadan takip ettiğini gösterirse, o yarı silinir ve gösterge tüm genişliği kaplar. Daha büyük bir tahta, tahtanın zaten söylediğini tekrar eden bir etiketten her zaman daha iyidir.</p>
+</section>
+
+<section id="prototype">
+  <div class="part-label">Appendix</div>
+  <h2>Oynanabilir Prototip</h2>
+
+  <p class="lead"><strong>Case bir prototip istemiyordu.</strong> Yine de kendim için yaptım, çünkü çekirdeği tahmin etmek yerine ölçmek istedim. Bilerek basit, ve bir ustalık gösterisi olarak sunulmuyor: düzgün bir arayüz yok, sanat geçişi yok, onboarding yok, ve his kesinlikle bazı yerlerde yanlış; gerçek bir oyuncuyla geçirilecek tek bir oturum bunları ortaya çıkarır. Neye yaradığı ise dar, ve zaten var olma sebebi bu: Kısım IV'teki kuralların gerçekten çalıştığında tutarlı kaldığını gösteriyor, ve bu belgedeki küme sayılarıyla ölü tahta rakamları da buradan çıktı.</p>
+
+  <p><strong>Yan yana duran iki veya daha fazla aynı karoya dokun.</strong> Beş karo <strong>Ant Nest</strong>, yedi karo <strong>Puffball</strong>, dokuz karo <strong>Pollen Cloud</strong> yapar. Tek eksen, üç kademe, istisna yok. Tahtanın yanındaki <strong>Pollen Meter</strong> temizlediğin her karoyla doluyor; dolduğunda arılar tahtadaki en dirençli engelin bir katmanına hasar veriyor ve bar sıfırlanıyor.</p>
+
+  <p><strong>Seedpod</strong>'lar tahtada hazır duruyor; altlarını temizleyip alt sıraya indirerek toplarsın, power-up kombinasyonları fazladan düşürür. Aşağıdaki bölüm gerçek: hamle bütçesi, iki engel ve üç hedef, ve 1&ndash;25. bölümlerin kullandığı dört renkli set.</p>
+
+  <style>
+    .proto{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin:26px 0}
+    .proto-hud{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;align-items:center;font-family:var(--sans)}
+    .hud-chip{background:var(--paper-2);border:1px solid var(--line);border-radius:7px;
+      padding:6px 11px;font-size:13px;font-weight:600;color:var(--ink-2)}
+    .hud-chip b{color:var(--green);font-size:15px}
+    .hud-chip.goal b{color:var(--terra)}
+    .hud-chip.moves b{font-size:17px}
+    .proto-btn{background:var(--green);color:#fff;border:none;border-radius:7px;padding:7px 13px;
+      font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer}
+    .proto-btn.ghost{background:var(--paper-2);color:var(--ink-2);border:1px solid var(--line)}
+    #proto-reset{margin-left:auto}
+    .board-wrap{position:relative;max-width:400px;margin:0 auto}
+    #proto-board{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;touch-action:manipulation}
+    #fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .pt{position:absolute;width:6px;height:6px;border-radius:50%;opacity:.95;
+      transition:transform .42s cubic-bezier(.2,.7,.3,1),opacity .42s linear}
+    .cell{aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;
+      font-size:clamp(14px,4.2vw,20px);cursor:pointer;user-select:none;color:#fff;line-height:1}
+    .cell:active{transform:scale(.92)}
+    .cell.pu{border:2px solid #1e2419;box-shadow:0 0 0 2px rgba(255,255,255,.7) inset}
+    .cell.pod{background:#f2e7cf;color:#8a6b3a;border:2px solid #8a6b3a;font-size:clamp(15px,4.4vw,22px)}
+    .cell.leaf{background:#cdbf9a;color:#5a4a28}
+    .cell.pot{background:#b98a63;color:#4a2f1c;font-family:var(--sans);font-weight:800;font-size:13px}
+    .cell.pop{animation:pp .16s ease-out forwards}
+    @keyframes pp{to{transform:scale(.15);opacity:0}}
+    .cell.hit{animation:hh .18s ease-out}
+    @keyframes hh{40%{transform:translateY(-4px) scale(1.06)}}
+    .cell.drop{animation:dd .24s cubic-bezier(.3,.85,.4,1) backwards}
+    @keyframes dd{from{transform:translateY(-150%)}}
+    .cell.formed{animation:bl .5s ease-out}
+    @keyframes bl{0%{transform:scale(.6)}55%{transform:scale(1.18)}}
+    .proto-log{font-family:var(--sans);font-size:13.5px;color:var(--ink-2);
+      margin-top:14px;min-height:2.6em;text-align:center;line-height:1.5}
+    .proto-log b{color:var(--green)}
+    .proto-log.win{color:var(--green);font-weight:700}
+    .proto-log.lose{color:var(--terra);font-weight:700}
+    .proto-key{display:flex;flex-wrap:wrap;gap:6px 13px;justify-content:center;
+      margin-top:14px;font-family:var(--sans);font-size:12px;color:var(--ink-3)}
+    .proto-key span{display:flex;align-items:center;gap:5px}
+    .proto-key i{width:17px;height:17px;border-radius:4px;display:inline-flex;
+      align-items:center;justify-content:center;color:#fff;font-style:normal;font-size:11px}
+    .proto-note{font-family:var(--sans);font-size:13.5px;color:var(--ink-3);
+      margin-top:18px;line-height:1.55;border-top:1px solid var(--line);padding-top:14px}
+    @media(prefers-reduced-motion:reduce){
+      .cell.pop,.cell.drop,.cell.formed,.cell.hit{animation:none}
+      .pt{display:none}
+    }
+  </style>
+
+  <div class="proto">
+    <div class="proto-hud">
+      <span class="hud-chip moves">Hamle <b id="p-moves">25</b></span>
+      <span class="hud-chip goal">Yaprak <b id="p-leaf">5</b></span>
+      <span class="hud-chip goal">Saksı <b id="p-pot">3</b></span>
+      <span class="hud-chip goal">Seedpod <b id="p-pod">0</b>/2</span>
+      <span class="hud-chip">Polen <b id="p-pollen">0</b>/30</span>
+      <button id="proto-sound" class="proto-btn ghost" type="button">Ses: kapalı</button>
+      <button id="proto-reset" class="proto-btn" type="button">Sıfırla</button>
+    </div>
+    <div class="board-wrap"><div id="proto-board"></div><div id="fx"></div></div>
+    <div class="proto-log" id="p-log">25 hamlede 5 Dry Leaf, 3 Clay Pot temizle ve 2 Seedpod topla.</div>
+    <div class="proto-key">
+      <span><img src="../images/pu_antnest.png" class="tbl-icon" alt=""> 5 karo &rarr; Ant Nest</span>
+      <span><img src="../images/pu_puffball.png" class="tbl-icon" alt=""> 7 karo &rarr; Puffball</span>
+      <span><img src="../images/pu_pollencloud.png" class="tbl-icon" alt=""> 9 karo &rarr; Pollen Cloud</span>
+      <span><img src="../images/pu_beehive.png" class="tbl-icon" alt=""> Pollen Meter &rarr; arılar</span>
+      <span><img src="../images/seedpod.png" class="tbl-icon" alt=""> Seedpod</span>
+    </div>
+  </div>
+
+  <p class="print-only" style="font-family:var(--sans);font-size:14px;color:#4a5443;margin:0">
+    <strong>Bu prototip etkileşimli, baskıda çıkmıyor.</strong>
+    <strong>outwinder.com/dream</strong> adresinde, sayfanın sonunda çalışıyor.
+  </p>
+
+  <p class="proto-note"><strong>Bu prototip neyi uyguluyor, neyi uygulamıyor.</strong> Mantık: çekirdek fiil, çökme ve doldurma, Kısım IV'teki eşik ve etkileriyle üç power-up'ın hepsi, Pollen Meter ve tek engellik ödemesi, &#34;yan yana iki power-up birlikte ateşlenir&#34; düzeyinde kombinasyonlar, başlangıçta yerleştirilen ve bonus olarak düşen Seedpod'lar ile alt sırada toplanmaları, hamle bütçesi, üç hedef ve ilk iki engel. His: Kısım V'teki sütun başına gecikmeyle kademeli çökme ve yerine oturma bütçeleri, katmanlı partiküller, ve ses yoğunluk kuralı. Bütün sesler tarayıcıda üretiliyor, küme büyüdükçe her bir sesin şiddeti düşüyor, ve büyük bir temizlik ses şiddetiyle değil perde ve süreyle okunuyor. Sesi aç; Kısım V'in okunamayan kısmı orası.<br><br>Şunları <em>uygulamıyor</em>: diğer yedi engel, booster'lar, kombinasyon tablosundaki güçlendirilmiş sonuçlar, ve meta katmanının tamamı. Dört renkli seti çalıştırıyor, çünkü erken bandın bir bölümü örnek alındı.</p>
+
+  <script>
+  (function(){
+    var R=8,C=8,START_MOVES=25,POD_GOAL=2;
+    var COL={
+      g:{css:'#4a9d5f',img:'../images/el_fern.png',name:'Fern',hz:392.00},
+      r:{css:'#d4573a',img:'../images/el_poppy.png',name:'Poppy',hz:440.00},
+      y:{css:'#e0a92b',img:'../images/el_daisy.png',name:'Daisy',hz:493.88},
+      b:{css:'#3f8bc4',img:'../images/el_bluebell.png',name:'Bluebell',hz:587.33},
+      p:{css:'#8a5fb0',img:'../images/el_lavender.png',name:'Lavender',hz:659.25}
+    };
+    /* this is an early-band level, so it runs the four-colour set from Part III */
+    var KEYS=['g','r','y','b'];
+    var PU={
+      vine :{css:'#4a9d5f',img:'../images/pu_antnest.png',name:'Ant Nest'},
+      thorn:{css:'#d4573a',img:'../images/pu_puffball.png',name:'Puffball'},
+      cloud:{css:'#e0a92b',img:'../images/pu_pollencloud.png',name:'Pollen Cloud'}
+    };
+    var board=document.getElementById('proto-board'), fx=document.getElementById('fx');
+    var eM=document.getElementById('p-moves'), eL=document.getElementById('p-leaf'),
+        eP=document.getElementById('p-pot'), ePod=document.getElementById('p-pod'),
+        log=document.getElementById('p-log');
+    var g,moves,leafLeft,potLeft,pods,busy,over,dropCols,pollen;
+    var POLLEN_FULL=30;
+
+    /* ---------- audio: generated, nothing loaded ---------- */
+    var actx=null, sound=false;
+    function AC(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ sound=false; } } return actx; }
+    function tone(hz,dur,gain,type,delay,slideTo){
+      if(!sound)return; var a=AC(); if(!a)return;
+      var t0=a.currentTime+(delay||0);
+      var o=a.createOscillator(), gn=a.createGain();
+      o.type=type||'sine'; o.frequency.setValueAtTime(hz,t0);
+      if(slideTo)o.frequency.exponentialRampToValueAtTime(slideTo,t0+dur);
+      gn.gain.setValueAtTime(0.0001,t0);
+      gn.gain.exponentialRampToValueAtTime(Math.max(gain,0.0002),t0+0.012);
+      gn.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+      o.connect(gn); gn.connect(a.destination); o.start(t0); o.stop(t0+dur+0.02);
+    }
+    /* Part V density rule: per-event loudness falls as the count rises */
+    function sfxBlast(colour,n){
+      var base=COL[colour]?COL[colour].hz:440, voices=Math.min(n,8), per=0.075/Math.sqrt(n);
+      for(var i=0;i<voices;i++) tone(base*Math.pow(2,i/12), 0.09+n*0.006, per, 'triangle', i*0.026);
+      if(n>=5) tone(base/2, 0.22+n*0.01, 0.05/Math.sqrt(n), 'sine', 0.02);
+    }
+    function sfxForm(){ [0,4,7].forEach(function(st,i){ tone(392*Math.pow(2,st/12),0.18,0.06,'sine',i*0.05); }); }
+    function sfxPod(){ tone(174.6,0.26,0.08,'sine',0,233.1); }
+    function sfxCollect(){ [0,5,12].forEach(function(st,i){ tone(440*Math.pow(2,st/12),0.22,0.07,'sine',i*0.07); }); }
+    function sfxPower(){ tone(110,0.34,0.09,'sawtooth',0,330); tone(660,0.2,0.04,'triangle',0.03,990); }
+    function sfxHit(){ tone(150,0.08,0.05,'square'); }
+    function sfxEnd(win){
+      if(win)[0,5,9,14].forEach(function(st,i){ tone(392*Math.pow(2,st/12),0.3,0.07,'sine',i*0.1); });
+      else [0,-3,-7].forEach(function(st,i){ tone(330*Math.pow(2,st/12),0.3,0.05,'sine',i*0.12); });
+    }
+
+    /* ---------- particles ---------- */
+    function burstAt(idx,colour,tier){
+      if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+      var cell=board.children[idx]; if(!cell)return;
+      var br=board.getBoundingClientRect(), cr=cell.getBoundingClientRect();
+      var cx=cr.left-br.left+cr.width/2, cy=cr.top-br.top+cr.height/2;
+      var n=tier===3?14:(tier===2?8:5);
+      for(var i=0;i<n;i++){
+        var d=document.createElement('div'); d.className='pt';
+        d.style.background=colour; d.style.left=cx+'px'; d.style.top=cy+'px';
+        if(tier===3){ d.style.width='8px'; d.style.height='8px'; }
+        fx.appendChild(d);
+        (function(el){
+          var ang=Math.random()*6.283, dist=(tier===3?34:20)+Math.random()*26;
+          requestAnimationFrame(function(){
+            el.style.transform='translate('+(Math.cos(ang)*dist)+'px,'+(Math.sin(ang)*dist+16)+'px) scale(.3)';
+            el.style.opacity='0';
+          });
+          setTimeout(function(){ el.remove(); }, tier===3?620:320);
+        })(d);
+      }
+    }
+
+    function rnd(){ return KEYS[(Math.random()*KEYS.length)|0]; }
+    function inb(r,c){ return r>=0&&r<R&&c>=0&&c<C; }
+    function say(h,cls){ log.className='proto-log'+(cls?' '+cls:''); log.innerHTML=h; }
+    function wait(ms){ return new Promise(function(res){ setTimeout(res,ms); }); }
+
+    function init(){
+      g=[];
+      for(var r=0;r<R;r++){ var row=[]; for(var c=0;c<C;c++) row.push({t:'tile',k:rnd()}); g.push(row); }
+      [[2,1],[3,5],[5,2],[6,6],[4,0]].forEach(function(s){ g[s[0]][s[1]]={t:'leaf'}; });
+      [[5,4],[2,3],[6,1]].forEach(function(s,i){ g[s[0]][s[1]]={t:'pot',layers:(i%2)+1}; });
+      [[3,2],[4,6]].forEach(function(s){ g[s[0]][s[1]]={t:'pod'}; });
+      moves=START_MOVES; leafLeft=5; potLeft=3; pods=0; pollen=0;
+      busy=false; over=false; dropCols=null;
+      say('25 hamlede 5 Dry Leaf, 3 Clay Pot temizle ve 2 Seedpod topla.');
+      render();
+    }
+    function hud(){ eM.textContent=moves; eL.textContent=leafLeft; eP.textContent=potLeft; ePod.textContent=pods;
+      var el=document.getElementById('p-pollen'); if(el)el.textContent=pollen; }
+
+    function render(flash){
+      board.innerHTML='';
+      for(var r=0;r<R;r++)for(var c=0;c<C;c++){
+        var x=g[r][c], d=document.createElement('div');
+        d.className='cell'; d.dataset.r=r; d.dataset.c=c;
+        if(!x){ d.style.background='#e4e0d6'; }
+        else if(x.t==='tile'){
+          var item=COL[x.k];
+          d.style.background=item.css;
+          var im=document.createElement('img'); im.src=item.img; im.className='cell-icon'; im.alt=item.name;
+          d.appendChild(im);
+          if(dropCols&&dropCols.indexOf(c)>=0){ d.classList.add('drop'); d.style.animationDelay=(c*30)+'ms'; }
+        }
+        else if(x.t==='leaf'){ d.classList.add('leaf'); d.textContent='❀'; d.title='Dry Leaf'; }
+        else if(x.t==='pot'){ d.classList.add('pot'); d.textContent=x.layers; d.title='Clay Pot, '+x.layers+' katman'; }
+        else if(x.t==='pod'){
+          d.classList.add('pod'); d.title='Seedpod: alt s\u0131raya indir';
+          var im=document.createElement('img'); im.src='../images/seedpod.png'; im.className='cell-icon'; im.alt='Seedpod';
+          d.appendChild(im);
+        }
+        else {
+          var p=PU[x.k]; d.classList.add('pu'); d.style.background=p.css; d.title=p.name;
+          var im=document.createElement('img'); im.src=p.img; im.className='cell-icon'; im.alt=p.name;
+          d.appendChild(im);
+          if(flash&&flash.indexOf(r+','+c)>=0)d.classList.add('formed');
+        }
+        d.addEventListener('click',onTap);
+        board.appendChild(d);
+      }
+      dropCols=null; hud();
+    }
+
+    function cluster(r,c){
+      var k=g[r][c].k, seen={}, out=[], st=[[r,c]];
+      while(st.length){
+        var q=st.pop(), y=q[0], x=q[1], id=y+','+x;
+        if(seen[id]||!inb(y,x))continue;
+        var cell=g[y][x];
+        if(!cell||cell.t!=='tile'||cell.k!==k)continue;
+        seen[id]=1; out.push([y,x]);
+        st.push([y+1,x],[y-1,x],[y,x+1],[y,x-1]);
+      }
+      return out;
+    }
+
+    function damageNeighbours(cells){
+      var done={}, any=false;
+      cells.forEach(function(h){
+        [[h[0]+1,h[1]],[h[0]-1,h[1]],[h[0],h[1]+1],[h[0],h[1]-1]].forEach(function(n){
+          var y=n[0],x=n[1],id=y+','+x;
+          if(!inb(y,x)||done[id])return;
+          var o=g[y][x]; if(!o)return;
+          if(o.t==='leaf'){ done[id]=1; g[y][x]=null; leafLeft--; any=true; }
+          else if(o.t==='pot'){ done[id]=1; o.layers--; any=true;
+            if(o.layers<=0){ g[y][x]=null; potLeft--; } }
+        });
+      });
+      return any;
+    }
+
+    /* everything that is not a power-up or a pod obeys gravity; pods and power-ups fall too */
+    function settle(){
+      var touched=[];
+      for(var c=0;c<C;c++){
+        var keep=[], changed=false;
+        for(var r=R-1;r>=0;r--) if(g[r][c]) keep.push(g[r][c]);
+        for(var r2=R-1,i=0;r2>=0;r2--,i++){
+          var nv = i<keep.length ? keep[i] : {t:'tile',k:rnd()};
+          if(g[r2][c]!==nv) changed=true;
+          g[r2][c]=nv;
+        }
+        if(changed)touched.push(c);
+      }
+      return touched;
+    }
+
+    /* a Seedpod resting on the bottom row is collected */
+    /* Pollen Meter: fills from cleared tiles, pays out one obstacle layer */
+    function addPollen(n){
+      pollen+=n;
+      if(pollen<POLLEN_FULL)return null;
+      pollen-=POLLEN_FULL;
+      var tgt=null,best=-1;
+      for(var y=0;y<R;y++)for(var x=0;x<C;x++){
+        var o=g[y][x]; if(!o)continue;
+        var w = o.t==='pot' ? 10+o.layers : (o.t==='leaf' ? 5 : 0);
+        if(w>best){ best=w; tgt=[y,x]; }
+      }
+      if(!tgt)return null;
+      var o=g[tgt[0]][tgt[1]];
+      if(o.t==='leaf'){ g[tgt[0]][tgt[1]]=null; leafLeft--; }
+      else if(o.t==='pot'){ o.layers--; if(o.layers<=0){ g[tgt[0]][tgt[1]]=null; potLeft--; } }
+      sfxPod(); burstAt(idxOf(tgt[0],tgt[1]),'#c98a1e',2);
+      return '<b>Pollen Meter</b> doldu. Ar\u0131lar en diren\u00e7li engelden bir katman ald\u0131.';
+    }
+
+    function collectPods(){
+      var n=0;
+      for(var c=0;c<C;c++){
+        if(g[R-1][c]&&g[R-1][c].t==='pod'){ g[R-1][c]=null; pods++; n++; }
+      }
+      return n;
+    }
+
+    function commonColour(cells){
+      var t={},best=null,bn=-1,k;
+      cells.forEach(function(q){ var x=g[q[0]][q[1]]; if(x&&x.t==='tile')t[x.k]=(t[x.k]||0)+1; });
+      for(k in t) if(t[k]>bn){ bn=t[k]; best=k; }
+      return best;
+    }
+
+    function plan(kind,r,c,colour){
+      var hit=[],convert=[];
+      function add(y,x){ if(inb(y,x)&&g[y][x]&&g[y][x].t==='tile')hit.push([y,x]); }
+      if(kind==='vine'){
+        if(Math.random()<0.5){ for(var x1=0;x1<C;x1++)add(r,x1); }
+        else { for(var y1=0;y1<R;y1++)add(y1,c); }
+      }
+      else if(kind==='thorn'){ for(var a=-2;a<=2;a++)for(var b=-2;b<=2;b++)add(r+a,c+b); }
+      else if(kind==='cloud'){
+        var target=colour||commonColour([[r,c]])||rnd();
+        for(var y2=0;y2<R;y2++)for(var x2=0;x2<C;x2++)
+          if(g[y2][x2]&&g[y2][x2].t==='tile'&&g[y2][x2].k===target)hit.push([y2,x2]);
+      }
+      else if(kind==='hive'){
+        /* Royal Match's Propeller: pick the hardest obstacle on the board, go there */
+        var tgt=null,best=-1;
+        for(var y3=0;y3<R;y3++)for(var x3=0;x3<C;x3++){
+          var o=g[y3][x3]; if(!o)continue;
+          var w = o.t==='pot' ? 10+o.layers : (o.t==='leaf' ? 5 : 0);
+          if(w>best){ best=w; tgt=[y3,x3]; }
+        }
+        if(tgt){
+          hit.push(['TARGET',tgt[0],tgt[1]]);
+          for(var a4=-1;a4<=1;a4++)for(var b5=-1;b5<=1;b5++)add(tgt[0]+a4,tgt[1]+b5);
+        } else {
+          for(var a5=-1;a5<=1;a5++)for(var b6=-1;b6<=1;b6++)add(r+a5,c+b6);
+        }
+      }
+      return {hit:hit,convert:convert};
+    }
+
+    function idxOf(r,c){ return r*C+c; }
+    function markPop(cells){ cells.forEach(function(h){ var el=board.children[idxOf(h[0],h[1])]; if(el)el.classList.add('pop'); }); }
+    function markHit(cells){
+      var done={};
+      cells.forEach(function(h){
+        [[h[0]+1,h[1]],[h[0]-1,h[1]],[h[0],h[1]+1],[h[0],h[1]-1]].forEach(function(n){
+          var id=n[0]+','+n[1];
+          if(!inb(n[0],n[1])||done[id])return;
+          var o=g[n[0]][n[1]]; if(!o||(o.t!=='leaf'&&o.t!=='pot'))return;
+          done[id]=1; var el=board.children[idxOf(n[0],n[1])]; if(el)el.classList.add('hit');
+        });
+      });
+    }
+
+    function checkEnd(){
+      if(leafLeft<=0&&potLeft<=0&&pods>=POD_GOAL){ over=true; sfxEnd(true);
+        say('B\u00f6l\u00fcm tamamland\u0131, <b>'+moves+'</b> hamle artt\u0131.','win'); return true; }
+      if(moves<=0){ over=true; sfxEnd(false);
+        say('Hamleler bitti. '+leafLeft+' Dry Leaf, '+potLeft+' Clay Pot ve '+Math.max(0,POD_GOAL-pods)+' Seedpod kald\u0131. Tekrar denemek i\u00e7in s\u0131f\u0131rla.','lose');
+        return true; }
+      return false;
+    }
+
+    function resolve(msg,tier,flash){
+      dropCols=settle();
+      var got=collectPods();
+      if(got)sfxCollect();
+      return wait(tier>=3?260:150).then(function(){
+        render(flash);
+        return wait(tier>=3?300:200);
+      }).then(function(){
+        if(!checkEnd()) say(got? msg+' <b>'+got+'</b> Seedpod topland\u0131.' : msg);
+        busy=false;
+      });
+    }
+
+    function onTap(e){
+      if(busy||over)return;
+      var r=+e.currentTarget.dataset.r, c=+e.currentTarget.dataset.c, cell=g[r][c];
+      if(!cell)return;
+
+      if(cell.t==='leaf'||cell.t==='pot'||cell.t==='pod'){
+        say(cell.t==='leaf'?'Dry Leaf, yan\u0131nda patlatt\u0131\u011f\u0131nda temizlenir.'
+          : cell.t==='pot'?'Clay Pot, yan\u0131ndaki her patlamada bir katman kaybeder.'
+          : 'Seedpod alt s\u0131raya indi\u011finde toplan\u0131r. Alt\u0131n\u0131 temizle.');
+        return;
+      }
+      if(cell.t==='pu'){ busy=true; moves--; fireAt(r,c,cell.k); return; }
+
+      var cl=cluster(r,c);
+      if(cl.length<2){ say('Tek karo patlat\u0131lamaz. Yan yana iki veya daha fazlas\u0131n\u0131 bul.'); return; }
+      busy=true; moves--;
+      var n=cl.length, colour=cell.k;
+      sfxBlast(colour,n);
+      markPop(cl); markHit(cl);
+      cl.forEach(function(h,i){ if(i<10)burstAt(idxOf(h[0],h[1]),COL[colour].css,n>=5?2:1); });
+
+      wait(160).then(function(){
+        if(damageNeighbours(cl))sfxHit();
+        cl.forEach(function(h){ g[h[0]][h[1]]=null; });
+        var beeMsg=addPollen(n);
+
+        var made=null, flash=[];
+        if(n>=5){
+          if(n>=9) made='cloud';
+          else if(n>=7) made='thorn';
+          else made='vine';
+          g[r][c]={t:'pu',k:made}; flash.push(r+','+c); sfxForm();
+          burstAt(idxOf(r,c),PU[made].css,2);
+        }
+        if(n>=9){
+          var spot=null;
+          for(var x=0;x<C&&!spot;x++) if(g[0][x]===null) spot=[0,x];
+          if(!spot)for(var y=0;y<R&&!spot;y++)for(var x2=0;x2<C&&!spot;x2++) if(g[y][x2]===null) spot=[y,x2];
+          if(spot){ g[spot[0]][spot[1]]={t:'pod'}; sfxPod(); }
+        }
+
+        var msg;
+        if(made) msg='<b>'+n+'</b> karo temizlendi. Bu bir <b>'+PU[made].name+'</b> yapar.';
+        else msg=n+' karo temizlendi. Be\u015f ve \u00fczeri bir power-up yapar.';
+        if(beeMsg) msg=beeMsg;
+        return resolve(msg, n>=5?2:1, flash);
+      });
+    }
+
+    function fireAt(r,c,kind){
+      var partners=[[r+1,c],[r-1,c],[r,c+1],[r,c-1]].filter(function(q){
+        return inb(q[0],q[1])&&g[q[0]][q[1]]&&g[q[0]][q[1]].t==='pu'; });
+      var names=[PU[kind].name], all={hit:[],convert:[]};
+      g[r][c]=null;
+      var e1=plan(kind,r,c,null);
+      all.hit=all.hit.concat(e1.hit); all.convert=all.convert.concat(e1.convert);
+      partners.forEach(function(q){
+        var y=q[0],x=q[1]; if(!g[y][x]||g[y][x].t!=='pu')return;
+        var k2=g[y][x].k; g[y][x]=null;
+        var e2=plan(k2,y,x,null);
+        all.hit=all.hit.concat(e2.hit); all.convert=all.convert.concat(e2.convert);
+        names.push(PU[k2].name);
+      });
+      var combined=names.length>1;
+      sfxPower();
+      markPop(all.hit); markHit(all.hit);
+      all.hit.forEach(function(h,i){ if(i<14)burstAt(idxOf(h[0],h[1]),PU[kind].css,3); });
+
+      wait(200).then(function(){
+        var targets=all.hit.filter(function(h){return h[0]==='TARGET';});
+        all.hit=all.hit.filter(function(h){return h[0]!=='TARGET';});
+        targets.forEach(function(t){
+          var o=g[t[1]][t[2]]; if(!o)return;
+          if(o.t==='leaf'){ g[t[1]][t[2]]=null; leafLeft--; }
+          else if(o.t==='pot'){ g[t[1]][t[2]]=null; potLeft--; }
+        });
+        if(targets.length)sfxHit();
+        if(damageNeighbours(all.hit))sfxHit();
+        var beeMsg2=addPollen(all.hit.length);
+        var conv=all.convert.length?commonColour(all.convert):null;
+        all.convert.forEach(function(q){ if(g[q[0]][q[1]]&&g[q[0]][q[1]].t==='tile'&&conv)g[q[0]][q[1]]={t:'tile',k:conv}; });
+        all.hit.forEach(function(h){ if(g[h[0]][h[1]]&&g[h[0]][h[1]].t==='tile')g[h[0]][h[1]]=null; });
+
+        if(combined){
+          var spot=null;
+          for(var x=0;x<C&&!spot;x++) if(g[0][x]===null) spot=[0,x];
+          if(spot){ g[spot[0]][spot[1]]={t:'pod'}; sfxPod(); }
+        }
+        var label=combined?'<b>'+names.join(' + ')+'</b> birle\u015fti':'<b>'+names[0]+'</b> ate\u015flendi';
+        var msg2=label+': '+all.hit.length+' karo temizlendi'+(combined?', ve bir Seedpod d\u00fc\u015ft\u00fc':'')+'.';
+        if(beeMsg2) msg2=beeMsg2;
+        return resolve(msg2,3,[]);
+      });
+    }
+
+    document.getElementById('proto-reset').addEventListener('click',function(){ init(); });
+    document.getElementById('proto-sound').addEventListener('click',function(){
+      sound=!sound;
+      if(sound){ var a=AC(); if(a&&a.state==='suspended')a.resume(); tone(523.25,0.12,0.06,'sine'); }
+      this.textContent='Ses: '+(sound?'a\u00e7\u0131k':'kapal\u0131');
+      this.className='proto-btn '+(sound?'':'ghost');
+    });
+    init();
+  })();
+  </script>
+</section>
+
+
+
+<footer class="wrap">
+  <p><strong>Enes Duruk</strong> · <a href="https://outwinder.com">outwinder.com</a> · Oyun tasarım çalışması, Eylül 2026.</p>
+  <p style="margin-top:8px">Analiz, Royal Match, Royal Kingdom ve Toon Blast’i kendi oynayışıma dayanıyor; ilerleme verileri her iki oyun için topluluk dokümantasyonuyla karşılaştırılarak doğrulandı. Kısım II–VIII arasındaki tüm tasarım bana ait.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var nav=document.querySelector('.topnav-inner');
+  if(!nav)return;
+  var links=[].slice.call(nav.querySelectorAll('a[href^="#"]'));
+  var map=links.map(function(a){
+    var el=document.getElementById(a.getAttribute('href').slice(1));
+    return el?{a:a,el:el}:null;
+  }).filter(Boolean);
+  if(!map.length)return;
+
+  var current=null,ticking=false;
+
+  function update(){
+    var navH=nav.getBoundingClientRect().height;
+    var probe=navH+40;                       // just under the sticky bar
+    var found=null;
+    for(var i=0;i<map.length;i++){
+      var r=map[i].el.getBoundingClientRect();
+      if(r.top<=probe && r.bottom>probe){found=map[i];break;}
+      if(r.top>probe){break;}
+      found=map[i];                           // last one that started above the probe
+    }
+    // past the final section, keep the last link lit
+    if(!found && window.innerHeight+window.scrollY>=document.body.scrollHeight-4)
+      found=map[map.length-1];
+    if(found===current)return;
+    if(current)current.a.classList.remove('active');
+    current=found;
+    if(!current)return;
+    current.a.classList.add('active');
+    // keep the active tab visible in the horizontally scrolling bar
+    var ar=current.a.getBoundingClientRect(),nr=nav.getBoundingClientRect();
+    if(ar.left<nr.left+8)      nav.scrollLeft+=ar.left-nr.left-16;
+    else if(ar.right>nr.right-8) nav.scrollLeft+=ar.right-nr.right+16;
+  }
+  var last=0;
+  function onScroll(){
+    var now=Date.now();
+    if(now-last>=60){ last=now; update(); return; }
+    if(ticking)return;
+    ticking=true;
+    setTimeout(function(){ ticking=false; last=Date.now(); update(); },60);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll,{passive:true});
+  update();
+})();
+</script>
+</body>
+</html>
