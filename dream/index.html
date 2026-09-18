@@ -227,7 +227,7 @@ footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47
 
   <h3>1 · Game Mechanics</h3>
 
-  <p>The two games ask for different kinds of decision.</p>
+  <p>The two games ask for different kinds of decisions.</p>
 
   <p><strong>Royal Match asks you to find a shape.</strong> You swap two adjacent tiles, and the move's value lies in the geometry you produce. Four in a line makes a Rocket. Four in a square makes a Propeller. Five in an L or T makes a TNT. Five in a line makes a Light Ball. The board is full of legal moves and most of them are worth nothing, so the skill is scanning for the few that are.</p>
 
@@ -347,7 +347,7 @@ footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47
 
   <h3>Royal Kingdom</h3>
 
-  <p>Royal Kingdom is a swap match-3, and over fifty minutes of it the moment-to-moment play is hard to tell apart from Royal Match. What I could see differ is the meta: a wider district-scale restoration view in place of room-by-room close-ups. The boss levels are the one place the board itself behaves differently. You are attacking a structure rather than clearing a goal, and where you make the break decides where the attack lands, so position becomes a decision Royal Match never asks the player to make. The animated rescue set pieces around them are not the difference; Royal Match and Toon Blast both run those.</p>
+  <p>Royal Kingdom is a swap match-3, and over fifty minutes of it the moment-to-moment play is hard to tell apart from Royal Match. Where I could see it differ is the meta: a wider district-scale restoration view in place of room-by-room close-ups. The boss levels are the one place the board itself behaves differently. You are attacking a structure rather than clearing a goal, and where you make the break decides where the attack lands, so position becomes a decision Royal Match never asks the player to make. The animated rescue set pieces around them are not the difference; Royal Match and Toon Blast both run those.</p>
 
   <p>I read the pair as a portfolio decision. Same verb, different meta, aimed at the second slot on a player's phone. It is also the clearest argument that a blast title is the open position, since it is the one question the existing engine cannot answer.</p>
 
@@ -366,7 +366,7 @@ footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47
 
   <p class="lead"><strong>Bloomrise</strong> is a casual tap-to-blast puzzle game set in a valley of abandoned glasshouses. Tap two or more adjacent flowers to blast them, and the tiles above fall into the gap. Every level you finish earns a Sprout, and Sprouts bring one more corner of the valley back into bloom.</p>
 
-  <p>The cast is small. Mira, a botanist who has inherited a ruined estate, and Burrow, a mole who does the digging and is confidently wrong about most things. The player restores the Glasshouse, then the Orchard, then the Terraces, and on up the valley. The theme is warm, character-led and deliberately familiar, and so is the core.</p>
+  <p>The cast is small. Mira, a botanist who has inherited a ruined estate, and Burrow, a mole who does the digging and is confidently wrong about most things. The player restores the Glasshouse, then the Orchard, then the Terraces, and on up the valley. Nothing about the wrapper is trying to surprise anyone; the surprise, such as it is, is in the core.</p>
 
   <h3>The core, stated plainly</h3>
 
@@ -680,7 +680,7 @@ footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47
 
   <h3>Power-ups</h3>
 
-  <p>Three come from cluster size, one from position. Here is what each actually does on a standard 8×8 board at five colours, because a ladder built on vague descriptions is a ladder nobody can tune.</p>
+  <p>All three come from cluster size, on one axis. Here is what each actually does on a standard 8×8 board at five colours, because a ladder built on vague descriptions is a ladder nobody can tune.</p>
 
   <div class="tbl-scroll">
   <table>
@@ -707,7 +707,7 @@ footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47
     <thead><tr><th>Combination</th><th>Result</th></tr></thead>
     <tbody>
       <tr><td><img src="images/pu_antnest.png" class="tbl-icon" alt=""><img src="images/pu_antnest.png" class="tbl-icon" alt=""> Ant Nest + Ant Nest</td><td>Clears the full row <em>and</em> the full column.</td></tr>
-      <tr><td><img src="images/pu_antnest.png" class="tbl-icon" alt=""><img src="images/pu_puffball.png" class="tbl-icon" alt=""> Ant Nest + Puffball</td><td>The line clears, and a 5×5 detonates at each end of it.</td></tr>
+      <tr><td><img src="images/pu_antnest.png" class="tbl-icon" alt=""><img src="images/pu_puffball.png" class="tbl-icon" alt=""> Ant Nest + Puffball</td><td>The row or column clears (following the Ant Nest's orientation), and a 5×5 detonates at each end of it.</td></tr>
       <tr><td><img src="images/pu_puffball.png" class="tbl-icon" alt=""><img src="images/pu_puffball.png" class="tbl-icon" alt=""> Puffball + Puffball</td><td>7×7, strips two obstacle layers.</td></tr>
       <tr><td><img src="images/pu_pollencloud.png" class="tbl-icon" alt=""><img src="images/pu_antnest.png" class="tbl-icon" alt=""> Pollen Cloud + Ant Nest</td><td>Every tile of the chosen colour becomes an Ant Nest, then all fire.</td></tr>
       <tr><td><img src="images/pu_pollencloud.png" class="tbl-icon" alt=""><img src="images/pu_puffball.png" class="tbl-icon" alt=""> Pollen Cloud + Puffball</td><td>Every tile of the chosen colour becomes a Puffball, then all fire.</td></tr>
@@ -857,7 +857,7 @@ footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47
   </table>
   </div>
 
-  <p>Haptics follow the same tiering and are off by default above tier 3, because continuous haptic feedback drains battery and is the second thing players turn off. Root and bloom get a light tap, detonations a medium one, and nothing else vibrates.</p>
+  <p>Haptics follow the same tiering. Below tier 4 nothing vibrates, because continuous haptic feedback drains battery and is the second thing players turn off. Detonations get a medium tap, combinations a strong one, and everything else is silent.</p>
 
   <h3>Accessibility, treated as a feature</h3>
 
@@ -1073,7 +1073,7 @@ footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47
     <thead><tr><th>Position</th><th>Role</th><th>Difficulty</th></tr></thead>
     <tbody>
       <tr><td class="num">1–2</td><td>Recovery. Clean win, rhythm restored.</td><td>Low</td></tr>
-      <tr><td class="num">3–4</td><td>Teaching. New element, forgiving frame.</td><td>Low–medium</td></tr>
+      <tr><td class="num">3–4</td><td>Teaching. New element, forgiving frame.</td><td>Low to medium</td></tr>
       <tr><td class="num">5–6</td><td>Application. The new element at a real budget.</td><td>Medium</td></tr>
       <tr><td class="num">7</td><td>Spike. Two systems at once.</td><td>High</td></tr>
       <tr><td class="num">8–10</td><td>Consolidation. Varied boards, nothing new.</td><td>Medium, descending</td></tr>
@@ -1101,11 +1101,11 @@ footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47
     <li><strong>Fast.</strong> Short budgets where the level resolves in a handful of moves and power-ups barely feature. Legitimate as a change of pace, but more than one in ten and the ladder stops being the game.</li>
   </ul>
 
-  <p>Level 35, the combination tutorial, is the hardest board in the first fifty to author and the reason it is scheduled. It is a narrow eight-wide board with two guaranteed open columns side by side, obstacle placement that funnels large clusters into both, and a budget generous enough that a player will make two power-ups before they are forced to spend one. Nothing explains the combination. The board makes it likely and the player discovers it.</p>
+  <p>Level 35, the combination tutorial, is the hardest board in the first fifty to author and the reason it is scheduled. It is an eight-wide board with two guaranteed open columns side by side, obstacle placement that funnels large clusters into both, and a budget generous enough that a player will make two power-ups before they are forced to spend one. Nothing explains the combination. The board makes it likely and the player discovers it.</p>
 
   <h3>What I would measure</h3>
 
-  <p>These targets are starting hypotheses. I have no telemetry from either reference game, and a first live cohort would correct them within a week.</p>
+  <p>These targets are starting hypotheses. I have no telemetry from any of the three reference games, and a first live cohort would correct them within a week.</p>
 
   <div class="tbl-scroll">
   <table>
@@ -1907,7 +1907,7 @@ footer a{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(47
 
 <footer class="wrap">
   <p><strong>Enes Duruk</strong> · <a href="https://outwinder.com">outwinder.com</a> · Game design study, September 2026.</p>
-  <p style="margin-top:8px">Analysis based on my own play of Royal Match, Royal Kingdom and Toon Blast, with progression data cross-referenced against community documentation for both titles. All design in Parts II to VIII is my own.</p>
+  <p style="margin-top:8px">Analysis based on my own play of Royal Match, Royal Kingdom and Toon Blast, with progression data cross-referenced against community documentation for all three titles. All design in Parts II to VIII is my own.</p>
 </footer>
 
 </div>
